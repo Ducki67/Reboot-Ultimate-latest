@@ -769,7 +769,10 @@ DWORD WINAPI Main(LPVOID)
         return 1;
     }
 
+    std::cout << std::format("Base Address: 0x{:x}\n", __int64(GetModuleHandleW(0)));
+
     LOG_INFO(LogInit, "Initializing Reboot Ultimate!");
+    LOG_INFO(LogDev, "Built on {} {}", __DATE__, __TIME__);
 
     Addresses::SetupVersion();
 
@@ -866,7 +869,6 @@ DWORD WINAPI Main(LPVOID)
 
     Hooking::MinHook::Hook((PVOID)Addresses::KickPlayer, (PVOID)AGameSession::KickPlayerHook, (PVOID*)&AGameSession::KickPlayerOriginal);
 
-    LOG_INFO(LogDev, "Built on {} {}", __DATE__, __TIME__);
     LOG_INFO(LogDev, "Size: 0x{:x}", sizeof(TMap<FName, void*>));
 
     Hooking::MinHook::Hook((PVOID)Addresses::ActorGetNetMode, (PVOID)GetNetModeHook2, nullptr);
@@ -1016,8 +1018,8 @@ DWORD WINAPI Main(LPVOID)
 
         if (!matchmaking)
             matchmaking = Memcury::Scanner::FindPattern("83 7D 88 01 7F 0D 48 8B CE E8", false).Get();
-        // if (!matchmaking)
-            // matchmaking = Memcury::Scanner::FindPattern("83 BD ? ? ? ? ? 7F 18 49 8D 4D D8 48 8B D7 E8").Get(); // 4.20
+        if (!matchmaking)
+            matchmaking = Memcury::Scanner::FindPattern("83 BD ? ? ? ? ? 7F 18 49 8D 4D D8 48 8B D7 E8").Get(); // 4.20
 
         bool bMatchmakingSupported = matchmaking && Engine_Version >= 420;
         int idx = 0;
@@ -1238,7 +1240,7 @@ DWORD WINAPI Main(LPVOID)
             AFortPlayerControllerAthena::ServerRequestSeatChangeHook, (PVOID*)&AFortPlayerControllerAthena::ServerRequestSeatChangeOriginal, false);
 
     // if (false)
-    if (Fortnite_Version > 6.10) // so on 6.10 there isa param and our little finder dont work for that so
+    if (Fortnite_Version > 6.20) // so on 6.20 & below there is a param and our little finder dont work for that so
     {
         Hooking::MinHook::Hook(FortPlayerControllerAthenaDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerControllerGameplay.StartGhostMode"), // (Milxnor) TODO: This changes to a component in later seasons.
             AFortPlayerControllerAthena::StartGhostModeHook, (PVOID*)&AFortPlayerControllerAthena::StartGhostModeOriginal, false, true); // We can exec hook since it only gets called via blueprint.

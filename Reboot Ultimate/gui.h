@@ -500,6 +500,8 @@ static inline void StaticUI()
 	ImGui::Checkbox("Infinite Ammo", &Globals::bInfiniteAmmo);
 	ImGui::Checkbox("Infinite Materials", &Globals::bInfiniteMaterials);
 
+	ImGui::Checkbox("Private IP's are Operator", &Globals::bPrivateIPsAreOperator);
+
 	ImGui::Checkbox("No MCP", &Globals::bNoMCP);
 
 	if (Addresses::ApplyGadgetData && Addresses::RemoveGadgetData && Engine_Version < 424)
@@ -553,7 +555,7 @@ static inline void MainTabs()
 			}
 		}
 
-		if (ImGui::BeginTabItem(("Storm")))
+		if (ImGui::BeginTabItem(("Zone")))
 		{
 			Tab = ZONE_TAB;
 			PlayerTab = -1;
@@ -954,6 +956,11 @@ static inline void MainUI()
 					bool bWillBeLategame = Globals::bLateGame.load();
 					ImGui::Checkbox("Lategame", &bWillBeLategame);
 					SetIsLategame(bWillBeLategame);
+				}
+
+				if (!Globals::bStartedListening)
+				{
+					ImGui::SliderInt("Players Required to Start the Match", &WarmupRequiredPlayerCount, 1, 100);
 				}
 
 				ImGui::Text(std::format("Joinable {}", Globals::bStartedListening).c_str());
@@ -1851,6 +1858,8 @@ static inline void PregameUI()
 
 		ImGui::SliderInt("Seconds until load into map", &SecondsUntilTravel, 1, 100);
 	}
+
+	ImGui::SliderInt("Players Required to Start the Match", &WarmupRequiredPlayerCount, 1, 100);
 		
 	if (!Globals::bCreative)
 		ImGui::InputText("Playlist", &PlaylistName);
