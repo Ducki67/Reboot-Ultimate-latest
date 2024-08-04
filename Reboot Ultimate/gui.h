@@ -958,18 +958,18 @@ static inline void MainUI()
 					SetIsLategame(bWillBeLategame);
 				}
 
+				ImGui::Text(std::format("Joinable: {}", Globals::bStartedListening).c_str());
+
 				if (!Globals::bStartedListening)
 				{
 					ImGui::SliderInt("Players Required to Start the Match", &WarmupRequiredPlayerCount, 1, 100);
 				}
 
-				ImGui::Text(std::format("Joinable {}", Globals::bStartedListening).c_str());
-
 				if (!Globals::bStartedListening) // hm
 				{
 					auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
 					GET_PLAYLIST(GameState);
-					ImGui::SliderInt("Players required to start the match", &WarmupRequiredPlayerCount, 1, CurrentPlaylist->GetMaxPlayers());
+					ImGui::SliderInt("Players Required to Start the Match", &WarmupRequiredPlayerCount, 1, CurrentPlaylist->GetMaxPlayers());
 				}
 
 				static std::string ConsoleCommand;
@@ -1856,10 +1856,10 @@ static inline void PregameUI()
 			// ImGui::InputText("Custom Map", &CustomMapName);
 		}
 
-		ImGui::SliderInt("Seconds until load into map", &SecondsUntilTravel, 1, 100);
+		ImGui::SliderInt("Seconds Until Start", &SecondsUntilTravel, 1, 100);
 	}
 
-	ImGui::SliderInt("Players Required to Start the Match", &WarmupRequiredPlayerCount, 1, 100);
+	ImGui::SliderInt("Players Required to Start", &WarmupRequiredPlayerCount, 1, 100);
 		
 	if (!Globals::bCreative)
 		ImGui::InputText("Playlist", &PlaylistName);
