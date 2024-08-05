@@ -167,6 +167,21 @@ void AActor::SetActorEnableCollision(bool bNewActorEnableCollision)
 	this->ProcessEvent(SetActorEnableCollisionFn, &bNewActorEnableCollision);
 }
 
+bool AActor::GetActorEnableCollision() const
+{
+	static auto bActorEnableCollisionOffset = GetOffset("bActorEnableCollision");
+	static auto bActorEnableCollisionFieldMask = GetFieldMask(GetProperty("bActorEnableCollision"));
+	return ReadBitfieldValue(bActorEnableCollisionOffset, bActorEnableCollisionFieldMask);
+}
+
+bool AActor::ReadBitfieldValue(int32 Offset, uint32 FieldMask) const
+{
+	// Implement the logic to read the bitfield value
+	// This is a placeholder implementation
+	const uint8* BytePtr = reinterpret_cast<const uint8*>(this) + Offset;
+	return (*BytePtr & FieldMask) != 0;
+}
+
 bool AActor::TeleportTo(const FVector& DestLocation, const FRotator& DestRotation)
 {
 	static auto fn = FindObject<UFunction>(L"/Script/Engine.Actor.K2_TeleportTo");

@@ -199,7 +199,11 @@ static std::vector Tertiaries = {
 	"WID_Sniper_BoltAction_Scope_Athena_SR_Ore_T03",
 	"WID_Sniper_BoltAction_Scope_Athena_VR_Ore_T03",
 	"WID_Sniper_BoltAction_Scope_Athena_R_Ore_T03",
-	"WID_Sniper_BoltAction_Scope_Athena_UC_Ore_T03",
+	"WID_Sniper_Heavy_Athena_SR_Ore_T03",
+	"WID_Sniper_Heavy_Athena_VR_Ore_T03",
+	"WID_Sniper_BoltAction_Scope_Athena_SR_Ore_T03",
+	"WID_Sniper_BoltAction_Scope_Athena_VR_Ore_T03",
+	"WID_Sniper_BoltAction_Scope_Athena_R_Ore_T03",
 	"WID_Sniper_Standard_Scope_Athena_SR_Ore_T03",
 	"WID_Sniper_Standard_Scope_Athena_VR_Ore_T03",
 	"WID_Sniper_Suppressed_Scope_Athena_SR_Ore_T03",
@@ -212,6 +216,10 @@ static std::vector Tertiaries = {
 	"WID_Sniper_CoreSniper_Athena_VR",
 	"WID_Sniper_CoreSniper_Athena_R",
 	"WID_Sniper_CoreSniper_Athena_UC",
+	"WID_Sniper_CoreSniper_Athena_SR",
+	"WID_Sniper_CoreSniper_Athena_VR",
+	"WID_Sniper_CoreSniper_Athena_R",
+	"WID_Sniper_CoreSniper_Athena_UC"
 };
 
 static std::vector Secondaries = {
@@ -275,25 +283,43 @@ static std::vector Consumables1 = {
 	"Athena_ShockGrenade",
 	"WID_Hook_Gun_VR_Ore_T03",
 	"WID_Badger_Grape_VR",
+	"WID_Boss_GrapplingHoot",
+	"WID_Boss_Adventure_GH",
+	"WID_Launcher_Shockwave_Athena_UR_Ore_T03",
 	"WID_Athena_BadgerBangsNew",
 	"WID_Athena_HappyGhost",
 	"Athena_KnockGrenade",
 	"Athena_Rift_Item",
 	"Athena_GasGrenade",
 	"Athena_SilverBlazer_V2",
-	"Athena_HolidayGiftBox",
-	"Athena_GiftBox",
 	"Athena_Balloons_Consumable",
 	"Athena_Balloons",
 	"Athena_TowerGrenade",
 	"WID_Athena_AppleSun",
-	"Athena_DanceGrenade",
+	"WID_Athena_AppleSun",
+	"Athena_IceGrenade",
+	"WID_Athena_Bucket_Old",
+	"ID_ValetMod_Tires_OffRoad_Thrown",
+	"WID_Athena_HappyGhost",
+	"Athena_KnockGrenade",
+	"Athena_Rift_Item",
+	"Athena_GasGrenade",
+	"Athena_SilverBlazer_V2",
+	"Athena_Balloons_Consumable",
+	"Athena_Balloons",
+	"Athena_TowerGrenade",
+	"WID_Athena_AppleSun",
+	"WID_Athena_AppleSun",
 	"Athena_IceGrenade",
 	"WID_Athena_Bucket_Old",
 	"ID_ValetMod_Tires_OffRoad_Thrown",
 	"WID_Pistol_Flintlock_Athena_C",
 	"WID_Pistol_Flintlock_Athena_UC",
+	"WID_Pistol_Flintlock_Athena_C",
+	"WID_Pistol_Flintlock_Athena_UC",
 	"WID_Launcher_Rocket_Athena_R_Ore_T03",
+	"WID_Launcher_Rocket_Athena_VR_Ore_T03",
+	"WID_Launcher_Rocket_Athena_SR_Ore_T03",
 	"WID_Launcher_Rocket_Athena_VR_Ore_T03",
 	"WID_Launcher_Rocket_Athena_SR_Ore_T03",
 	"WID_Launcher_Grenade_Athena_R_Ore_T03",
@@ -324,8 +350,17 @@ static std::vector Consumables2 = {
 static std::vector Traps = {
 	"TID_Context_BouncePad_Athena",
 	"TID_Floor_Player_Launch_Pad_Athena",
+	"TID_Context_BouncePad_Athena",
+	"TID_Floor_Player_Launch_Pad_Athena",
+	"TID_Context_BouncePad_Athena",
+	"TID_Floor_Player_Launch_Pad_Athena",
+	"TID_Context_Reinforced_Athena",
+	"TID_Context_Reinforced_Athena",
 	"TID_Context_Freeze_Athena",
 	"TID_Floor_Player_Campfire_Athena",
+	"TID_Floor_Player_Campfire_Athena",
+	"TID_Floor_MountedTurret_Athena",
+	"TID_ContextTrap_Athena",
 	"TID_ContextTrap_Athena"
 };
 
@@ -843,8 +878,6 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 			L"/Game/Items/ResourcePickups/MetalItemData.MetalItemData");
 		static auto Gold = FindObject<UFortItemDefinition>(
 			L"/Game/Items/ResourcePickups/Athena_WadsItemData.Athena_WadsItemData");
-		static auto Crown = FindObject<UFortItemDefinition>(
-			L"/VictoryCrownsGameplay/Items/AGID_VictoryCrown.AGID_VictoryCrown");
 
 		static UFortItemDefinition* Primary = nullptr;
 
@@ -906,27 +939,38 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 			L"/PrimalGameplay/Items/Ammo/AthenaAmmoDataArrows.AthenaAmmoDataArrows");
 		static auto ReconAmmo = FindObject<UFortItemDefinition>(
 			L"/MotherGameplay/Items/Scooter/Ammo_Athena_Mother_Scooter.Ammo_Athena_Mother_Scooter");
+		static auto STWHeavy = FindObject<UFortItemDefinition>(
+			L"/Game/Items/Ammo/AmmoDataBulletsHeavy.AmmoDataBulletsHeavy");
+		static auto STWMedium = FindObject<UFortItemDefinition>(
+			L"/Game/Items/Ammo/AmmoDataBulletsMedium.AmmoDataBulletsMedium");
+		static auto STWLight = FindObject<UFortItemDefinition>(
+			L"/Game/Items/Ammo/AmmoDataBulletsLight.AmmoDataBulletsLight");
+		static auto STWShells = FindObject<UFortItemDefinition>(
+			L"/Game/Items/Ammo/AmmoDataShells.AmmoDataShells");
 
-		WorldInventory->AddItem(WoodItemData, nullptr, 999);
-		WorldInventory->AddItem(StoneItemData, nullptr, 999);
-		WorldInventory->AddItem(MetalItemData, nullptr, 999);
-		WorldInventory->AddItem(Gold, nullptr, 5000);
+		WorldInventory->AddItem(WoodItemData, nullptr, (std::rand() % 646) + 186);
+		WorldInventory->AddItem(StoneItemData, nullptr, (std::rand() % 646) + 186);
+		WorldInventory->AddItem(MetalItemData, nullptr, (std::rand() % 646) + 186);
+		WorldInventory->AddItem(Gold, nullptr, (std::rand() % 7500) + 1200);
 		WorldInventory->AddItem(Primary, nullptr, 1);
 		WorldInventory->AddItem(Secondary, nullptr, 1);
 		WorldInventory->AddItem(Tertiary, nullptr, 1);
 		WorldInventory->AddItem(Consumable1, nullptr, Consumable1->GetMaxStackSize());
 		WorldInventory->AddItem(Consumable2, nullptr, Consumable2->GetMaxStackSize());
-		WorldInventory->AddItem(ShellsAmmo, nullptr, (std::rand() % 876) + 87);
-		WorldInventory->AddItem(HeavyAmmo, nullptr, (std::rand() % 876) + 50);
-		WorldInventory->AddItem(MediumAmmo, nullptr, (std::rand() % 999) + 186);
-		WorldInventory->AddItem(LightAmmo, nullptr, (std::rand() % 999) + 124);
+		WorldInventory->AddItem(ShellsAmmo, nullptr, (std::rand() % 576) + 87);
+		WorldInventory->AddItem(HeavyAmmo, nullptr, (std::rand() % 576) + 50);
+		WorldInventory->AddItem(MediumAmmo, nullptr, (std::rand() % 824) + 186);
+		WorldInventory->AddItem(LightAmmo, nullptr, (std::rand() % 824) + 124);
 		WorldInventory->AddItem(RocketAmmo, nullptr, (std::rand() % 12) + 3);
-		WorldInventory->AddItem(ExplosiveAmmo, nullptr, 999);
-		WorldInventory->AddItem(EnergyCells, nullptr, 999);
+		WorldInventory->AddItem(ExplosiveAmmo, nullptr, (std::rand() % 999) + 186);
+		WorldInventory->AddItem(EnergyCells, nullptr, (std::rand() % 999) + 186);
+		WorldInventory->AddItem(STWHeavy, nullptr, (std::rand() % 999) + 186);
+		WorldInventory->AddItem(STWMedium, nullptr, (std::rand() % 999) + 186);
+		WorldInventory->AddItem(STWLight, nullptr, (std::rand() % 999) + 186);
+		WorldInventory->AddItem(STWShells, nullptr, (std::rand() % 999) + 186);
 		WorldInventory->AddItem(Arrows, nullptr, (std::rand() % 30) + 12);
 		WorldInventory->AddItem(ReconAmmo, nullptr, 999);
 		WorldInventory->AddItem(Trap, nullptr, (std::rand() % 5) + 2);
-		WorldInventory->AddItem(Crown, nullptr, 1);
 
 		WorldInventory->Update();
 	}

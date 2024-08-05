@@ -183,16 +183,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			}
 
 			auto& weaponName = Arguments[1];
-			int count = 1;
-
-			try
-			{
-				if (NumArgs >= 2)
-					count = std::stoi(Arguments[2]);
-			}
-			catch (...)
-			{
-			}
 
 			if (weaponName == "ar_uc")
 			{
@@ -209,18 +199,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else if (weaponName == "ar_sr" || weaponName == "scar_sr" || weaponName == "scar")
 			{
 				weaponName = "WID_Assault_AutoHigh_Athena_SR_Ore_T03";
-			}
-			else if (weaponName == "tacar_r")
-			{
-				weaponName = "WID_Assault_PistolCaliber_AR_Athena_R_Ore_T03";
-			}
-			else if (weaponName == "tacar_vr")
-			{
-				weaponName = "WID_Assault_PistolCaliber_AR_Athena_VR_Ore_T03";
-			}
-			else if (weaponName == "tacar_sr" || weaponName == "tacar")
-			{
-				weaponName = "WID_Assault_PistolCaliber_AR_Athena_SR_Ore_T03";
 			}
 			else if (weaponName == "ar_ur" || weaponName == "scar_ur" || weaponName == "skyesar" || weaponName == "skyear")
 			{
@@ -246,11 +224,11 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "WID_Shotgun_Standard_Athena_UC_Ore_T03";
 			}
-			else if (weaponName == "pump_vr")
+			else if (weaponName == "pump_vr" || weaponName == "spazz_vr")
 			{
 				weaponName = "WID_Shotgun_Standard_Athena_VR_Ore_T03";
 			}
-			else if (weaponName == "pump_sr" || weaponName == "pump")
+			else if (weaponName == "pump_sr" || weaponName == "spazz_sr" || weaponName == "spazz")
 			{
 				weaponName = "WID_Shotgun_Standard_Athena_SR_Ore_T03";
 			}
@@ -269,6 +247,14 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else if (weaponName == "tac_sr" || weaponName == "tac")
 			{
 				weaponName = "WID_Shotgun_HighSemiAuto_Athena_SR_Ore_T03";
+			}
+			else if (weaponName == "doublebarrel_vr")
+			{
+				weaponName = "WID_Shotgun_BreakBarrel_Athena_VR_Ore_T03";
+			}
+			else if (weaponName == "doublebarrel_sr" || weaponName == "doublebarrel")
+			{
+				weaponName = "WID_Shotgun_BreakBarrel_Athena_SR_Ore_T03";
 			}
 			else if (weaponName == "flint_c")
 			{
@@ -398,6 +384,10 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "WID_WaffleTruck_Sniper_StormScout";
 			}
+			else if (weaponName == "boom" || weaponName == "boomsniper")
+			{
+				weaponName = "WID_WaffleTruck_BoomSniper";
+			}
 			else if (weaponName == "rocket_r")
 			{
 				weaponName = "WID_Launcher_Rocket_Athena_R_Ore_T03";
@@ -462,7 +452,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "WID_Launcher_Shockwave_Athena_UR_Ore_T03";
 			}
-			else if (weaponName == "rift")
+			else if (weaponName == "rift" || weaponName == "rifts")
 			{
 				weaponName = "Athena_Rift_Item";
 			}
@@ -490,10 +480,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "Athena_GasGrenade";
 			}
-			else if (weaponName == "fishingrod")
-			{
-				weaponName = "WID_Athena_FloppingRabbit";
-			}
 			else if (weaponName == "shieldbubble")
 			{
 				weaponName = "Athena_SilverBlazer_V2";
@@ -518,10 +504,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "WID_Athena_Flopper_HopFlopper";
 			}
-			else if (weaponName == "snowyflopper" || weaponName == "snowyfish")
-			{
-				weaponName = "WID_Athena_Flopper_Snowman";
-			}
 			else if (weaponName == "slurpfish")
 			{
 				weaponName = "WID_Athena_Flopper_Effective";
@@ -530,7 +512,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "WID_Athena_Flopper_Zero";
 			}
-			else if (weaponName == "chugsplash" || weaponName == "chug" || weaponName == "chugs")
+			else if (weaponName == "chugsplash" || weaponName == "chugs")
 			{
 				weaponName = "Athena_ChillBronco";
 			}
@@ -549,10 +531,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else if (weaponName == "c4")
 			{
 				weaponName = "Athena_C4";
-			}
-			else if (weaponName == "stormflip")
-			{
-				weaponName = "Athena_DogSweater";
 			}
 			else if (weaponName == "firefly" || weaponName == "fireflies")
 			{
@@ -578,10 +556,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "AGID_Athena_Scooter";
 			}
-			else if (weaponName == "harpoon")
-			{
-				weaponName = "WID_Athena_HappyGhost_Infinite";
-			}
 			else if (weaponName == "jules" || weaponName == "julesgrappler" || weaponName == "julesgrap")
 			{
 				weaponName = "WID_Boss_GrapplingHoot";
@@ -602,17 +576,9 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "WID_Badger_Grape_VR";
 			}
-			else if (weaponName == "batarangs")
-			{
-				weaponName = "WID_Athena_BadgerBangsNew";
-			}
 			else if (weaponName == "flare" || Command == "flaregun")
 			{
 				weaponName = "WID_FringePlank_Athena_Prototype";
-			}
-			else if (weaponName == "stwpumpkin" || weaponName == "stwrocket")
-			{
-				weaponName = "WID_Launcher_Pumpkin_RPG_SR_Ore_T01";
 			}
 			else if (weaponName == "grabitron")
 			{
@@ -625,6 +591,26 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else if (weaponName == "launchpad" || weaponName == "launch" || weaponName == "pad" || weaponName == "launches")
 			{
 				weaponName = "TID_Floor_Player_Launch_Pad_Athena";
+			}
+			else if (weaponName == "rocketammo" || weaponName == "rockets")
+			{
+				weaponName = "AmmoDataRockets";
+			}
+			else if (weaponName == "heavyammo")
+			{
+				weaponName = "AthenaAmmoDataBulletsHeavy";
+			}
+			else if (weaponName == "shells")
+			{
+				weaponName = "AthenaAmmoDataShells";
+			}
+			else if (weaponName == "medium" || weaponName == "mediumammo")
+			{
+				weaponName = "AthenaAmmoDataBulletsMedium";
+			}
+			else if (weaponName == "light" || weaponName == "lightammo")
+			{
+				weaponName = "AthenaAmmoDataBulletsLight";
 			}
 			else if (weaponName == "grappler" || weaponName == "grap" || weaponName == "grapple")
 			{
@@ -703,6 +689,28 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 					weaponName = "/SaveTheWorld/Items/Weapons/Ranged/WIP/TestGod.TestGod";
 				}
 			}
+			else if (weaponName == "pump")
+			{
+				if (Fortnite_Version < 6.31)
+				{
+					weaponName = "WID_Shotgun_Standard_Athena_UC_Ore_T03";
+				}
+				else
+				{
+					weaponName = "WID_Shotgun_Standard_Athena_SR_Ore_T03";
+				}
+			}
+			else if (weaponName == "harpoon")
+			{
+				if (Fortnite_Version < 13.40)
+				{
+					weaponName = "WID_Athena_HappyGhost";
+				}
+				else
+				{
+					weaponName = "WID_Athena_HappyGhost_Infinite";
+				}
+			}
 
 			auto WID = Cast<UFortWorldItemDefinition>(FindObject(weaponName, nullptr, ANY_PACKAGE));
 
@@ -710,6 +718,17 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				SendMessageToConsole(PlayerController, L"Invalid WID! This usually means you either have the wrong name of an item, or the item doesn't exist on your version!");
 				return;
+			}
+
+			int count = WID->GetMaxStackSize();
+
+			try
+			{
+				if (NumArgs >= 2)
+					count = std::stoi(Arguments[2]);
+			}
+			catch (...)
+			{
 			}
 
 			bool bShouldUpdate = false;
@@ -720,185 +739,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, L"Granted item!");
 		}
-		/*
-		else if (Command == "changeclipsize")
-		{
-			if (NumArgs < 1)
-			{
-				SendMessageToConsole(ReceivingController, L"Please provide a valid clip size!");
-				return;
-			}
-
-			auto WorldInventory = ReceivingController->GetWorldInventory();
-
-			if (!WorldInventory)
-			{
-				SendMessageToConsole(PlayerController, L"No world inventory!");
-				return;
-			}
-
-			static auto WeaponDef = FindObject<UFortWeaponItemDefinition>("/Game/Athena/Items/Weapons/WID_Shotgun_Standard_Athena_SR_Ore_T03.WID_Shotgun_Standard_Athena_SR_Ore_T03");
-
-			int NewClipSize = WeaponDef->GetClipSize();
-
-			try { NewClipSize = std::stoi(Arguments[1]); }
-			catch (...) {}
-
-			WeaponDef->GetClipSize() = NewClipSize;
-
-			bool bShouldUpdate = false;
-			WorldInventory->AddItem(WeaponDef, &bShouldUpdate);
-
-			if (bShouldUpdate)
-				WorldInventory->Update();
-
-			SendMessageToConsole(PlayerController, L"Granted item!");
-		}
-		else if (Command == "changerarity")
-		{
-			if (NumArgs < 1)
-			{
-				SendMessageToConsole(ReceivingController, L"Please provide a valid clip size!");
-				return;
-			}
-
-			auto WorldInventory = ReceivingController->GetWorldInventory();
-
-			if (!WorldInventory)
-			{
-				SendMessageToConsole(PlayerController, L"No world inventory!");
-				return;
-			}
-
-			static auto WeaponDef = FindObject<UFortWeaponItemDefinition>("/Game/Athena/Items/Weapons/WID_Shotgun_Standard_Athena_SR_Ore_T03.WID_Shotgun_Standard_Athena_SR_Ore_T03");
-
-			int NewRarity;
-
-			try { NewRarity = std::stoi(Arguments[1]); }
-			catch (...) {}
-
-			if (static_cast<EFortRarity>(NewRarity) < EFortRarity::EFortRarity_MAX)
-			{
-				WeaponDef->GetRarity() = static_cast<EFortRarity>(NewRarity);
-				WeaponDef->GetTier() = static_cast<EFortItemTier>(NewRarity);
-			}
-
-			bool bShouldUpdate = false;
-			WorldInventory->AddItem(WeaponDef, &bShouldUpdate);
-
-			if (bShouldUpdate)
-				WorldInventory->Update();
-
-			SendMessageToConsole(PlayerController, L"Granted item!");
-		}
-		else if (Command == "changedamage")
-		{
-			if (NumArgs < 1)
-			{
-				SendMessageToConsole(ReceivingController, L"Please provide a valid clip size!");
-				return;
-			}
-
-			auto WorldInventory = ReceivingController->GetWorldInventory();
-
-			if (!WorldInventory)
-			{
-				SendMessageToConsole(PlayerController, L"No world inventory!");
-				return;
-			}
-
-			static auto WeaponDef = FindObject<UFortWeaponItemDefinition>("/Game/Athena/Items/Weapons/WID_Shotgun_Standard_Athena_SR_Ore_T03.WID_Shotgun_Standard_Athena_SR_Ore_T03");
-
-			TArray<int> DamageArray = WeaponDef->GetDamage();
-
-			int NewDamage = 0;
-
-			try { NewDamage = std::stoi(Arguments[1]); }
-			catch (...) {}
-
-			for (int i = 0; i < DamageArray.Num(); i++)
-			{
-				DamageArray[i] = NewDamage;
-			}
-
-			bool bShouldUpdate = false;
-			WorldInventory->AddItem(WeaponDef, &bShouldUpdate);
-
-			if (bShouldUpdate)
-				WorldInventory->Update();
-
-			SendMessageToConsole(PlayerController, L"Granted item!");
-		}
-		else if (Command == "changespread")
-		{
-			if (NumArgs < 1)
-			{
-				SendMessageToConsole(ReceivingController, L"Please provide a valid clip size!");
-				return;
-			}
-
-			auto WorldInventory = ReceivingController->GetWorldInventory();
-
-			if (!WorldInventory)
-			{
-				SendMessageToConsole(PlayerController, L"No world inventory!");
-				return;
-			}
-
-			static auto WeaponDef = FindObject<UFortWeaponItemDefinition>("/Game/Athena/Items/Weapons/WID_Sniper_BoltAction_Scope_Athena_SR_Ore_T03.WID_Sniper_BoltAction_Scope_Athena_SR_Ore_T03");
-			static auto WeaponDef2 = FindObject<UFortWeaponItemDefinition>("/Game/Athena/Items/Weapons/WID_Assault_Heavy_Athena_R_Ore_T03.WID_Assault_Heavy_Athena_R_Ore_T03");
-
-			int NewSpread = WeaponDef->GetSpread();
-
-			try { NewSpread = std::stoi(Arguments[1]); }
-			catch (...) {}
-
-			WeaponDef->GetSpread() = NewSpread;
-			WeaponDef2->GetSpread() = NewSpread;
-
-			bool bShouldUpdate = false;
-			WorldInventory->AddItem(WeaponDef, &bShouldUpdate);
-			WorldInventory->AddItem(WeaponDef2, &bShouldUpdate);
-
-			if (bShouldUpdate)
-				WorldInventory->Update();
-
-			SendMessageToConsole(PlayerController, L"Granted item!");
-		}
-		*/
-		/*
-		else if (Command == "renametest")
-		{
-			if (NumArgs < 1)
-			{
-				SendMessageToConsole(ReceivingController, L"Please provide a name!");
-				return;
-			}
-
-			auto WorldInventory = ReceivingController->GetWorldInventory();
-
-			if (!WorldInventory)
-			{
-				SendMessageToConsole(PlayerController, L"No world inventory!");
-				return;
-			}
-
-			static auto WeaponDef = FindObject<UFortItemDefinition>("/Game/Athena/Items/Weapons/WID_Shotgun_Standard_Athena_SR_Ore_T03.WID_Shotgun_Standard_Athena_SR_Ore_T03");
-
-			auto NewName = std::wstring(Arguments[1].begin(), Arguments[1].end()).c_str();
-
-			static auto NameOffset = WeaponDef->GetOffset("DisplayName");
-			UKismetTextLibrary::Conv_TextToString(WeaponDef->Get<FText>(NameOffset)) = NewName;
-
-			bool bShouldUpdate = false;
-			WorldInventory->AddItem(WeaponDef, &bShouldUpdate);
-
-			if (bShouldUpdate)
-				WorldInventory->Update();
-
-			SendMessageToConsole(PlayerController, L"Granted item!");
-		}
-		*/
 		else if (Command == "togglesnowmap")
 		{
 			if (Calendar::HasSnowModification())
@@ -919,75 +759,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				SendMessageToConsole(PlayerController, L"Version doesn't have any snow modification!");
 			}
 		}
-		/* else if (Command == "debugattributes")
-		{
-			auto AbilitySystemComponent = ReceivingPlayerState->GetAbilitySystemComponent();
-
-			if (!AbilitySystemComponent)
-			{
-				SendMessageToConsole(PlayerController, L"No AbilitySystemComponent!");
-				return;
-			}
-
-			SendMessageToConsole(PlayerController, (L"AbilitySystemComponent->GetSpawnedAttributes().Num(): " + std::to_wstring(AbilitySystemComponent->GetSpawnedAttributes().Num())).c_str());
-
-			for (int i = 0; i < AbilitySystemComponent->GetSpawnedAttributes().Num(); ++i)
-			{
-				auto CurrentAttributePathName = AbilitySystemComponent->GetSpawnedAttributes().at(i)->GetPathName();
-				SendMessageToConsole(PlayerController, (L"SpawnedAttribute Name: " + std::wstring(CurrentAttributePathName.begin(), CurrentAttributePathName.end())).c_str());
-			}
-		}
-		else if (Command == "debugcurrentitem")
-		{
-			auto Pawn = ReceivingController->GetMyFortPawn();
-
-			if (!Pawn)
-			{
-				SendMessageToConsole(PlayerController, L"No pawn!");
-				return;
-			}
-
-			auto CurrentWeapon = Pawn->GetCurrentWeapon();
-
-			if (!CurrentWeapon)
-			{
-				SendMessageToConsole(PlayerController, L"No CurrentWeapon!");
-				return;
-			}
-
-			auto WorldInventory = ReceivingController->GetWorldInventory();
-
-			if (!CurrentWeapon)
-			{
-				SendMessageToConsole(PlayerController, L"No WorldInventory!");
-				return;
-			}
-
-			auto ItemInstance = WorldInventory->FindItemInstance(CurrentWeapon->GetItemEntryGuid());
-			auto ReplicatedEntry = WorldInventory->FindReplicatedEntry(CurrentWeapon->GetItemEntryGuid());
-
-			if (!ItemInstance)
-			{
-				SendMessageToConsole(PlayerController, L"Failed to find ItemInstance!");
-				return;
-			}
-
-			if (!ReplicatedEntry)
-			{
-				SendMessageToConsole(PlayerController, L"Failed to find ReplicatedEntry!");
-				return;
-			}
-
-			SendMessageToConsole(PlayerController, (L"ReplicatedEntry->GetGenericAttributeValues().Num(): " + std::to_wstring(ReplicatedEntry->GetGenericAttributeValues().Num())).c_str());
-			SendMessageToConsole(PlayerController, (L"ReplicatedEntry->GetStateValues().Num(): " + std::to_wstring(ReplicatedEntry->GetStateValues().Num())).c_str());
-
-			for (int i = 0; i < ReplicatedEntry->GetStateValues().Num(); ++i)
-			{
-				SendMessageToConsole(PlayerController, (L"[{}] StateValue Type: "
-					+ std::to_wstring((int)ReplicatedEntry->GetStateValues().at(i, FFortItemEntryStateValue::GetStructSize()).GetStateType())).c_str()
-				);
-			}
-		} */
 		else if (Command == "op")
 		{
 			if (ReceivingController == PlayerController)
@@ -1234,7 +1005,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				AFortPickup::SpawnPickup(CreateData);
 			}
 		}
-		else if (Command == "getlocation")
+		else if (Command == "getlocation" || Command == "getloc" || Command == "cords" || Command == "a")
 		{
 			auto Pawn = ReceivingController->GetMyFortPawn();
 
@@ -1246,34 +1017,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			Pawn->CopyToClipboard(Loc);
 		}
-		/*
-		else if (Command == "testactordir")
-		{
-			auto Pawn = ReceivingController->GetMyFortPawn();
-
-			if (!Pawn)
-			{
-				SendMessageToConsole(ReceivingController, L"No pawn!");
-				return;
-			}
-
-			auto PawnLocation = Pawn->GetActorLocation();
-			auto UpVector = Pawn->GetActorUpVector();
-			auto ForwardVector = Pawn->GetActorForwardVector();
-			auto RightVector = Pawn->GetActorRightVector();
-
-			FString Loc = PawnLocation.ToString();
-			FString UpVec = UpVector.ToString();
-			FString ForwardVec = ForwardVector.ToString();
-			FString RightVec = RightVector.ToString();
-
-			SendMessageToConsole(PlayerController, Loc);
-			SendMessageToConsole(PlayerController, UpVec);
-			SendMessageToConsole(PlayerController, ForwardVec);
-			SendMessageToConsole(PlayerController, RightVec);
-		}
-		*/
-		else if (Command == "dbno" || Command == "dnbo") // i kept misspelling it
+		else if (Command == "dbno" || Command == "dnbo")
 		{
 			auto Pawn = ReceivingController->GetMyFortPawn();
 
@@ -1290,50 +1034,12 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		{
 			Globals::bLogProcessEvent = !Globals::bLogProcessEvent;
 		}
-		/*
-		else if (Command == "accolade")
-		{
-			ReceivingController->GiveAccolade(ReceivingController, FindObject<UFortAccoladeItemDefinition>("/Game/Athena/Items/Accolades/AccoladeId_014_Elimination_Bronze.AccoladeId_014_Elimination_Bronze"));
-		}
-		*/
-		/*
-		else if (Command == "givexptest")
-		{
-			static auto KillScoreOffset = ReceivingPlayerState->GetOffset("KillScore");
-			int Kills = *(int*)(__int64(ReceivingPlayerState) + KillScoreOffset);
-
-			auto TimeAlive = UGameplayStatics::GetTimeSeconds(GetWorld());
-
-			int CombatXP = Kills * 100;
-			int SurvivalXP = TimeAlive * 100;
-			int BonusMedalXP = 0;
-			int ChallengeXP = 0;
-			int MatchXP = 0;
-
-			ReceivingController->GiveXP(ReceivingController, CombatXP, SurvivalXP, BonusMedalXP, ChallengeXP, MatchXP);
-
-			FString a = std::to_wstring(CombatXP).c_str();
-			FString b = std::to_wstring(SurvivalXP).c_str();
-			FString c = std::to_wstring(BonusMedalXP).c_str();
-			FString d = std::to_wstring(ChallengeXP).c_str();
-			FString e = std::to_wstring(MatchXP).c_str();
-
-			SendMessageToConsole(PlayerController, (L"Gave XP: {}, {}, {}, {}, {}", a, b, c, d, e));
-		}
-		*/
-		else if (Command == "fakewin") // ends the game and gives confetti but doesnt show #1 victory royale sign thingy idk
+		else if (Command == "fakewin")
 		{
 			GameMode->EndMatch();
 			PlayerController->PlayWinEffects(PlayerController->GetPawn(), PlayerController->GetMyFortPawn()->GetCurrentWeapon()->GetWeaponData(), 1, false);
 			PlayerController->ClientNotifyWon(PlayerController->GetPawn(), PlayerController->GetMyFortPawn()->GetCurrentWeapon()->GetWeaponData(), 1);
 			PlayerController->ClientNotifyTeamWon(PlayerController->GetPawn(), PlayerController->GetMyFortPawn()->GetCurrentWeapon()->GetWeaponData(), 1);
-		}
-		else if (Command == "giveability")
-		{
-			if (NumArgs >= 1)
-			{
-
-			}
 		}
 		else if (Command == "startaircraft")
 		{
@@ -1430,28 +1136,41 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, std::wstring(PlayerNames.begin(), PlayerNames.end()).c_str());
 		}
-		else if (Command == "launch" || Command == "fling")
+		else if (Command == "launch")
 		{
-			if (Arguments.size() <= 3)
+			float X = 0.0f, Y = 0.0f, Z = 0.0f;
+
+			int argCount = Arguments.size();
+
+			try
 			{
-				SendMessageToConsole(PlayerController, L"Please provide X, Y, and Z!\n");
+				if (argCount == 2)
+				{
+					Z = std::stof(Arguments[1]);
+				}
+				else if (argCount == 3)
+				{
+					X = std::stof(Arguments[1]);
+					Z = std::stof(Arguments[2]);
+				}
+				else if (argCount == 4)
+				{
+					X = std::stof(Arguments[1]);
+					Y = std::stof(Arguments[2]);
+					Z = std::stof(Arguments[3]);
+				}
+			}
+			catch (...)
+			{
+				SendMessageToConsole(PlayerController, L"Invalid input. Please provide numeric values.");
 				return;
 			}
-
-			float X{}, Y{}, Z{};
-
-			try { X = std::stof(Arguments[1]); }
-			catch (...) {}
-			try { Y = std::stof(Arguments[2]); }
-			catch (...) {}
-			try { Z = std::stof(Arguments[3]); }
-			catch (...) {}
 
 			auto Pawn = ReceivingController->GetMyFortPawn();
 
 			if (!Pawn)
 			{
-				SendMessageToConsole(PlayerController, L"No pawn to teleport!");
+				SendMessageToConsole(PlayerController, L"No pawn to launch!");
 				return;
 			}
 
@@ -1459,10 +1178,11 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			struct
 			{
-				FVector											   LaunchVelocity;                                           // (Parm, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash, NativeAccessSpecifierPublic)
-				bool                                               bXYOverride;                                              // (Parm, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash, NativeAccessSpecifierPublic)
-				bool                                               bZOverride;                                               // (Parm, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash, NativeAccessSpecifierPublic)
+				FVector LaunchVelocity; // (Parm, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash, NativeAccessSpecifierPublic)
+				bool bXYOverride;       // (Parm, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash, NativeAccessSpecifierPublic)
+				bool bZOverride;        // (Parm, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash, NativeAccessSpecifierPublic)
 			} ACharacter_LaunchCharacter_Params{ FVector(X, Y, Z), false, false };
+
 			Pawn->ProcessEvent(LaunchCharacterFn, &ACharacter_LaunchCharacter_Params);
 
 			SendMessageToConsole(PlayerController, L"Launched character!");
@@ -1488,99 +1208,38 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			Pawn->SetShield(Shield);
 			SendMessageToConsole(PlayerController, L"Set shield!\n");
 		}
-		else if (Command == "siphontest")
-		{
-			// auto Ability = LoadObject<UClass>("/Game/Creative/Abilities/Siphon/GA_Creative_OnKillSiphon.GA_Creative_OnKillSiphon_C", BGACLASS);
-			auto Ability = LoadObject<UClass>("/Game/Athena/Heroes/Abilities/Siphon/GE_SiphonEffect_Shield.GE_SiphonEffect_Shield_C", BGACLASS);
-
-			if (!Ability)
-			{
-				SendMessageToConsole(PlayerController, L"No siphon ability!");
-				return;
-			}
-
-			auto AbilitySystemComponent = ReceivingPlayerState->GetAbilitySystemComponent();
-
-			FGameplayAbilitySpec* AbilitySpec = nullptr;
-
-			auto CompareAbilities = [&AbilitySpec, &Ability](FGameplayAbilitySpec* Spec)
-				{
-					auto CurrentAbility = Spec->GetAbility();
-
-					// LOG_INFO(LogDev, "CurrentAbility->ClassPrivate->GetName(): {}, Ability->GetName(): {}", CurrentAbility->ClassPrivate->GetName(), Ability->GetName());
-
-					if (CurrentAbility->ClassPrivate->GetName() == Ability->GetName())
-					{
-						AbilitySpec = Spec;
-					}
-				};
-
-			// LoopSpecs(AbilitySystemComponent, CompareAbilities);
-
-			// if (!AbilitySpec)
-			// {
-				// SendMessageToConsole(PlayerController, L"Can't find AbilitySpec!");
-				// return;
-			// }
-
-			// int Zero = 0;
-
-			// static unsigned int* (*GiveAbilityAndActivateOnce)(UAbilitySystemComponent* ASC, int* outHandle, __int64 Spec, FGameplayEventData* TriggerEventData) = decltype(GiveAbilityAndActivateOnce)(Addresses::GiveAbilityAndActivateOnce); // EventData is only on ue500?
-
-			// if (GiveAbilityAndActivateOnce)
-			// {
-				// GiveAbilityAndActivateOnce(AbilitySystemComponent, &Zero, __int64(AbilitySpec), nullptr);
-			// }
-
-			FGameplayEffectContextHandle EffectContext{};
-			AbilitySystemComponent->ApplyGameplayEffectToSelf(Ability, 0.f, EffectContext);
-		}
-		else if (Command == "printmangspawners")
-		{
-			static auto MangSpawnerClass = FindObject<UClass>("/Game/Athena/AI/MANG/BP_MANG_Spawner.BP_MANG_Spawner_C");
-
-			auto AllMangSpawners = UGameplayStatics::GetAllActorsOfClass(GetWorld(), MangSpawnerClass);
-
-			if (AllMangSpawners.Num() < 1)
-			{
-				SendMessageToConsole(PlayerController, L"No Mang Spawners found.");
-				return;
-			}
-
-			for (int i = 0; i < AllMangSpawners.Num(); i++)
-			{
-				SendMessageToConsole(PlayerController, (L"Mang Spawner: {} at {}", std::wstring(AllMangSpawners.at(i)->GetFullName().begin(), AllMangSpawners.at(i)->GetFullName().end()).c_str(), AllMangSpawners.at(i)->GetActorLocation().ToString()));
-			}
-		}
 		else if (Command == "god")
 		{
-			static auto GodFn = FindObject<UFunction>("/Script/Engine.CheatManager.God");
+			auto Pawn = ReceivingController->GetMyFortPawn();
 
-			if (GodFn)
+			if (!Pawn)
 			{
-				auto CheatManager = ReceivingController->SpawnCheatManager(UCheatManager::StaticClass());
+				SendMessageToConsole(PlayerController, L"No pawn!");
+				return;
+			}
 
-				if (!CheatManager)
-				{
-					SendMessageToConsole(PlayerController, L"Failed to spawn player's cheat manager!");
-					return;
-				}
+			float MaxHealth = Pawn->GetMaxHealth();
 
-				CheatManager->God();
-				CheatManager = nullptr;
+			auto HealthSet = Pawn->GetHealthSet();
+
+			if (!HealthSet)
+			{
+				SendMessageToConsole(PlayerController, L"No HealthSet!");
+				return;
+			}
+
+			static auto HealthOffset = HealthSet->GetOffset("Health");
+			auto& Health = HealthSet->Get<FFortGameplayAttributeData>(HealthOffset);
+
+			if (Health.GetMinimum() != MaxHealth)
+			{
+				Health.GetMinimum() = MaxHealth;
+				SendMessageToConsole(PlayerController, L"God ON.");
 			}
 			else
 			{
-				auto Pawn = ReceivingController->GetMyFortPawn();
-
-				if (!Pawn)
-				{
-					SendMessageToConsole(PlayerController, L"No pawn!");
-					return;
-				}
-
-				Pawn->SetCanBeDamaged(!Pawn->CanBeDamaged());
-				SendMessageToConsole(PlayerController, std::wstring(L"God set to " + std::to_wstring(!(bool)Pawn->CanBeDamaged())).c_str());
+				Health.GetMinimum() = 0;
+				SendMessageToConsole(PlayerController, L"God OFF.");
 			}
 		}
 		else if (Command == "spawnaifromclass")
@@ -1697,45 +1356,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				SendMessageToConsole(PlayerController, L"Failed to summon!");
 			}
 		}
-		else if (Command == "foundationtest")
-		{
-			auto BuildingFoundationClass = FindObject<UClass>(L"/Script/FortniteGame.BuildingFoundation");
-			auto AllBuildingFoundations = UGameplayStatics::GetAllActorsOfClass(GetWorld(), BuildingFoundationClass);
-
-			for (int i = 0; i < AllBuildingFoundations.Num(); i++)
-			{
-				auto BuildingFoundation = AllBuildingFoundations.at(i);
-
-				static auto DynamicFoundationTypeOffset = BuildingFoundation->GetOffset("DynamicFoundationType");
-				auto DynamicFoundationType = BuildingFoundation->Get<uint8_t>(DynamicFoundationTypeOffset);
-
-				if (DynamicFoundationType == 3)
-				{
-					BuildingFoundation->Get<uint8_t>(DynamicFoundationTypeOffset) = 0;
-
-					static auto bServerStreamedInLevelOffset = BuildingFoundation->GetOffset("bServerStreamedInLevel");
-					static auto bServerStreamedInLevelFieldMask = GetFieldMask(BuildingFoundation->GetProperty("bServerStreamedInLevel"));
-					BuildingFoundation->SetBitfieldValue(bServerStreamedInLevelOffset, bServerStreamedInLevelFieldMask, true);
-
-					static auto OnRep_ServerStreamedInLevelFn = FindObject<UFunction>(L"/Script/FortniteGame.BuildingFoundation.OnRep_ServerStreamedInLevel");
-					BuildingFoundation->ProcessEvent(OnRep_ServerStreamedInLevelFn);
-
-					static auto SetDynamicFoundationEnabledFn = FindObject<UFunction>(L"/Script/FortniteGame.BuildingFoundation.SetDynamicFoundationEnabled");
-					bool bEnabled = true;
-					BuildingFoundation->ProcessEvent(SetDynamicFoundationEnabledFn, &bEnabled);
-
-					static auto AdditionalWorldsOffset = BuildingFoundation->GetOffset("AdditionalWorlds");
-					auto AdditionalWorlds = BuildingFoundation->Get<TArray<TSoftObjectPtr<UWorld>>>(AdditionalWorldsOffset);
-
-
-
-					BuildingFoundation->FlushNetDormancy();
-					BuildingFoundation->ForceNetUpdate();
-
-					LOG_INFO(LogDev, "Showed Foundation {}", BuildingFoundation->GetFullName());
-				}
-			}
-		}
 		/*
 		else if (Command == "changesize") // This works but doesn't visually update on the client (If done fully on the client with Rift or Cranium (No gameserver) it fully works)
 		{
@@ -1847,14 +1467,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			Pawn->LaunchURL(L"https://pastebin.com/4pmMgegz");
 		}
-		/*
-		else if (Command == "killserver")
-		{
-			bool bIgnorePlatformRestrictions = true;
-
-			ReceivingController->QuitGame(GetWorld(), ReceivingController, EQuitPreference::Quit, bIgnorePlatformRestrictions); // this is funny trust
-		}
-		*/
 		else if (Command == "applycid" || Command == "skin")
 		{
 			auto PlayerState = Cast<AFortPlayerState>(ReceivingController->GetPlayerState());
@@ -1917,18 +1529,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		{
 			static auto ServerSuicideFn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerController.ServerSuicide");
 			ReceivingController->ProcessEvent(ServerSuicideFn);
-		}
-		else if (Command == "testexecutefunc")
-		{
-			ReceivingController->Execute(FindObject<UFunction>("/Script/FortniteGame.FortPlayerController.ServerSuicide"));
-		}
-		else if (Command == "testexecutefunc2")
-		{
-			ReceivingController->GetMyFortPawn()->Execute(FindObject<UFunction>("/Script/Engine.Character.LaunchCharacter"), FVector(10000, 1000, 0), false, false);
-		}
-		else if (Command == "textexecutefunc3")
-		{
-			SendMessageToConsole(ReceivingController, FindObject("/Script/Engine.Default__KismetSystemLibrary")->Execute<FString>(FindObject<UFunction>("/Script/Engine.KismetSystemLibrary.GetPathName"), ReceivingController->GetPawn()));
 		}
 		else if (Command == "spawn" || Command == "summon")
 		{
@@ -2080,55 +1680,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				SendMessageToConsole(PlayerController, L"Not a valid class!");
 			}
 		}
-		else if (Command == "spawnbottest2")
-		{
-			// FortniteGame/Plugins/GameFeatures/CosmosGameplay/Content/AI/NPCs/Cosmos/AISpawnerData/BP_AIBotSpawnerData_Cosmos
-			// /Game/Athena/AI/NPCs/Base/AISpawnerData/BP_AIBotSpawnerData_NPC_Base.BP_AIBotSpawnerData_NPC_Base_C
-			// /CosmosGameplay/AI/NPCs/Cosmos/AISpawnerData/BP_AIBotSpawnerData_Cosmos.BP_AIBotSpawnerData_Cosmos_C
-
-			if (NumArgs < 1)
-			{
-				SendMessageToConsole(PlayerController, L"Please provide a customization object!");
-				return;
-			}
-
-			auto Pawn = ReceivingController->GetPawn();
-
-			if (!Pawn)
-			{
-				SendMessageToConsole(PlayerController, L"No pawn to spawn bot at!");
-				return;
-			}
-
-			static auto BlueprintGeneratedClassClass = FindObject<UClass>(L"/Script/Engine.BlueprintGeneratedClass");
-			auto SpawnerDataClass = LoadObject<UClass>(Arguments[1], BlueprintGeneratedClassClass);
-			// auto SpawnerData = LoadObject<UFortAthenaAIBotSpawnerData>(Arguments[1], UFortAthenaAIBotSpawnerData::StaticClass());
-
-			if (!SpawnerDataClass)
-			{
-				SendMessageToConsole(PlayerController, L"Invalid SpawnerDataClass!");
-				return;
-			}
-
-			auto DefaultSpawnerData = Cast<UFortAthenaAIBotSpawnerData>(SpawnerDataClass->CreateDefaultObject());
-
-			if (!SpawnerDataClass)
-			{
-				SendMessageToConsole(PlayerController, L"Invalid DefaultSpawnerData!");
-				return;
-			}
-
-			auto NewPawn = SpawnAIFromSpawnerData(Pawn->GetActorLocation(), DefaultSpawnerData);
-
-			if (NewPawn)
-			{
-				SendMessageToConsole(PlayerController, L"Spawned!");
-			}
-			else
-			{
-				SendMessageToConsole(PlayerController, L"Failed to spawn!");
-			}
-		}
 		else if (Command == "spawnbot" || Command == "bot")
 		{
 			auto Pawn = ReceivingController->GetPawn();
@@ -2242,12 +1793,13 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			Pawn->SetHealth(Health);
 			SendMessageToConsole(PlayerController, L"Set health!\n");
 		}
-		else if (Command == "pausesafezone")
+		else if (Command == "pausesafezone" || Command == "pausezone")
 		{
 			auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
 			auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
 
 			UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"pausesafezone", nullptr);
+			SendMessageToConsole(PlayerController, L"Paused/Unpaused Zone.");
 			// GameMode->PauseSafeZone(GameState->IsSafeZonePaused() == 0);
 		}
 		else if (Command == "teleport" || Command == "tp" || Command == "to")
@@ -2264,31 +1816,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			CheatManager = nullptr;
 			SendMessageToConsole(PlayerController, L"Teleported!");
 		}
-		/*
-		else if (Command == "testballermove")
-		{
-			auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn());
-
-			if (!Pawn->IsInVehicle())
-			{
-				SendMessageToConsole(PlayerController, L"Get in a baller!");
-				return;
-			}
-
-			auto Vehicle = Pawn->GetVehicle();
-
-			if (Vehicle->GetFullName().contains("Octopus"))
-			{
-				FReplicatedPhysicsPawnState VehicleState;
-				VehicleState.GetTranslation() = Pawn->GetActorLocation() + FVector(1000, 1000, 1000);
-				VehicleState.GetRotation() = FQuat(0, 0, 0, 0);
-				VehicleState.GetAngularVelocity() = FVector(1000, 1000, 1000);
-				VehicleState.GetLinearVelocity() = FVector(1000, 1000, 1000);
-
-				Vehicle->ServerMove(VehicleState);
-			}
-		}
-		*/
 		else if (Command == "fly")
 		{
 			auto Pawn = Cast<APawn>(ReceivingController->GetPawn());
@@ -2298,6 +1825,53 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				SendMessageToConsole(PlayerController, L"No pawn found!");
 				return;
 			}
+
+			static auto CharMovementOffset = Pawn->GetOffset("CharacterMovement");
+			if (CharMovementOffset != -1)
+			{
+				auto CharMovement = Pawn->Get<UObject*>(CharMovementOffset);
+
+				static auto MovementOffset = CharMovement->GetOffset("MovementMode", false);
+				if (MovementOffset != -1)
+				{
+					EMovementMode MovementMode = CharMovement->Get<EMovementMode>(MovementOffset);
+					EMovementMode NewMode = EMovementMode::MOVE_Walking;
+
+					if (MovementMode != EMovementMode::MOVE_Flying)
+					{
+						NewMode = EMovementMode::MOVE_Flying;
+					}
+
+					static auto SetMovementModeFn = FindObject<UFunction>(L"/Script/Engine.CharacterMovementComponent.SetMovementMode");
+
+					if (SetMovementModeFn)
+					{
+						CharMovement->ProcessEvent(SetMovementModeFn, &NewMode);
+					}
+				}
+				else
+				{
+					SendMessageToConsole(PlayerController, L"Movement mode not found!");
+					return;
+				}
+			}
+			else
+			{
+				SendMessageToConsole(PlayerController, L"Character movement not found!");
+				return;
+			}
+		}
+		else if (Command == "ghost")
+		{
+			auto Pawn = Cast<APawn>(ReceivingController->GetPawn());
+
+			if (!Pawn)
+			{
+				SendMessageToConsole(PlayerController, L"No pawn!");
+				return;
+			}
+
+			Pawn->SetActorEnableCollision(!Pawn->GetActorEnableCollision());
 
 			static auto CharMovementOffset = Pawn->GetOffset("CharacterMovement");
 			if (CharMovementOffset != -1)
@@ -2544,7 +2118,86 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			CheatManager = nullptr;
 			SendMessageToConsole(PlayerController, L"Destroyed target!");
 		}
-		else if (Command == "bugitgo")
+		else if (Command == "buildfree" || Command == "infmats")
+		{
+			if (Arguments.size() <= 1)
+			{
+				SendMessageToConsole(PlayerController, L"Please choose \"true\" or \"false\"!\n");
+				return;
+			}
+			std::string quickbarType = Arguments[1];
+			std::transform(quickbarType.begin(), quickbarType.end(), quickbarType.begin(), ::tolower);
+
+			if (quickbarType == "true")
+			{
+				if (Globals::bInfiniteMaterials == true)
+				{
+					SendMessageToConsole(PlayerController, L"Infinite Materials is already true.");
+				}
+				else
+				{
+					Globals::bInfiniteMaterials = true;
+					SendMessageToConsole(PlayerController, L"Build Free enabled!");
+				}
+			}
+			else if (quickbarType == "false")
+			{
+				if (Globals::bInfiniteMaterials == false)
+				{
+					SendMessageToConsole(PlayerController, L"Infinite Materials is already false.");
+				}
+				else
+				{
+					Globals::bInfiniteMaterials = false;
+					SendMessageToConsole(PlayerController, L"Build Free disabled.");
+				}
+			}
+			else
+			{
+				SendMessageToConsole(PlayerController, L"Invalid option! Please choose \"true\" or \"false\".\n");
+			}
+		}
+		else if (Command == "infiniteammo" || Command == "infammo")
+		{
+			if (Arguments.size() <= 1)
+			{
+				SendMessageToConsole(PlayerController, L"Please choose \"true\" or \"false\"!\n");
+				return;
+			}
+
+			std::string quickbarType = Arguments[1];
+			std::transform(quickbarType.begin(), quickbarType.end(), quickbarType.begin(), ::tolower);
+
+			if (quickbarType == "true")
+			{
+				if (Globals::bInfiniteAmmo == true)
+				{
+					SendMessageToConsole(PlayerController, L"Infinite Ammo is already true.");
+				}
+				else
+				{
+					Globals::bInfiniteAmmo = true;
+					SendMessageToConsole(PlayerController, L"Infinite Ammo enabled!");
+				}
+			}
+			else if (quickbarType == "false")
+			{
+				if (Globals::bInfiniteAmmo == false)
+				{
+					SendMessageToConsole(PlayerController, L"Infinite Ammo is already false.");
+				}
+				else
+				{
+					Globals::bInfiniteAmmo = false;
+					SendMessageToConsole(PlayerController, L"Infinite Ammo disabled.");
+				}
+			}
+			else
+			{
+				SendMessageToConsole(PlayerController, L"Invalid option! Please choose \"true\" or \"false\".\n");
+			}
+		}
+		else if (Command == "bugitgo" || Command == "b")
 		{
 			if (Arguments.size() <= 3)
 			{

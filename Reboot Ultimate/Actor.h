@@ -38,6 +38,8 @@ public:
 	struct FRotator GetActorRotation();
 	void FlushNetDormancy();
 	void SetActorEnableCollision(bool bNewActorEnableCollision);
+	bool GetActorEnableCollision() const;
+	bool ReadBitfieldValue(int32 Offset, uint32 FieldMask) const;
 	bool TeleportTo(const FVector& DestLocation, const FRotator& DestRotation);
 	bool IsActorBeingDestroyed();
 	bool IsNetStartup();
