@@ -43,6 +43,7 @@ public:
 	AFortAthenaVehicle* GetVehicle();
 	UFortWeaponItemDefinition* GetVehicleWeaponDefinition(AFortAthenaVehicle* Vehicle);
 	void UnEquipVehicleWeaponDefinition(UFortWeaponItemDefinition* VehicleWeaponDefinition);
+	void SiphonMats();
 	
 	static void ServerReviveFromDBNOHook(AFortPlayerPawn* Pawn, AController* EventInstigator);
 	static void ServerHandlePickupWithRequestedSwapHook(UObject* Context, FFrame* Stack, void* Ret); // we could native hook this but idk

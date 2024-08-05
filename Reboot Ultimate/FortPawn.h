@@ -70,6 +70,7 @@ public:
 	void SetHealth(float NewHealth);
 	void SetMaxHealth(float NewHealthVal);
 	void SetShield(float NewShield);
+	float GetMaxShield();
 	void SetMaxShield(float NewShieldVal);
 	static void NetMulticast_Athena_BatchedDamageCuesHook(UObject* Context, FFrame* Stack, void* Ret);
 	static void MovingEmoteStoppedHook(UObject* Context, FFrame* Stack, void* Ret);

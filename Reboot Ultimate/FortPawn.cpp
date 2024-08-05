@@ -117,6 +117,17 @@ void AFortPawn::SetShield(float NewShield)
 		this->ProcessEvent(SetShieldFn, &NewShield);
 }
 
+float AFortPawn::GetMaxShield()
+{
+	float MaxShield = 0;
+	static auto GetMaxShieldFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPawn.GetMaxShield");
+
+	if (GetMaxShieldFn)
+		this->ProcessEvent(GetMaxShieldFn, &MaxShield);
+
+	return MaxShield;
+}
+
 void AFortPawn::SetMaxShield(float NewShieldVal)
 {
 	static auto SetMaxShieldFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPawn.SetMaxShield");

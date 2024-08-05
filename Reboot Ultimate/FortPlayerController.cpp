@@ -1537,43 +1537,84 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 
 		// LOG_INFO(LogDev, "Reported kill.");
 
-		if (Globals::AmountOfHealthSiphon != 0)
+		auto KillerAbilityComp = KillerPlayerState->GetAbilitySystemComponent();
+
+		if (KillerAbilityComp)
 		{
-			if (KillerPawn && KillerPawn != DeadPawn)
+			auto ActivatableAbilities = KillerAbilityComp->GetActivatableAbilities();
+			auto& Items = ActivatableAbilities->GetItems();
+			for (size_t i = 0; i < Items.Num(); i++)
+			{
+				auto& Item = Items.At(i, FGameplayAbilitySpec::GetStructSize());
+				auto Ability = Item.GetAbility();
+				if (Ability && Ability->ClassPrivate && Ability->ClassPrivate->GetName().contains("Siphon"))
+				{
+					FGameplayTag Tag{};
+					Tag.TagName = UKismetStringLibrary::Conv_StringToName(TEXT("GameplayCue.Shield.PotionConsumed"));
+
+					auto NetMulticast_InvokeGameplayCueAdded = FindObject<UFunction>(L"/Script/GameplayAbilities.AbilitySystemComponent:NetMulticast_InvokeGameplayCueAdded");
+					auto NetMulticast_InvokeGameplayCueExecuted = FindObject<UFunction>(L"/Script/GameplayAbilities.AbilitySystemComponent:NetMulticast_InvokeGameplayCueExecuted");
+
+					if (!NetMulticast_InvokeGameplayCueAdded || !NetMulticast_InvokeGameplayCueExecuted)
+						break;
+
+					static auto GameplayCueTagOffsetAdded = NetMulticast_InvokeGameplayCueAdded->GetOffsetFunc("GameplayCueTag");
+					static auto GameplayCueTagOffsetExecuted = NetMulticast_InvokeGameplayCueExecuted->GetOffsetFunc("GameplayCueTag");
+					static auto PredictionKeyOffsetAdded = NetMulticast_InvokeGameplayCueAdded->GetOffsetFunc("PredictionKey");
+
+					auto AddedParams = Alloc<void>(NetMulticast_InvokeGameplayCueAdded->GetPropertiesSize());
+					auto ExecutedParams = Alloc<void>(NetMulticast_InvokeGameplayCueExecuted->GetPropertiesSize());
+
+					if (!AddedParams || !ExecutedParams)
+						break;
+
+					*(FGameplayTag*)(int64(AddedParams) + GameplayCueTagOffsetAdded) = Tag;
+					*(FGameplayTag*)(int64(ExecutedParams) + GameplayCueTagOffsetExecuted) = Tag;
+					//(FPredictionKey*)(int64(AddedParams) + PredictionKeyOffsetAdded) = Tag;
+
+					if (Globals::AmountOfHealthSiphon != 0)
+					{
+						KillerAbilityComp->ProcessEvent(NetMulticast_InvokeGameplayCueAdded, AddedParams);
+						KillerAbilityComp->ProcessEvent(NetMulticast_InvokeGameplayCueExecuted, ExecutedParams);
+					}
+
+					break;
+				}
+			}
+		}
+
+		if (KillerPawn && KillerPawn != DeadPawn && KillerPlayerState && KillerPlayerState != DeadPlayerState && KillerPlayerState->GetAbilitySystemComponent())
+		{
+			if (Globals::AmountOfHealthSiphon != 0)
 			{
 				float Health = KillerPawn->GetHealth();
 				float Shield = KillerPawn->GetShield();
 
-				int MaxHealth = 100;
-				int MaxShield = 100;
-				int AmountGiven = 0;
-				/*
-				int ShieldGiven = 0;
-				int HealthGiven = 0;
-				*/
+				float MaxHealth = KillerPawn->GetMaxHealth();
+				float MaxShield = KillerPawn->GetMaxShield();
+
+				float AmountGiven = 0;
 
 				if ((MaxHealth - Health) > 0)
 				{
-					int AmountToGive = MaxHealth - Health >= Globals::AmountOfHealthSiphon ? Globals::AmountOfHealthSiphon : MaxHealth - Health;
+					float AmountToGive = MaxHealth - Health >= Globals::AmountOfHealthSiphon ? Globals::AmountOfHealthSiphon : MaxHealth - Health;
 					KillerPawn->SetHealth(Health + AmountToGive);
 					AmountGiven += AmountToGive;
 				}
 
-				if ((MaxShield - Shield) > 0 && AmountGiven < Globals::AmountOfHealthSiphon)
+				if ((MaxShield - Shield) >= 0 && AmountGiven < Globals::AmountOfHealthSiphon)
 				{
-					int AmountToGive = MaxShield - Shield >= Globals::AmountOfHealthSiphon ? Globals::AmountOfHealthSiphon : MaxShield - Shield;
-					AmountToGive -= AmountGiven;
-
-					if (AmountToGive > 0)
+					if (MaxShield - Shield > 0)
 					{
-						KillerPawn->SetShield(Shield + AmountToGive);
-						AmountGiven += AmountToGive;
-					}
-				}
-				
-				if (AmountGiven > 0)
-				{
+						float AmountToGive = MaxShield - Shield >= Globals::AmountOfHealthSiphon ? Globals::AmountOfHealthSiphon : MaxShield - Shield;
+						AmountToGive -= AmountGiven;
 
+						if (AmountToGive > 0)
+						{
+							KillerPawn->SetShield(Shield + AmountToGive);
+							AmountGiven += AmountToGive;
+						}
+					}
 				}
 			}
 		}

@@ -220,6 +220,48 @@ UFortWeaponItemDefinition* AFortPlayerPawn::GetVehicleWeaponDefinition(AFortAthe
 	return Vehicle->GetVehicleWeaponForSeat(Vehicle->FindSeatIndex(this));
 }
 
+void AFortPlayerPawn::SiphonMats()
+{
+	if (Globals::AmountOfHealthSiphon != 0)
+	{
+		auto PlayerController = Cast<AFortPlayerController>(GetController());
+		auto WorldInventory = PlayerController->GetWorldInventory();
+
+		static auto WoodItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/WoodItemData.WoodItemData");
+		static auto StoneItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/StoneItemData.StoneItemData");
+		static auto MetalItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/MetalItemData.MetalItemData");
+
+		int MaxMaterials = 999;
+
+		auto WoodInstance = WorldInventory->FindItemInstance(WoodItemData);
+		auto WoodCount = WoodInstance ? WoodInstance->GetItemEntry()->GetCount() : 0;
+
+		auto StoneInstance = WorldInventory->FindItemInstance(StoneItemData);
+		auto StoneCount = StoneInstance ? StoneInstance->GetItemEntry()->GetCount() : 0;
+
+		auto MetalInstance = WorldInventory->FindItemInstance(MetalItemData);
+		auto MetalCount = MetalInstance ? MetalInstance->GetItemEntry()->GetCount() : 0;
+
+		if (WoodCount < MaxMaterials)
+		{
+			int WoodToAdd = FMath::Min(50, MaxMaterials - WoodCount);
+			WorldInventory->AddItem(WoodItemData, nullptr, WoodToAdd);
+		}
+		if (StoneCount < MaxMaterials)
+		{
+			int StoneToAdd = FMath::Min(50, MaxMaterials - StoneCount);
+			WorldInventory->AddItem(StoneItemData, nullptr, StoneToAdd);
+		}
+		if (MetalCount < MaxMaterials)
+		{
+			int MetalToAdd = FMath::Min(50, MaxMaterials - MetalCount);
+			WorldInventory->AddItem(MetalItemData, nullptr, MetalToAdd);
+		}
+
+		WorldInventory->Update();
+	}
+}
+
 void AFortPlayerPawn::UnEquipVehicleWeaponDefinition(UFortWeaponItemDefinition* VehicleWeaponDefinition)
 {
 	if (!VehicleWeaponDefinition)

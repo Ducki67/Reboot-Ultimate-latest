@@ -26,19 +26,6 @@ struct FGuid
 	{
 		return !(*this == other);
 	}
-
-	std::string ToString()
-	{
-		return "{" + std::to_string(A) + ", " + std::to_string(B) + ", " + std::to_string(C) + ", " + std::to_string(D) + "}";
-	}
-};
-
-template<typename... Parms>
-struct ParameterStruct
-{
-	std::tuple<Parms...> Parameters;
-
-	ParameterStruct(Parms... Params) : Parameters(Params...) {}
 };
 
 class UObject
@@ -65,25 +52,6 @@ public:
 		ProcessEventOriginal(this, Function, Parms);
 	}
 
-	template<typename T = int, typename ...Parms>
-	T Execute(UFunction* Function, Parms... Params)
-	{
-		auto ParamStruct = ParameterStruct<Parms...>(Params...);
-
-		auto ReturnValueOffset = 0;
-
-		if (Offsets::ReturnValue)
-			ReturnValueOffset = *(int*)(__int64(Function) + Offsets::ReturnValue);
-
-		ProcessEventOriginal(this, Function, &ParamStruct);
-
-		if (ReturnValueOffset > 0)
-		{
-			T ReturnValue = *reinterpret_cast<T*>(__int64(&ParamStruct) + ReturnValueOffset);
-			return ReturnValue;
-		}
-	}
-
 	std::string GetName() const { return NamePrivate.ToString(); }
 	std::string GetPathName() const;
 	std::string GetFullName() const;
@@ -96,7 +64,9 @@ public:
 
 	void* GetProperty(const std::string& ChildName, bool bWarnIfNotFound = true);
 	void* GetProperty(const std::string& ChildName, bool bWarnIfNotFound = true) const;
+	void* GetPropertyFunc(const std::string& ChildName, bool bWarnIfNotFound = true);
 	int GetOffset(const std::string& ChildName, bool bWarnIfNotFound = true);
+	int GetOffsetFunc(const std::string& ChildName, bool bWarnIfNotFound = true);
 	int GetOffset(const std::string& ChildName, bool bWarnIfNotFound = true) const;
 
 	template <typename T = UObject*>
@@ -131,7 +101,7 @@ public:
 
 		SavedOffsets.emplace(CachedName, Offset->second);
 
-		return *(T*)(__int64(this) + Offset->second); 
+		return *(T*)(__int64(this) + Offset->second);
 	} */
 
 	template <typename T = UObject*>
