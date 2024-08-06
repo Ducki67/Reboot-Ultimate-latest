@@ -5,7 +5,7 @@
 
 APawn* UFortServerBotManagerAthena::SpawnAI(FVector InSpawnLocation, FRotator InSpawnRotation, UFortAthenaAISpawnerDataComponentList* AISpawnerComponentList)
 {
-	static auto SpawnAIFn = FindObject<UFunction>("/Script/FortniteGame.FortServerBotManagerAthena.SpawnAI");
+	static auto SpawnAIFn = FindObject<UFunction>(L"/Script/FortniteGame.FortServerBotManagerAthena.SpawnAI");
 
 	struct
 	{

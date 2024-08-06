@@ -99,7 +99,7 @@ void AFortPlayerControllerAthena::EndGhostModeHook(AFortPlayerControllerAthena* 
 
 	if (!GhostModeItemDef) // bro IDFK
 	{
-		GhostModeItemDef = FindObject<UFortWorldItemDefinition>("/Game/Athena/Items/Gameplay/SpookyMist/AGID_SpookyMist.AGID_SpookyMist");
+		GhostModeItemDef = FindObject<UFortWorldItemDefinition>(L"/Game/Athena/Items/Gameplay/SpookyMist/AGID_SpookyMist.AGID_SpookyMist");
 	}
 
 	if (!GhostModeItemDef)
@@ -140,7 +140,7 @@ void AFortPlayerControllerAthena::ServerCreativeSetFlightSpeedIndexHook(UObject*
 
 	// LOG_INFO(LogDev, "Player {} wanting to change creative flight speed at index {}", Context->GetName(), Index);
 
-	static auto WantedFlightSpeedChangedFn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerControllerGameplay:OnRep_FlyingModifierIndex");
+	static auto WantedFlightSpeedChangedFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerControllerGameplay:OnRep_FlyingModifierIndex");
 
 	if (!WantedFlightSpeedChangedFn)
 	{
@@ -614,7 +614,7 @@ void AFortPlayerControllerAthena::ServerReadyToStartMatchHook(AFortPlayerControl
 			if (QuickBars)
 				return ServerReadyToStartMatchOriginal(PlayerController);
 
-			static auto FortQuickBarsClass = FindObject<UClass>("/Script/FortniteGame.FortQuickBars");
+			static auto FortQuickBarsClass = FindObject<UClass>(L"/Script/FortniteGame.FortQuickBars");
 
 			QuickBars = GetWorld()->SpawnActor<AActor>(FortQuickBarsClass);
 

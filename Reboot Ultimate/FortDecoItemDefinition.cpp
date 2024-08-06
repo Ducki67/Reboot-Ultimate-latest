@@ -2,6 +2,6 @@
 
 UClass* UFortDecoItemDefinition::StaticClass()
 {
-	static auto ptr = FindObject<UClass>("/Script/FortniteGame.FortDecoItemDefinition");
+	static auto ptr = FindObject<UClass>(L"/Script/FortniteGame.FortDecoItemDefinition");
 	return ptr;
 }

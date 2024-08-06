@@ -11,7 +11,7 @@ struct FItemsToGive
 {
 	static UStruct* GetStruct()
 	{
-		static auto Struct = FindObject<UStruct>("/Script/FortniteGame.ItemsToGive");
+		static auto Struct = FindObject<UStruct>(L"/Script/FortniteGame.ItemsToGive");
 		return Struct;
 	}
 
@@ -51,7 +51,7 @@ public:
 
 	static UClass* StaticClass()
 	{
-		static auto Class = FindObject<UClass>("/Script/FortniteGame.FortAthenaMutator_GiveItemsAtGamePhaseStep");
+		static auto Class = FindObject<UClass>(L"/Script/FortniteGame.FortAthenaMutator_GiveItemsAtGamePhaseStep");
 		return Class;
 	}
 };

@@ -3,6 +3,8 @@
 #include "Object.h"
 #include "GameplayAbilitySpec.h"
 #include "AttributeSet.h"
+#include "GameplayTagContainer.h"
+#include "AbilitySystemComponent.h"
 
 // using FPredictionKey = PadHex18;
 // using FGameplayEventData = PadHexA8;
@@ -18,7 +20,7 @@ struct FPredictionKey // todo move
 
 	static UStruct* GetStruct()
 	{
-		static auto Struct = FindObject<UStruct>("/Script/GameplayAbilities.PredictionKey");
+		static auto Struct = FindObject<UStruct>(L"/Script/GameplayAbilities.PredictionKey");
 		return Struct;
 	}
 
@@ -61,6 +63,47 @@ public:
 		this->ProcessEvent(fn, &UAbilitySystemComponent_ClientActivateAbilityFailed_Params);
 	}
 
+	void NetMulticast_InvokeGameplayCueAdded(FGameplayTag GameplayCueTag)
+	{
+		static UFunction* NetMulticast_InvokeGameplayCueAddedFn = FindObject<UFunction>(L"/Script/GameplayAbilities.AbilitySystemComponent.NetMulticast_InvokeGameplayCueAdded");
+
+		if (!NetMulticast_InvokeGameplayCueAddedFn)
+			return;
+
+		static int NetMulticast_InvokeGameplayCueExecutedParamSize = NetMulticast_InvokeGameplayCueAddedFn->GetPropertiesSize();
+
+		auto NetMulticast_InvokeGameplayCueAddedParams = Alloc(NetMulticast_InvokeGameplayCueExecutedParamSize);
+
+		if (!NetMulticast_InvokeGameplayCueAddedParams)
+			return;
+
+		static auto GameplayCueTagOffset = FindOffsetStruct("/Script/GameplayAbilities.AbilitySystemComponent.NetMulticast_InvokeGameplayCueAdded", "GameplayCueTag");
+		*(FGameplayTag*)(__int64(NetMulticast_InvokeGameplayCueAddedParams) + GameplayCueTagOffset) = GameplayCueTag;
+
+		this->ProcessEvent(NetMulticast_InvokeGameplayCueAddedFn, NetMulticast_InvokeGameplayCueAddedParams);
+	}
+
+	void NetMulticast_InvokeGameplayCueExecuted(FGameplayTag GameplayCueTag)
+	{
+		static UFunction* NetMulticast_InvokeGameplayCueExecutedFn = FindObject<UFunction>(L"/Script/GameplayAbilities.AbilitySystemComponent.NetMulticast_InvokeGameplayCueExecuted");
+
+		if (!NetMulticast_InvokeGameplayCueExecutedFn)
+			return;
+
+		static int NetMulticast_InvokeGameplayCueExecutedParamSize = NetMulticast_InvokeGameplayCueExecutedFn->GetPropertiesSize();
+
+		auto NetMulticast_InvokeGameplayCueExecutedParams = Alloc(NetMulticast_InvokeGameplayCueExecutedParamSize);
+
+		if (!NetMulticast_InvokeGameplayCueExecutedParams)
+			return;
+
+		static auto GameplayCueTagOffset = FindOffsetStruct("/Script/GameplayAbilities.AbilitySystemComponent.NetMulticast_InvokeGameplayCueExecuted", "GameplayCueTag");
+
+		*(FGameplayTag*)(__int64(NetMulticast_InvokeGameplayCueExecutedParams) + GameplayCueTagOffset) = GameplayCueTag;
+
+		this->ProcessEvent(NetMulticast_InvokeGameplayCueExecutedFn, NetMulticast_InvokeGameplayCueExecutedParams);
+	}
+
 	TArray<UAttributeSet*>& GetSpawnedAttributes()
 	{
 		static auto SpawnedAttributesOffset = GetOffset("SpawnedAttributes");
@@ -84,7 +127,7 @@ public:
 	void ClientCancelAbility(FGameplayAbilitySpecHandle AbilityToCancel, FGameplayAbilityActivationInfo* ActivationInfo);
 	bool HasAbility(UObject* DefaultAbility);
 	FActiveGameplayEffectHandle ApplyGameplayEffectToSelf(UClass* GameplayEffectClass, float Level, const FGameplayEffectContextHandle& EffectContext = FGameplayEffectContextHandle());
-	// FGameplayEffectContextHandle MakeEffectContext();
+	FGameplayEffectContextHandle MakeEffectContext();
 	void RemoveActiveGameplayEffectBySourceEffect(UClass* GEClass, int StacksToRemove, UAbilitySystemComponent* Instigator);
 	void ConsumeAllReplicatedData(FGameplayAbilitySpecHandle AbilityHandle, FPredictionKey* AbilityOriginalPredictionKey);
 	FGameplayAbilitySpecHandle GiveAbilityEasy(UClass* AbilityClass, UObject* SourceObject = nullptr, bool bDoNotRegive = true);

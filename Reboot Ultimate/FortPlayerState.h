@@ -34,6 +34,10 @@ public:
 
 	void UpdateScoreStatChanged();
 	void EndDBNOAbilities();
+	void ApplySiphonEffect();
+	void ApplyHealthEffect();
+	void DisableFallDamage();
+	void ApplyCrownEffect();
 
 	static bool AreUniqueIDsIdentical(FUniqueNetIdRepl* A, FUniqueNetIdRepl* B);
 

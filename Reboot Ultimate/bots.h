@@ -271,6 +271,7 @@ public:
 		auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
 		auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
 		AFortPlayerControllerAthena* KillerController = nullptr;
+		AFortPlayerStateAthena* KillerPlayerState = nullptr;
 		AFortPawn* KillerPawn = nullptr;
 
 		if (KillerState)
@@ -360,9 +361,9 @@ public:
 			KillerState->ClientReportKill(PlayerState);
 		}
 
-		if (Globals::AmountOfHealthSiphon != 0)
+		if (KillerPawn && KillerPawn != Pawn && KillerController && Cast<AController>(KillerController) != Cast<AController>(AIBotController))
 		{
-			if (KillerPawn && KillerPawn != Pawn && KillerController && Cast<AController>(KillerController) != Cast<AController>(AIBotController))
+			if (Globals::AmountOfHealthSiphon != 0)
 			{
 				auto WorldInventory = KillerController->GetWorldInventory();
 
@@ -373,35 +374,64 @@ public:
 				static auto StoneItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/StoneItemData.StoneItemData");
 				static auto MetalItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/MetalItemData.MetalItemData");
 
-				WorldInventory->AddItem(WoodItemData, nullptr, 50);
-				WorldInventory->AddItem(StoneItemData, nullptr, 50);
-				WorldInventory->AddItem(MetalItemData, nullptr, 50);
+				int MaxMaterials = 999;
+
+				auto WoodInstance = WorldInventory->FindItemInstance(WoodItemData);
+				auto WoodCount = WoodInstance ? WoodInstance->GetItemEntry()->GetCount() : 0;
+
+				auto StoneInstance = WorldInventory->FindItemInstance(StoneItemData);
+				auto StoneCount = StoneInstance ? StoneInstance->GetItemEntry()->GetCount() : 0;
+
+				auto MetalInstance = WorldInventory->FindItemInstance(MetalItemData);
+				auto MetalCount = MetalInstance ? MetalInstance->GetItemEntry()->GetCount() : 0;
+
+				if (WoodCount < MaxMaterials)
+				{
+					int WoodToAdd = FMath::Min(50, MaxMaterials - WoodCount);
+					WorldInventory->AddItem(WoodItemData, nullptr, WoodToAdd);
+				}
+				if (StoneCount < MaxMaterials)
+				{
+					int StoneToAdd = FMath::Min(50, MaxMaterials - StoneCount);
+					WorldInventory->AddItem(StoneItemData, nullptr, StoneToAdd);
+				}
+				if (MetalCount < MaxMaterials)
+				{
+					int MetalToAdd = FMath::Min(50, MaxMaterials - MetalCount);
+					WorldInventory->AddItem(MetalItemData, nullptr, MetalToAdd);
+				}
 
 				WorldInventory->Update();
 
 				float Health = KillerPawn->GetHealth();
 				float Shield = KillerPawn->GetShield();
 
-				int MaxHealth = 100;
-				int MaxShield = 100;
-				int AmountGiven = 0;
+				float MaxHealth = KillerPawn->GetMaxHealth();
+				float MaxShield = KillerPawn->GetMaxShield();
+
+				float AmountGiven = 0;
 
 				if ((MaxHealth - Health) > 0)
 				{
-					int AmountToGive = MaxHealth - Health >= Globals::AmountOfHealthSiphon ? Globals::AmountOfHealthSiphon : MaxHealth - Health;
+					float AmountToGive = MaxHealth - Health >= Globals::AmountOfHealthSiphon ? Globals::AmountOfHealthSiphon : MaxHealth - Health;
 					KillerPawn->SetHealth(Health + AmountToGive);
 					AmountGiven += AmountToGive;
 				}
 
-				if ((MaxShield - Shield) > 0 && AmountGiven < Globals::AmountOfHealthSiphon)
+				if ((MaxShield - Shield) >= 0 && AmountGiven < Globals::AmountOfHealthSiphon)
 				{
-					int AmountToGive = MaxShield - Shield >= Globals::AmountOfHealthSiphon ? Globals::AmountOfHealthSiphon : MaxShield - Shield;
-					AmountToGive -= AmountGiven;
+					// KillerPlayerState->ApplySiphonEffect();
 
-					if (AmountToGive > 0)
+					if (MaxShield - Shield > 0)
 					{
-						KillerPawn->SetShield(Shield + AmountToGive);
-						AmountGiven += AmountToGive;
+						float AmountToGive = MaxShield - Shield >= Globals::AmountOfHealthSiphon ? Globals::AmountOfHealthSiphon : MaxShield - Shield;
+						AmountToGive -= AmountGiven;
+
+						if (AmountToGive > 0)
+						{
+							KillerPawn->SetShield(Shield + AmountToGive);
+							AmountGiven += AmountToGive;
+						}
 					}
 				}
 			}
@@ -514,7 +544,7 @@ public:
 
 			for (int i = 0; i < AIBotController->GetInventory()->GetItemList().GetReplicatedEntries().Num(); i++)
 			{
-				if (AIBotController->GetInventory()->GetItemList().GetReplicatedEntries()[i].GetItemDefinition()->IsA(FindObject<UClass>("/Script/FortniteGame.FortWeaponMeleeItemDefinition")) || (Cast<UFortWorldItemDefinition>(AIBotController->GetInventory()->GetItemList().GetReplicatedEntries()[i].GetItemDefinition()) && !Cast<UFortWorldItemDefinition>(AIBotController->GetInventory()->GetItemList().GetReplicatedEntries()[i].GetItemDefinition())->CanBeDropped()))
+				if (AIBotController->GetInventory()->GetItemList().GetReplicatedEntries()[i].GetItemDefinition()->IsA(FindObject<UClass>(L"/Script/FortniteGame.FortWeaponMeleeItemDefinition")) || (Cast<UFortWorldItemDefinition>(AIBotController->GetInventory()->GetItemList().GetReplicatedEntries()[i].GetItemDefinition()) && !Cast<UFortWorldItemDefinition>(AIBotController->GetInventory()->GetItemList().GetReplicatedEntries()[i].GetItemDefinition())->CanBeDropped()))
 					continue;
 
 				PickupCreateData CreateData;

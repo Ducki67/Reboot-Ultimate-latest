@@ -4,7 +4,7 @@
 
 AActor* AController::GetViewTarget()
 {
-	static auto GetViewTargetFn = FindObject<UFunction>("/Script/Engine.Controller.GetViewTarget");
+	static auto GetViewTargetFn = FindObject<UFunction>(L"/Script/Engine.Controller.GetViewTarget");
 	AActor* ViewTarget = nullptr;
 	this->ProcessEvent(GetViewTargetFn, &ViewTarget);
 	return ViewTarget;
@@ -18,7 +18,7 @@ void AController::Possess(class APawn* Pawn)
 
 bool AController::LineOfSightTo(AActor* Other, const FVector& ViewPoint, bool bAlternateChecks)
 {
-	static auto LineOfSightToFn = FindObject<UFunction>("/Script/Engine.Controller.LineOfSightTo");
+	static auto LineOfSightToFn = FindObject<UFunction>(L"/Script/Engine.Controller.LineOfSightTo");
 
 	struct
 	{
@@ -35,12 +35,12 @@ bool AController::LineOfSightTo(AActor* Other, const FVector& ViewPoint, bool bA
 
 void AController::StopMovement()
 {
-	static auto StopMovementFn = FindObject<UFunction>("/Script/Engine.Controller.StopMovement");
+	static auto StopMovementFn = FindObject<UFunction>(L"/Script/Engine.Controller.StopMovement");
 	this->ProcessEvent(StopMovementFn);
 }
 
 void AController::SetControlRotation(FRotator NewRotation)
 {
-	static auto SetControlRotationFn = FindObject<UFunction>("/Script/Engine.Controller.SetControlRotation");
+	static auto SetControlRotationFn = FindObject<UFunction>(L"/Script/Engine.Controller.SetControlRotation");
 	this->ProcessEvent(SetControlRotationFn, &NewRotation);
 }

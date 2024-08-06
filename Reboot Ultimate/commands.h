@@ -51,7 +51,8 @@ inline bool IsOperator(APlayerState* PlayerState, AFortPlayerController* PlayerC
 	{
 		return true;
 	}
-	if (Globals::bPrivateIPsAreOperator) {
+	if (Globals::bPrivateIPsAreOperator) 
+	{
 		return IsPrivateIP(IPStr);
 	}
 

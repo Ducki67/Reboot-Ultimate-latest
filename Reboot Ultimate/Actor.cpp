@@ -65,14 +65,14 @@ AActor* AActor::GetOwner()
 
 void AActor::K2_DestroyActor()
 {
-	static auto DestroyActorFn = FindObject<UFunction>("/Script/Engine.Actor.K2_DestroyActor");
+	static auto DestroyActorFn = FindObject<UFunction>(L"/Script/Engine.Actor.K2_DestroyActor");
 
 	this->ProcessEvent(DestroyActorFn);
 }
 
 UActorComponent* AActor::GetComponentByClass(class UClass* ComponentClass)
 {
-	static auto fn = FindObject<UFunction>("/Script/Engine.Actor.GetComponentByClass");
+	static auto fn = FindObject<UFunction>(L"/Script/Engine.Actor.GetComponentByClass");
 	struct
 	{
 		class UClass* ComponentClass;                                           // (Parm, ZeroConstructor, IsPlainOldData, NoDestructor, UObjectWrapper, HasGetValueTypeHash, NativeAccessSpecifierPublic)
@@ -86,7 +86,7 @@ UActorComponent* AActor::GetComponentByClass(class UClass* ComponentClass)
 
 float AActor::GetDistanceTo(AActor* OtherActor)
 {
-	static auto fn = FindObject<UFunction>("/Script/Engine.Actor.GetDistanceTo");
+	static auto fn = FindObject<UFunction>(L"/Script/Engine.Actor.GetDistanceTo");
 
 	struct { AActor* OtherActor; float ReturnValue; } AActor_GetDistanceTo_Params{OtherActor};
 
@@ -102,7 +102,7 @@ float AActor::GetDistanceTo_Manual(AActor* OtherActor)
 
 FVector AActor::GetActorScale3D()
 {
-	static auto GetActorScale3DFn = FindObject<UFunction>("/Script/Engine.Actor.GetActorScale3D");
+	static auto GetActorScale3DFn = FindObject<UFunction>(L"/Script/Engine.Actor.GetActorScale3D");
 
 	FVector Scale3D;
 	this->ProcessEvent(GetActorScale3DFn, &Scale3D);
@@ -112,7 +112,7 @@ FVector AActor::GetActorScale3D()
 
 FVector AActor::GetActorLocation()
 {
-	static auto K2_GetActorLocationFn = FindObject<UFunction>("/Script/Engine.Actor.K2_GetActorLocation");
+	static auto K2_GetActorLocationFn = FindObject<UFunction>(L"/Script/Engine.Actor.K2_GetActorLocation");
 	FVector ret;
 	this->ProcessEvent(K2_GetActorLocationFn, &ret);
 
@@ -121,7 +121,7 @@ FVector AActor::GetActorLocation()
 
 FVector AActor::GetActorForwardVector()
 {
-	static auto GetActorForwardVectorFn = FindObject<UFunction>("/Script/Engine.Actor.GetActorForwardVector");
+	static auto GetActorForwardVectorFn = FindObject<UFunction>(L"/Script/Engine.Actor.GetActorForwardVector");
 	FVector ret;
 	this->ProcessEvent(GetActorForwardVectorFn, &ret);
 
@@ -130,7 +130,7 @@ FVector AActor::GetActorForwardVector()
 
 FVector AActor::GetActorRightVector()
 {
-	static auto GetActorRightVectorFn = FindObject<UFunction>("/Script/Engine.Actor.GetActorRightVector");
+	static auto GetActorRightVectorFn = FindObject<UFunction>(L"/Script/Engine.Actor.GetActorRightVector");
 	FVector ret;
 	this->ProcessEvent(GetActorRightVectorFn, &ret);
 
@@ -139,7 +139,7 @@ FVector AActor::GetActorRightVector()
 
 FVector AActor::GetActorUpVector()
 {
-	static auto GetActorUpVectorFn = FindObject<UFunction>("/Script/Engine.Actor.GetActorUpVector");
+	static auto GetActorUpVectorFn = FindObject<UFunction>(L"/Script/Engine.Actor.GetActorUpVector");
 	FVector ret;
 	this->ProcessEvent(GetActorUpVectorFn, &ret);
 
@@ -163,7 +163,7 @@ void AActor::FlushNetDormancy()
 
 void AActor::SetActorEnableCollision(bool bNewActorEnableCollision)
 {
-	static auto SetActorEnableCollisionFn = FindObject<UFunction>("/Script/Engine.Actor.SetActorEnableCollision");
+	static auto SetActorEnableCollisionFn = FindObject<UFunction>(L"/Script/Engine.Actor.SetActorEnableCollision");
 	this->ProcessEvent(SetActorEnableCollisionFn, &bNewActorEnableCollision);
 }
 
@@ -246,7 +246,7 @@ UObject* AActor::AddComponentByClass(UClass* Class)
 	params.RelativeTransform = FTransform();
 	params.bDeferredFinish = true;
 
-	static UFunction* AddComp = FindObject<UFunction>("/Script/Engine.Actor:AddComponentByClass");
+	static UFunction* AddComp = FindObject<UFunction>(L"/Script/Engine.Actor:AddComponentByClass");
 
 	this->ProcessEvent(AddComp, &params);
 
@@ -322,7 +322,7 @@ AActor* AActor::GetClosestActor(UClass* ActorClass, float DistMax, std::function
 
 float AActor::GetGameTimeSinceCreation()
 {
-	static auto GetGameTimeSinceCreationFn = FindObject<UFunction>("/Script/Engine.Actor.GetGameTimeSinceCreation");
+	static auto GetGameTimeSinceCreationFn = FindObject<UFunction>(L"/Script/Engine.Actor.GetGameTimeSinceCreation");
 	float ReturnValue;
 	this->ProcessEvent(GetGameTimeSinceCreationFn, &ReturnValue);
 	return ReturnValue;

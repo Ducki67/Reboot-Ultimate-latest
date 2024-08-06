@@ -2,7 +2,7 @@
 
 APawn* UAIBlueprintHelperLibrary::SpawnAIFromClass(UObject* WorldContextObject, TSubclassOf<APawn> PawnClass, UBehaviorTree* BehaviorTree, const FVector& Location, const FRotator& Rotation, bool bNoCollisionFail, AActor* Owner)
 {
-	static auto SpawnAIFromClassFn = FindObject<UFunction>("/Script/AIModule.AIBlueprintHelperLibrary.SpawnAIFromClass");
+	static auto SpawnAIFromClassFn = FindObject<UFunction>(L"/Script/AIModule.AIBlueprintHelperLibrary.SpawnAIFromClass");
 
 	struct
 	{

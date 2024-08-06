@@ -5,7 +5,7 @@
 
 void AFortAthenaAIBotController::SwitchTeam(uint8 TeamIndex)
 {
-	static auto SwitchTeamFn = FindObject<UFunction>("/Script/FortniteGame.FortAthenaAIBotController.SwitchTeam");
+	static auto SwitchTeamFn = FindObject<UFunction>(L"/Script/FortniteGame.FortAthenaAIBotController.SwitchTeam");
 	this->ProcessEvent(SwitchTeamFn, &TeamIndex);
 }
 
@@ -15,13 +15,13 @@ void AFortAthenaAIBotController::AddDigestedSkillSets()
 	{
 		auto CurrentDigestedBotSkillSet = this->GetDigestedBotSkillSets().at(i);
 
-		UClass* AimingDigestedSkillSetClass = FindObject<UClass>("/Script/FortniteGame.FortAthenaAIBotAimingDigestedSkillSet");
-		UClass* HarvestDigestedSkillSetClass = FindObject<UClass>("/Script/FortniteGame.FortAthenaAIBotHarvestDigestedSkillSet");
-		UClass* InventoryDigestedSkillSetClass = FindObject<UClass>("/Script/FortniteGame.FortAthenaAIBotInventoryDigestedSkillSet");
-		UClass* LootingDigestedSkillSetClass = FindObject<UClass>("/Script/FortniteGame.FortAthenaAIBotLootingDigestedSkillSet");
-		UClass* MovementDigestedSkillSetClass = FindObject<UClass>("/Script/FortniteGame.FortAthenaAIBotMovementDigestedSkillSet");
-		UClass* PerceptionDigestedSkillSetClass = FindObject<UClass>("/Script/FortniteGame.FortAthenaAIBotPerceptionDigestedSkillSet");
-		UClass* PlayStyleDigestedSkillSetClass = FindObject<UClass>("/Script/FortniteGame.FortAthenaAIBotPlayStyleDigestedSkillSet");
+		UClass* AimingDigestedSkillSetClass = FindObject<UClass>(L"/Script/FortniteGame.FortAthenaAIBotAimingDigestedSkillSet");
+		UClass* HarvestDigestedSkillSetClass = FindObject<UClass>(L"/Script/FortniteGame.FortAthenaAIBotHarvestDigestedSkillSet");
+		UClass* InventoryDigestedSkillSetClass = FindObject<UClass>(L"/Script/FortniteGame.FortAthenaAIBotInventoryDigestedSkillSet");
+		UClass* LootingDigestedSkillSetClass = FindObject<UClass>(L"/Script/FortniteGame.FortAthenaAIBotLootingDigestedSkillSet");
+		UClass* MovementDigestedSkillSetClass = FindObject<UClass>(L"/Script/FortniteGame.FortAthenaAIBotMovementDigestedSkillSet");
+		UClass* PerceptionDigestedSkillSetClass = FindObject<UClass>(L"/Script/FortniteGame.FortAthenaAIBotPerceptionDigestedSkillSet");
+		UClass* PlayStyleDigestedSkillSetClass = FindObject<UClass>(L"/Script/FortniteGame.FortAthenaAIBotPlayStyleDigestedSkillSet");
 
 		if (CurrentDigestedBotSkillSet->IsA(AimingDigestedSkillSetClass))
 			this->Get("CacheAimingDigestedSkillSet") = CurrentDigestedBotSkillSet;
@@ -113,6 +113,6 @@ void AFortAthenaAIBotController::OnAlertLevelChangedHook(AFortAthenaAIBotControl
 
 UClass* AFortAthenaAIBotController::StaticClass()
 {
-	static auto Class = FindObject<UClass>("/Script/FortniteGame.FortAthenaAIBotController");
+	static auto Class = FindObject<UClass>(L"/Script/FortniteGame.FortAthenaAIBotController");
 	return Class;
 }

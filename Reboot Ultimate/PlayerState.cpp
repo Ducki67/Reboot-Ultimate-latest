@@ -76,12 +76,12 @@ void APlayerState::SetPlayerName(const FString& S)
 
 void APlayerState::OnRep_PlayerName()
 {
-	static auto OnRep_PlayerNameFn = FindObject<UFunction>("/Script/Engine.PlayerState.OnRep_PlayerName");
+	static auto OnRep_PlayerNameFn = FindObject<UFunction>(L"/Script/Engine.PlayerState.OnRep_PlayerName");
 	this->ProcessEvent(OnRep_PlayerNameFn);
 }
 
 void APlayerState::OnRep_Score()
 {
-	static auto fn = FindObject<UFunction>("/Script/Engine.PlayerState.OnRep_Score");
+	static auto fn = FindObject<UFunction>(L"/Script/Engine.PlayerState.OnRep_Score");
 	this->ProcessEvent(fn);
 }

@@ -797,7 +797,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			FString Reason = L"You have been kicked.";
 
-			static auto ClientReturnToMainMenu = FindObject<UFunction>("/Script/Engine.PlayerController.ClientReturnToMainMenu");
+			static auto ClientReturnToMainMenu = FindObject<UFunction>(L"/Script/Engine.PlayerController.ClientReturnToMainMenu");
 			ReceivingController->ProcessEvent(ClientReturnToMainMenu, &Reason);
 
 			std::string KickedPlayerName;
@@ -821,7 +821,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			FString Reason = L"You have been banned.";
 
-			static auto ClientReturnToMainMenu = FindObject<UFunction>("/Script/Engine.PlayerController.ClientReturnToMainMenu");
+			static auto ClientReturnToMainMenu = FindObject<UFunction>(L"/Script/Engine.PlayerController.ClientReturnToMainMenu");
 			ReceivingController->ProcessEvent(ClientReturnToMainMenu, &Reason);
 
 			std::string BannedPlayerName;
@@ -832,6 +832,34 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			std::wstring Msg = MsgStream.str();
 
 			SendMessageToConsole(PlayerController, Msg.c_str());
+		}
+		else if (Command == "givegameplayeffect" || Command == "givege")
+		{
+			auto PlayerState = ReceivingController->GetPlayerStateAthena();
+
+			if (!PlayerState)
+			{
+				SendMessageToConsole(ReceivingController, L"No PlayerState!");
+				return;
+			}
+
+			auto AbilitySystemComponent = PlayerState->GetAbilitySystemComponent();
+
+			if (!AbilitySystemComponent)
+			{
+				SendMessageToConsole(ReceivingController, L"No AbilitySystemComponent!");
+				return;
+			}
+
+			UClass* AbilityClassToGive = nullptr;
+
+			if (NumArgs >= 1)
+			{
+				static auto BGAClass = FindObject<UClass>(L"/Script/Engine.BlueprintGeneratedClass");
+				AbilityClassToGive = LoadObject<UClass>(Arguments[1], BGAClass);
+			}
+
+			AbilitySystemComponent->ApplyGameplayEffectToSelf(AbilityClassToGive, 1.f);
 		}
 		else if (Command == "setpickaxe" || Command == "pickaxe")
 		{
@@ -1424,37 +1452,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				LOG_INFO(LogDev, "Destroyed Fishing Hole {}", FishingHole->GetFullName());
 			}
 		}
-		else if (Command == "mang")
-		{
-			if (NumArgs < 1)
-			{
-				SendMessageToConsole(PlayerController, L"Please provide a cheat command!");
-				return;
-			}
-
-			std::string cmd = Arguments[1];
-
-			cmd[0] = std::toupper(cmd[0]);
-
-			auto MangFn = FindObject<UFunction>("/Script/Engine.CheatManager." + cmd);
-
-			if (!MangFn)
-			{
-				SendMessageToConsole(PlayerController, L"Cheat command not supported!");
-				return;
-			}
-
-			auto CheatManager = ReceivingController->SpawnCheatManager(UCheatManager::StaticClass());
-
-			if (!CheatManager)
-			{
-				SendMessageToConsole(PlayerController, L"Failed to spawn player's cheat manager!");
-				return;
-			}
-
-			CheatManager->Mang(cmd);
-			CheatManager = nullptr;
-		}
 		else if (Command == "getscript")
 		{
 			auto Pawn = ReceivingController->GetMyFortPawn();
@@ -1527,7 +1524,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		}
 		else if (Command == "suicide" || Command == "frenchpeople")
 		{
-			static auto ServerSuicideFn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerController.ServerSuicide");
+			static auto ServerSuicideFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerController.ServerSuicide");
 			ReceivingController->ProcessEvent(ServerSuicideFn);
 		}
 		else if (Command == "spawn" || Command == "summon")
@@ -1680,6 +1677,10 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				SendMessageToConsole(PlayerController, L"Not a valid class!");
 			}
 		}
+		else if (Command == "togglemarktoteleport" || Command == "togglemarktotp")
+		{
+			bMarkToTeleport = !bMarkToTeleport;
+		}
 		else if (Command == "spawnbot" || Command == "bot")
 		{
 			auto Pawn = ReceivingController->GetPawn();
@@ -1759,7 +1760,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		}
 		else if (Command == "settimeofday" || Command == "time" || Command == "hour")
 		{
-			static auto SetTimeOfDayFn = FindObject<UFunction>("/Script/FortniteGame.FortKismetLibrary.SetTimeOfDay");
+			static auto SetTimeOfDayFn = FindObject<UFunction>(L"/Script/FortniteGame.FortKismetLibrary.SetTimeOfDay");
 
 			float NewTimeOfDay = 0.f;
 
@@ -1952,7 +1953,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			State.AngularVelocity = FVector(0, 0, 0);
 			State.SyncKey = 53640;
 
-			static auto ServerUpdatePhysicsParamsFn = FindObject<UFunction>("/Script/FortniteGame.FortPhysicsPawn.ServerUpdatePhysicsParams");
+			static auto ServerUpdatePhysicsParamsFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPhysicsPawn.ServerUpdatePhysicsParams");
 			Vehicle->ProcessEvent(ServerUpdatePhysicsParamsFn, &State);
 		}
 		else if (Command == "setspeed" || Command == "speed")
@@ -2004,7 +2005,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				LOG_INFO(LogDev, "Name added to whitelist: {}", Name.ToString());
 			}
 
-			static auto Server_SetCanEditCreativeIslandFn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerStateAthena.Server_SetCanEditCreativeIsland");
+			static auto Server_SetCanEditCreativeIslandFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerStateAthena.Server_SetCanEditCreativeIsland");
 
 			struct
 			{
@@ -2382,7 +2383,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		{
 			for (int i = 0; i < ClientConnections.Num(); i++)
 			{
-				static auto GodFn = FindObject<UFunction>("/Script/Engine.CheatManager.God");
+				static auto GodFn = FindObject<UFunction>(L"/Script/Engine.CheatManager.God");
 
 				auto PlayerController = Cast<AFortPlayerController>(ClientConnections.at(i)->GetPlayerController());
 

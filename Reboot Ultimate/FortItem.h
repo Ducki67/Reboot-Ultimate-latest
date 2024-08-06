@@ -252,7 +252,7 @@ public:
 
 	UFortItemDefinition* GetItemDefinitionBP()
 	{
-		static auto GetItemDefinitionBPFn = FindObject<UFunction>("/Script/FortniteGame.FortItem.GetItemDefinitionBP");
+		static auto GetItemDefinitionBPFn = FindObject<UFunction>(L"/Script/FortniteGame.FortItem.GetItemDefinitionBP");
 		UFortItemDefinition* ReturnValue;
 		this->ProcessEvent(GetItemDefinitionBPFn, &ReturnValue);
 		return ReturnValue;

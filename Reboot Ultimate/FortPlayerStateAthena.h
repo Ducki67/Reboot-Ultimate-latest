@@ -38,7 +38,7 @@ struct FDeathInfo
 {
 	static UStruct* GetStruct()
 	{
-		static auto Struct = FindObject<UStruct>("/Script/FortniteGame.DeathInfo");
+		static auto Struct = FindObject<UStruct>(L"/Script/FortniteGame.DeathInfo");
 		return Struct;
 	}
 
@@ -55,6 +55,18 @@ class AFortPlayerStateAthena : public AFortPlayerState
 {
 public:
 	static inline void (*ServerSetInAircraftOriginal)(UObject* Context, FFrame& Stack, void* Ret);
+
+	int32& GetSeasonLevelUIDisplay()
+	{
+		static auto SeasonLevelUIDisplayOffset = GetOffset("SeasonLevelUIDisplay");
+		return Get<int32>(SeasonLevelUIDisplayOffset);
+	}
+
+	void OnRep_SeasonLevelUIDisplay()
+	{
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerStateAthena.OnRep_SeasonLevelUIDisplay");
+		this->ProcessEvent(fn);
+	}
 	
 	uint8& GetSquadId()
 	{
@@ -201,25 +213,25 @@ public:
 
 	void OnRep_TeamScore()
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerStateAthena.OnRep_TeamScore");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerStateAthena.OnRep_TeamScore");
 		this->ProcessEvent(fn);
 	}
 
 	void OnRep_TeamScorePlacement()
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerStateAthena.OnRep_TeamScorePlacement");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerStateAthena.OnRep_TeamScorePlacement");
 		this->ProcessEvent(fn);
 	}
 
 	void OnRep_TotalPlayerScore()
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerStateAthena.OnRep_TotalPlayerScore");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerStateAthena.OnRep_TotalPlayerScore");
 		this->ProcessEvent(fn);
 	}
 
 	void OnRep_Place()
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerStateAthena.OnRep_Place");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerStateAthena.OnRep_Place");
 		this->ProcessEvent(fn);
 	}
 

@@ -45,7 +45,7 @@ public:
 
 		auto& AttributeSetSoft = this->Get<TSoftObjectPtr<UAttributeSet>>(AttributeSetOffset);
 
-		static auto AttributeClass = FindObject<UClass>("/Script/GameplayAbilities.AttributeSet");
+		static auto AttributeClass = FindObject<UClass>(L"/Script/GameplayAbilities.AttributeSet");
 	    return AttributeSetSoft.Get(AttributeClass, true);
 	}
 
@@ -53,7 +53,7 @@ public:
 
 	static UClass* StaticClass()
 	{
-		static auto Class = FindObject<UClass>("/Script/FortniteGame.FortGadgetItemDefinition");
+		static auto Class = FindObject<UClass>(L"/Script/FortniteGame.FortGadgetItemDefinition");
 		return Class;
 	}
 };

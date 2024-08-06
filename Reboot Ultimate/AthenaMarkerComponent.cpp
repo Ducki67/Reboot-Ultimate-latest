@@ -2,6 +2,7 @@
 #include "FortPlayerControllerAthena.h"
 #include "Text.h"
 #include "KismetTextLibrary.h"
+#include "gui.h"
 
 void UAthenaMarkerComponent::ServerAddMapMarkerHook(UAthenaMarkerComponent* MarkerComponent, FFortClientMarkerRequest MarkerRequest)
 {
@@ -19,8 +20,39 @@ void UAthenaMarkerComponent::ServerAddMapMarkerHook(UAthenaMarkerComponent* Mark
 
 	auto MarkerRequestPtr = &MarkerRequest;
 
-	bool useRealloc = false;
-	auto MarkerData = Alloc<FFortWorldMarkerData>(FFortWorldMarkerData::GetStructSize(), useRealloc);
+	if (bMarkToTeleport)
+	{
+		auto Pawn = PlayerController->GetPawn();
+
+		if (Pawn)
+		{
+			FVector LocationToTeleport = MarkerRequestPtr->GetWorldPosition();
+
+			static auto FindStaticGroundLocationAtFn = FindObject<UFunction>(L"/Script/FortniteGame.FortKismetLibrary.FindStaticGroundLocationAt");
+
+			struct
+			{
+				UWorld* World;
+				FVector InLocation;
+				AActor* IgnoreActor;
+				float TraceStartZ;
+				float TraceEndZ;
+				FVector ReturnValue;
+			}Params{ GetWorld() , LocationToTeleport , nullptr , 10000.f , -10000.f };
+
+			static auto DefaultFortKismetLibrary = FindObject(L"/Script/FortniteGame.Default__FortKismetLibrary");
+
+			DefaultFortKismetLibrary->ProcessEvent(FindStaticGroundLocationAtFn, &Params);
+
+			FVector GroundLocationToTeleport = Params.ReturnValue;
+			GroundLocationToTeleport.Z += 1000;
+
+			Pawn->TeleportTo(GroundLocationToTeleport, Pawn->GetActorRotation() /* Should use Pawn->ControlRotation but it's fine */);
+		}
+	}
+
+	bool bUseRealloc = false;
+	auto MarkerData = Alloc<FFortWorldMarkerData>(FFortWorldMarkerData::GetStructSize(), bUseRealloc);
 
 	static auto IconOffset = FindOffsetStruct("/Script/FortniteGame.MarkedActorDisplayInfo", "Icon");
 	static auto DisplayNameOffset = FindOffsetStruct("/Script/FortniteGame.MarkedActorDisplayInfo", "DisplayName");
@@ -147,7 +179,7 @@ void UAthenaMarkerComponent::ServerRemoveMapMarkerHook(UAthenaMarkerComponent* M
 		if (!CurrentTeamMemberMarkerComponent)
 			continue;
 
-		static auto ClientCancelMarkerFn = FindObject<UFunction>("/Script/FortniteGame.AthenaMarkerComponent.ClientCancelMarker");
+		static auto ClientCancelMarkerFn = FindObject<UFunction>(L"/Script/FortniteGame.AthenaMarkerComponent.ClientCancelMarker");
 
 		if (ClientCancelMarkerFn)
 		{

@@ -3,6 +3,9 @@
 #include "log.h"
 #include "inc.h"
 
+#define UE_PUSH_MACRO(name) __pragma(push_macro(name))
+#define UE_POP_MACRO(name) __pragma(pop_macro(name))
+
 /*
 #ifdef PROD
 #define UE_DEBUG_BREAK() ((void)0)

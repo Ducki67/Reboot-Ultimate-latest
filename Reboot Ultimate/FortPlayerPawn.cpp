@@ -180,7 +180,7 @@ void AFortPlayerPawn::ForceLaunchPlayerZipline() // Thanks android
 
 	// todo check if in vehicle
 
-	static auto LaunchCharacterFn = FindObject<UFunction>("/Script/Engine.Character.LaunchCharacter");
+	static auto LaunchCharacterFn = FindObject<UFunction>(L"/Script/Engine.Character.LaunchCharacter");
 
 	struct
 	{
@@ -193,7 +193,7 @@ void AFortPlayerPawn::ForceLaunchPlayerZipline() // Thanks android
 
 AActor* AFortPlayerPawn::ServerOnExitVehicle(ETryExitVehicleBehavior ExitForceBehavior)
 {
-	static auto ServerOnExitVehicleFn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerPawn.ServerOnExitVehicle");
+	static auto ServerOnExitVehicleFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerPawn.ServerOnExitVehicle");
 	struct 
 	{
 		ETryExitVehicleBehavior                            ExitForceBehavior;                                        // (Parm, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash, NativeAccessSpecifierPublic)
@@ -318,7 +318,7 @@ void AFortPlayerPawn::StartGhostModeExitHook(UObject* Context, FFrame* Stack, vo
 
 	auto WorldInventory = Controller->GetWorldInventory();
 
-	auto SpookyMistItemDefinition = FindObject<UFortGadgetItemDefinition>("/Game/Athena/Items/Gameplay/SpookyMist/AGID_SpookyMist.AGID_SpookyMist");
+	auto SpookyMistItemDefinition = FindObject<UFortGadgetItemDefinition>(L"/Game/Athena/Items/Gameplay/SpookyMist/AGID_SpookyMist.AGID_SpookyMist");
 	auto SpookyMistInstance = WorldInventory->FindItemInstance(SpookyMistItemDefinition);
 
 	if (SpookyMistInstance)
@@ -354,7 +354,7 @@ void AFortPlayerPawn::ServerSendZiplineStateHook(AFortPlayerPawn* Pawn, FZipline
 
 	if (*(int*)(__int64(&InZiplineState) + AuthoritativeValueOffset) > *(int*)(__int64(PawnZiplineState) + AuthoritativeValueOffset))
 	{
-		static auto ZiplinePawnStateStruct = FindObject<UStruct>("/Script/FortniteGame.ZiplinePawnState");
+		static auto ZiplinePawnStateStruct = FindObject<UStruct>(L"/Script/FortniteGame.ZiplinePawnState");
 		static auto ZiplinePawnStateSize = ZiplinePawnStateStruct->GetPropertiesSize();
 
 		CopyStruct(PawnZiplineState, &InZiplineState, ZiplinePawnStateSize);
@@ -415,7 +415,7 @@ void AFortPlayerPawn::ServerHandlePickupHook(AFortPlayerPawn* Pawn, AFortPickup*
 
 	static auto OnRep_bPickedUpFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPickup.OnRep_bPickedUp");
 	Pickup->ProcessEvent(OnRep_bPickedUpFn);
-  }
+}
 
 void AFortPlayerPawn::ServerHandlePickupInfoHook(AFortPlayerPawn* Pawn, AFortPickup* Pickup, __int64 Params)
 {
@@ -425,6 +425,6 @@ void AFortPlayerPawn::ServerHandlePickupInfoHook(AFortPlayerPawn* Pawn, AFortPic
 
 UClass* AFortPlayerPawn::StaticClass()
 {
-	static auto Class = FindObject<UClass>("/Script/FortniteGame.FortPlayerPawn");
+	static auto Class = FindObject<UClass>(L"/Script/FortniteGame.FortPlayerPawn");
 	return Class;
 }

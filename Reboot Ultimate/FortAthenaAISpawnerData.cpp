@@ -2,7 +2,7 @@
 
 UFortAthenaAISpawnerDataComponent_SpawnParamsBase* UFortAthenaAISpawnerData::GetSpawnParamsComponent()
 {
-	static auto GetSpawnParamsComponentFn = FindObject<UFunction>("/Script/FortniteGame.FortAthenaAISpawnerData.GetSpawnParamsComponent");
+	static auto GetSpawnParamsComponentFn = FindObject<UFunction>(L"/Script/FortniteGame.FortAthenaAISpawnerData.GetSpawnParamsComponent");
 	UFortAthenaAISpawnerDataComponent_SpawnParamsBase* ReturnValue;
 	this->ProcessEvent(GetSpawnParamsComponentFn, &ReturnValue);
 	return ReturnValue;
@@ -10,7 +10,7 @@ UFortAthenaAISpawnerDataComponent_SpawnParamsBase* UFortAthenaAISpawnerData::Get
 
 UFortAthenaAISpawnerDataComponentList* UFortAthenaAISpawnerData::CreateComponentListFromClass(TSubclassOf<UFortAthenaAISpawnerData> AISpawnerDataClass, UObject* OuterObject)
 {
-	static auto CreateComponentListFromClassFn = FindObject<UFunction>("/Script/FortniteGame.FortAthenaAISpawnerData.CreateComponentListFromClass");
+	static auto CreateComponentListFromClassFn = FindObject<UFunction>(L"/Script/FortniteGame.FortAthenaAISpawnerData.CreateComponentListFromClass");
 
 	struct
 	{
@@ -26,13 +26,13 @@ UFortAthenaAISpawnerDataComponentList* UFortAthenaAISpawnerData::CreateComponent
 
 UClass* UFortAthenaAISpawnerData::StaticClass()
 {
-	static auto Class = FindObject<UClass>("/Script/FortniteGame.FortAthenaAISpawnerData");
+	static auto Class = FindObject<UClass>(L"/Script/FortniteGame.FortAthenaAISpawnerData");
 	return Class;
 }
 
 TSubclassOf<APawn> UFortAthenaAISpawnerDataComponent_SpawnParamsBase::GetPawnClass()
 {
-	static auto GetPawnClassFn = FindObject<UFunction>("/Script/FortniteGame.FortAthenaAISpawnerDataComponent_SpawnParamsBase.GetPawnClass");
+	static auto GetPawnClassFn = FindObject<UFunction>(L"/Script/FortniteGame.FortAthenaAISpawnerDataComponent_SpawnParamsBase.GetPawnClass");
 	TSubclassOf<APawn> ReturnValue;
 	this->ProcessEvent(GetPawnClassFn, &ReturnValue);
 	return ReturnValue;

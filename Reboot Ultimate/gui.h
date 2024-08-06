@@ -103,6 +103,7 @@ extern inline bool bEnableCannonAnimations = true;
 extern inline float* CannonXMultiplier = &DefaultCannonMultiplier;
 extern inline float* CannonYMultiplier = &DefaultCannonMultiplier;
 extern inline float* CannonZMultiplier = &DefaultCannonMultiplier;
+extern inline bool bMarkToTeleport = false;
 extern inline std::map<std::string, TArray<ItemRow>> CustomLootpoolMap{};
 
 // THE BASE CODE IS FROM IMGUI GITHUB
@@ -1004,11 +1005,6 @@ static inline void MainUI()
 
 				ImGui::Text(std::format("Joinable: {}", Globals::bStartedListening).c_str());
 
-				if (!Globals::bStartedListening)
-				{
-					ImGui::SliderInt("Players Required to Start the Match", &WarmupRequiredPlayerCount, 1, 100);
-				}
-
 				if (!Globals::bStartedListening) // hm
 				{
 					auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
@@ -1038,8 +1034,8 @@ static inline void MainUI()
 				/*
 				if (ImGui::Button("New"))
 				{
-					static auto NextFn = FindObject<UFunction>("/Game/Athena/Prototype/Blueprints/Cube/CUBE.CUBE_C.Next");
-					static auto NewFn = FindObject<UFunction>("/Game/Athena/Prototype/Blueprints/Cube/CUBE.CUBE_C.New");					
+					static auto NextFn = FindObject<UFunction>(L"/Game/Athena/Prototype/Blueprints/Cube/CUBE.CUBE_C.Next");
+					static auto NewFn = FindObject<UFunction>(L"/Game/Athena/Prototype/Blueprints/Cube/CUBE.CUBE_C.New");					
 					auto Loader = GetEventLoader("/Game/Athena/Prototype/Blueprints/Cube/CUBE.CUBE_C");
 
 					LOG_INFO(LogDev, "Loader: {}", __int64(Loader));
@@ -1054,8 +1050,8 @@ static inline void MainUI()
 
 				if (ImGui::Button("Next"))
 				{
-					static auto NextFn = FindObject<UFunction>("/Game/Athena/Prototype/Blueprints/Cube/CUBE.CUBE_C.Next");
-					static auto NewFn = FindObject<UFunction>("/Game/Athena/Prototype/Blueprints/Cube/CUBE.CUBE_C.New");
+					static auto NextFn = FindObject<UFunction>(L"/Game/Athena/Prototype/Blueprints/Cube/CUBE.CUBE_C.Next");
+					static auto NewFn = FindObject<UFunction>(L"/Game/Athena/Prototype/Blueprints/Cube/CUBE.CUBE_C.New");
 					auto Loader = GetEventLoader("/Game/Athena/Prototype/Blueprints/Cube/CUBE.CUBE_C");
 
 					LOG_INFO(LogDev, "Loader: {}", __int64(Loader));
@@ -1375,7 +1371,7 @@ static inline void MainUI()
 				{
 					SkinsFile << FortniteVersionStr;
 
-					static auto CIDClass = FindObject<UClass>("/Script/FortniteGame.AthenaCharacterItemDefinition");
+					static auto CIDClass = FindObject<UClass>(L"/Script/FortniteGame.AthenaCharacterItemDefinition");
 
 					auto AllObjects = GetAllObjectsOfClass(CIDClass);
 
@@ -1398,7 +1394,7 @@ static inline void MainUI()
 			{
 				std::ofstream FunctionsFile("Functions.txt");
 
-				static auto FunctionsClass = FindObject<UClass>("/Script/CoreUObject.Function");
+				static auto FunctionsClass = FindObject<UClass>(L"/Script/CoreUObject.Function");
 
 				auto AllFunctions = GetAllObjectsOfClass(FunctionsClass);
 
@@ -1420,7 +1416,7 @@ static inline void MainUI()
 				if (PlaylistsFile.is_open())
 				{
 					PlaylistsFile << FortniteVersionStr;
-					static auto FortPlaylistClass = FindObject<UClass>("/Script/FortniteGame.FortPlaylist");
+					static auto FortPlaylistClass = FindObject<UClass>(L"/Script/FortniteGame.FortPlaylist");
 					// static auto FortPlaylistClass = FindObject("Class /Script/FortniteGame.FortPlaylistAthena");
 
 					auto AllObjects = GetAllObjectsOfClass(FortPlaylistClass);
@@ -1475,7 +1471,7 @@ static inline void MainUI()
 
 					DumpItemDefinitionClass(UFortWeaponItemDefinition::StaticClass());
 					DumpItemDefinitionClass(UFortGadgetItemDefinition::StaticClass());
-					DumpItemDefinitionClass(FindObject<UClass>("/Script/FortniteGame.FortAmmoItemDefinition"));
+					DumpItemDefinitionClass(FindObject<UClass>(L"/Script/FortniteGame.FortAmmoItemDefinition"));
 				}
 				else
 					std::cout << "Failed to open playlist file!\n";
@@ -1703,7 +1699,7 @@ static inline void MainUI()
 
 			/* if (ImGui::Button("Load BGA Class (and spawn so no GC)"))
 			{
-				static auto BGAClass = FindObject<UClass>("/Script/Engine.BlueprintGeneratedClass");
+				static auto BGAClass = FindObject<UClass>(L"/Script/Engine.BlueprintGeneratedClass");
 				auto Class = LoadObject<UClass>(ClassNameToDump, BGAClass);
 
 				if (Class)

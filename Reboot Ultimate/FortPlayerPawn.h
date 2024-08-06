@@ -35,6 +35,18 @@ public:
 	static inline void (*StartGhostModeExitOriginal)(UObject* Context, FFrame* Stack, void* Ret);
 	static inline void (*ServerHandlePickupWithRequestedSwapOriginal)(UObject* Context, FFrame* Stack, void* Ret);
 
+	uint8 GetVehicleSeatIndex()
+	{
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerPawn.GetVehicleSeatIndex");
+
+		struct
+		{
+			uint8                              ReturnValue;
+		}params;
+		this->ProcessEvent(fn, &params);
+		return params.ReturnValue;
+	}
+
 	struct FFortAthenaLoadout* GetCosmeticLoadout();
 	void ServerChoosePart(EFortCustomPartType Part, class UObject* ChosenCharacterPart);
 	void ForceLaunchPlayerZipline(); // Thanks android

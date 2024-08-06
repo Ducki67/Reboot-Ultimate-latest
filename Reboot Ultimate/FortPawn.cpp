@@ -42,13 +42,13 @@ bool AFortPawn::PickUpActor(AActor* PickupTarget, UFortDecoItemDefinition* Place
 
 void AFortPawn::PawnStartFire(uint8 FireModeNum)
 {
-	static auto PawnStartFireFn = FindObject<UFunction>("/Script/FortniteGame.FortPawn.PawnStartFire");
+	static auto PawnStartFireFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPawn.PawnStartFire");
 	this->ProcessEvent(PawnStartFireFn, &FireModeNum);
 }
 
 void AFortPawn::PawnStopFire(uint8 FireModeNum)
 {
-	static auto PawnStopFireFn = FindObject<UFunction>("/Script/FortniteGame.FortPawn.PawnStopFire");
+	static auto PawnStopFireFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPawn.PawnStopFire");
 	this->ProcessEvent(PawnStopFireFn, &FireModeNum);
 }
 
@@ -111,7 +111,7 @@ void AFortPawn::SetMaxHealth(float NewHealthVal)
 
 void AFortPawn::SetShield(float NewShield)
 {
-	static auto SetShieldFn = FindObject<UFunction>("/Script/FortniteGame.FortPawn.SetShield");
+	static auto SetShieldFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPawn.SetShield");
 
 	if (SetShieldFn)
 		this->ProcessEvent(SetShieldFn, &NewShield);
@@ -182,7 +182,7 @@ void AFortPawn::MovingEmoteStoppedHook(UObject* Context, FFrame* Stack, void* Re
 
 void AFortPawn::LaunchURL(const FString& URL)
 {
-	static auto LaunchURLFn = FindObject<UFunction>("/Script/Engine.KismetSystemLibrary.LaunchURL");
+	static auto LaunchURLFn = FindObject<UFunction>(L"/Script/Engine.KismetSystemLibrary.LaunchURL");
 
 	struct
 	{
@@ -222,6 +222,6 @@ void AFortPawn::SetMovementMode(EMovementMode NewMovementMode, uint8 NewCustomMo
 
 UClass* AFortPawn::StaticClass()
 {
-	static auto Class = FindObject<UClass>("/Script/FortniteGame.FortPawn");
+	static auto Class = FindObject<UClass>(L"/Script/FortniteGame.FortPawn");
 	return Class;
 }

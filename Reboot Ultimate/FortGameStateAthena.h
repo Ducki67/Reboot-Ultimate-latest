@@ -95,7 +95,7 @@ class AFortGameStateAthena : public AGameState
 public:
 	bool IsTeleportToCreativeHubAllowed()
 	{
-		static auto IsTeleportToCreativeHubAllowedFn = FindObject<UFunction>("/Script/FortniteGame.FortGameStateAthena.IsTeleportToCreativeHubAllowed");
+		static auto IsTeleportToCreativeHubAllowedFn = FindObject<UFunction>(L"/Script/FortniteGame.FortGameStateAthena.IsTeleportToCreativeHubAllowed");
 
 		struct
 		{
@@ -139,21 +139,21 @@ public:
 
 	void OnRep_CurrentHighScore()
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortGameStateAthena.OnRep_CurrentHighScore");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortGameStateAthena.OnRep_CurrentHighScore");
 		if (fn)
 			this->ProcessEvent(fn, nullptr);
 	}
 
 	void OnRep_WinningTeam()
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortGameStateAthena.OnRep_WinningTeam");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortGameStateAthena.OnRep_WinningTeam");
 		if (fn)
 			this->ProcessEvent(fn, nullptr);
 	}
 
 	void OnRep_WinningScore()
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortGameStateAthena.OnRep_WinningScore");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortGameStateAthena.OnRep_WinningScore");
 		if (fn)
 			this->ProcessEvent(fn, nullptr);
 	}
@@ -216,7 +216,7 @@ public:
 
 	void OnRep_WinningPlayerState()
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortGameStateAthena.OnRep_WinningPlayerState");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortGameStateAthena.OnRep_WinningPlayerState");
 		this->ProcessEvent(fn);
 	}
 

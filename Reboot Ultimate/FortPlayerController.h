@@ -14,7 +14,7 @@ struct FFortAthenaLoadout
 {
 	static UStruct* GetStruct()
 	{
-		static auto Struct = FindObject<UStruct>("/Script/FortniteGame.FortAthenaLoadout");
+		static auto Struct = FindObject<UStruct>(L"/Script/FortniteGame.FortAthenaLoadout");
 		return Struct;
 	}
 
@@ -282,13 +282,13 @@ public:
 
 	void OnProfileUpdated()
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerControllerAthenaXPComponent.OnProfileUpdated");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerControllerAthenaXPComponent.OnProfileUpdated");
 		this->ProcessEvent(fn, nullptr);
 	}
 
 	void OnXpUpdated(int32 InCombatXp, int32 InServivalXp, int32 InBonusMedalXp, int32 InChallengeXp, int32 InMatchXp, int32 InTotalXp)
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerControllerAthenaXPComponent.OnXpUpdated");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerControllerAthenaXPComponent.OnXpUpdated");
 
 		struct
 		{
@@ -306,13 +306,13 @@ public:
 
 	void HighPrioXPEvent(FXPEventEntry& HighPrioXPEvent)
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerControllerAthenaXPComponent.HighPrioXPEvent");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerControllerAthenaXPComponent.HighPrioXPEvent");
 		this->ProcessEvent(fn, &HighPrioXPEvent);
 	}
 
 	void OnInMatchProfileUpdate(int64 ProfileRevision)
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerControllerAthenaXPComponent.OnInMatchProfileUpdate");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerControllerAthenaXPComponent.OnInMatchProfileUpdate");
 
 		struct
 		{
@@ -324,7 +324,7 @@ public:
 
 	void OnRep_bRegisteredWithQuestManager()
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerControllerAthenaXPComponent.OnRep_bRegisteredWithQuestManager");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerControllerAthenaXPComponent.OnRep_bRegisteredWithQuestManager");
 		this->ProcessEvent(fn, nullptr);
 	}
 };
@@ -417,7 +417,7 @@ public:
 
 	bool IsPlayingEmote()
 	{
-		static auto IsPlayingEmoteFn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerController.IsPlayingEmote");
+		static auto IsPlayingEmoteFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerController.IsPlayingEmote");
 		bool Ret;
 		this->ProcessEvent(IsPlayingEmoteFn, &Ret);
 		return Ret;
@@ -469,7 +469,7 @@ public:
 
 	static UClass* StaticClass()
 	{
-		static auto Class = FindObject<UClass>("/Script/FortniteGame.FortPlayerController");
+		static auto Class = FindObject<UClass>(L"/Script/FortniteGame.FortPlayerController");
 		return Class;
 	}
 };

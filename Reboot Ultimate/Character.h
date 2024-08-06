@@ -14,13 +14,13 @@ public:
 
 	void Crouch(bool bClientSimulation)
 	{
-		static auto CrouchFn = FindObject<UFunction>("/Script/Engine.Character.Crouch");
+		static auto CrouchFn = FindObject<UFunction>(L"/Script/Engine.Character.Crouch");
 		this->ProcessEvent(CrouchFn, &bClientSimulation);
 	}
 
 	void UnCrouch(bool bClientSimulation)
 	{
-		static auto UnCrouchFn = FindObject<UFunction>("/Script/Engine.Character.UnCrouch");
+		static auto UnCrouchFn = FindObject<UFunction>(L"/Script/Engine.Character.UnCrouch");
 		this->ProcessEvent(UnCrouchFn, &bClientSimulation);
 	}
 };

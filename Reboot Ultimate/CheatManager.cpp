@@ -10,19 +10,19 @@ void UCheatManager::Teleport()
 
 void UCheatManager::DestroyTarget()
 {
-	static auto DestroyTargetFn = FindObject<UFunction>("/Script/Engine.CheatManager.DestroyTarget");
+	static auto DestroyTargetFn = FindObject<UFunction>(L"/Script/Engine.CheatManager.DestroyTarget");
 	this->ProcessEvent(DestroyTargetFn);
 }
 
 void UCheatManager::God()
 {
-	static auto GodFn = FindObject<UFunction>("/Script/Engine.CheatManager.God");
+	static auto GodFn = FindObject<UFunction>(L"/Script/Engine.CheatManager.God");
 	this->ProcessEvent(GodFn, nullptr);
 }
 
 void UCheatManager::DestroyAll(TSubclassOf<AActor> AClass)
 {
-	static auto DestroyAllFn = FindObject<UFunction>("/Script/Engine.CheatManager.DestroyAll");
+	static auto DestroyAllFn = FindObject<UFunction>(L"/Script/Engine.CheatManager.DestroyAll");
 
 	struct
 	{
@@ -34,7 +34,7 @@ void UCheatManager::DestroyAll(TSubclassOf<AActor> AClass)
 
 void UCheatManager::Mang(std::string Cmd)
 {
-	auto MangFn = FindObject<UFunction>("/Script/Engine.CheatManager." + Cmd);
+	auto MangFn = FindObject<UFunction>(L"/Script/Engine.CheatManager." + Cmd);
 
 	if (MangFn)
 		this->ProcessEvent(MangFn, nullptr);

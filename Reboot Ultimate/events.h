@@ -773,7 +773,7 @@ static inline bool CallOnReadys(bool* bWereAllSuccessful = nullptr)
 
 	/* if (Fortnite_Version == 17.30)
 	{
-		static auto onready = FindObject<UFunction>("/Buffet/Gameplay/Blueprints/BP_Buffet_Master_Scripting.BP_Buffet_Master_Scripting_C.OnReady_C6091CF24046D602CBB778A594DB5BA8");
+		static auto onready = FindObject<UFunction>(L"/Buffet/Gameplay/Blueprints/BP_Buffet_Master_Scripting.BP_Buffet_Master_Scripting_C.OnReady_C6091CF24046D602CBB778A594DB5BA8");
 		auto script = FindObject("/Buffet/Levels/Buffet_P.Buffet_P.PersistentLevel.BP_Event_Master_Scripting_2");
 
 		if (!script)

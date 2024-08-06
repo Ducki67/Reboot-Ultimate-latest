@@ -66,6 +66,6 @@ void UFortItem::SetOwningControllerForTemporaryItem(UObject* Controller)
 
 UClass* UFortItem::StaticClass()
 {
-	static auto Class = FindObject<UClass>("/Script/FortniteGame.FortItem");
+	static auto Class = FindObject<UClass>(L"/Script/FortniteGame.FortItem");
 	return Class;
 }

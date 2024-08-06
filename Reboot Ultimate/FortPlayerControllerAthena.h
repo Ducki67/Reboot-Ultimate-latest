@@ -150,7 +150,7 @@ class UFortQuestItem : public UFortItem // UFortAccountItem
 public:
 	bool HasCompletedObjectiveWithName(FName BackendName)
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortQuestItem.HasCompletedObjectiveWithName");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortQuestItem.HasCompletedObjectiveWithName");
 
 		struct
 		{
@@ -165,7 +165,7 @@ public:
 
 	int32 GetNumObjectivesComplete()
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortQuestItem.GetNumObjectivesComplete");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortQuestItem.GetNumObjectivesComplete");
 
 		struct
 		{
@@ -179,7 +179,7 @@ public:
 
 	float GetPercentageComplete()
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortQuestItem.GetPercentageComplete");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortQuestItem.GetPercentageComplete");
 
 		struct
 		{
@@ -293,7 +293,7 @@ public:
 
 	FText GetCompletionText()
 	{
-		static auto GetCompletionTextFn = FindObject<UFunction>("/Script/FortniteGame.FortQuestItemDefinition.GetCompletionText");
+		static auto GetCompletionTextFn = FindObject<UFunction>(L"/Script/FortniteGame.FortQuestItemDefinition.GetCompletionText");
 		FText ReturnValue;
 		this->ProcessEvent(GetCompletionTextFn, &ReturnValue);
 		return ReturnValue;
@@ -301,7 +301,7 @@ public:
 
 	static UClass* StaticClass()
 	{
-		static auto Class = FindObject<UClass>("/Script/FortniteGame.FortQuestItemDefinition");
+		static auto Class = FindObject<UClass>(L"/Script/FortniteGame.FortQuestItemDefinition");
 		return Class;
 	}
 };
@@ -311,7 +311,7 @@ class UFortQuestManager : public UObject
 public:
 	UFortQuestItem* GetQuestWithDefinition(UFortQuestItemDefinition* Definition)
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortQuestManager.GetQuestWithDefinition");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortQuestManager.GetQuestWithDefinition");
 
 		struct
 		{
@@ -326,7 +326,7 @@ public:
 
 	void SelfCompletedUpdatedQuest(AFortPlayerController* QuestOwner, UFortQuestItemDefinition* QuestDef, FName BackendName, int32 CompletionCount, int32 DeltaChange, AFortPlayerState* AssistingPlayer, bool ObjectiveCompleted, bool QuestCompleted)
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortQuestManager.SelfCompletedUpdatedQuest");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortQuestManager.SelfCompletedUpdatedQuest");
 
 		struct
 		{
@@ -345,13 +345,13 @@ public:
 
 	void ClaimQuestReward(UFortQuestItem* Quest)
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortQuestManager.ClaimQuestReward");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortQuestManager.ClaimQuestReward");
 		this->ProcessEvent(fn, nullptr);
 	}
 
 	void SendComplexCustomStatEvent(UObject* TargetObject, const FGameplayTagContainer& AdditionalSourceTags, const FGameplayTagContainer& TargetTags, bool* QuestActive, bool* QuestCompleted, int32 Count)
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortQuestManager.SendComplexCustomStatEvent");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortQuestManager.SendComplexCustomStatEvent");
 
 		struct
 		{
@@ -382,7 +382,7 @@ public:
 
 	UFortQuestManager* GetQuestManager(ESubGame SubGame)
 	{
-		static auto fn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerController.GetQuestManager");
+		static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerController.GetQuestManager");
 
 		struct
 		{
@@ -469,7 +469,7 @@ public:
 
 	void ClientSendTeamStatsForPlayer(FAthenaMatchTeamStats* TeamStats)
 	{
-		static auto ClientSendTeamStatsForPlayerFn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerControllerAthena.ClientSendTeamStatsForPlayer");
+		static auto ClientSendTeamStatsForPlayerFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerControllerAthena.ClientSendTeamStatsForPlayer");
 		static auto ParamSize = ClientSendTeamStatsForPlayerFn->GetPropertiesSize();
 		auto Params = malloc(ParamSize);
 
@@ -482,7 +482,7 @@ public:
 
 	void ClientSendMatchStatsForPlayer(FAthenaMatchStats* Stats)
 	{
-		static auto ClientSendMatchStatsForPlayerFn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerControllerAthena.ClientSendMatchStatsForPlayer");
+		static auto ClientSendMatchStatsForPlayerFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerControllerAthena.ClientSendMatchStatsForPlayer");
 		static auto ParamSize = ClientSendMatchStatsForPlayerFn->GetPropertiesSize();
 		auto Params = malloc(ParamSize);
 
@@ -511,7 +511,7 @@ public:
 
 	void PlayWinEffects(APawn* FinisherPawn, UFortWeaponItemDefinition* FinishingWeapon, uint8 DeathCause, bool bAudioOnly)
 	{
-		static auto PlayWinEffectsFn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerControllerAthena.PlayWinEffects");
+		static auto PlayWinEffectsFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerControllerAthena.PlayWinEffects");
 
 		struct
 		{
@@ -526,7 +526,7 @@ public:
 
 	void ClientNotifyWon(APawn* FinisherPawn, UFortWeaponItemDefinition* FinishingWeapon, uint8 DeathCause)
 	{
-		static auto ClientNotifyWonFn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerControllerAthena.ClientNotifyWon");
+		static auto ClientNotifyWonFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerControllerAthena.ClientNotifyWon");
 
 		struct
 		{
@@ -540,7 +540,7 @@ public:
 
 	void ClientNotifyTeamWon(APawn* FinisherPawn, UFortWeaponItemDefinition* FinishingWeapon, uint8 DeathCause)
 	{
-		static auto ClientNotifyTeamWonFn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerControllerAthena.ClientNotifyTeamWon");
+		static auto ClientNotifyTeamWonFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerControllerAthena.ClientNotifyTeamWon");
 
 		struct
 		{

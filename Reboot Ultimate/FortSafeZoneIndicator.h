@@ -32,7 +32,7 @@ public:
 
 	FVector& GetSafeZoneCenter()
 	{
-		static auto GetSafeZoneCenterFn = FindObject<UFunction>("/Script/FortniteGame.FortSafeZoneIndicator.GetSafeZoneCenter");
+		static auto GetSafeZoneCenterFn = FindObject<UFunction>(L"/Script/FortniteGame.FortSafeZoneIndicator.GetSafeZoneCenter");
 		FVector ReturnValue;
 		this->ProcessEvent(GetSafeZoneCenterFn, &ReturnValue);
 		return ReturnValue;

@@ -42,13 +42,13 @@ FActiveGameplayEffectHandle UAbilitySystemComponent::ApplyGameplayEffectToSelf(U
 	return UAbilitySystemComponent_BP_ApplyGameplayEffectToSelf_Params.ReturnValue;
 }
 
-/* FGameplayEffectContextHandle UAbilitySystemComponent::MakeEffectContext()
+FGameplayEffectContextHandle UAbilitySystemComponent::MakeEffectContext()
 {
-	static auto MakeEffectContextFn = FindObject<UFunction>("/Script/GameplayAbilities.AbilitySystemComponent.MakeEffectContext");
+	static auto MakeEffectContextFn = FindObject<UFunction>(L"/Script/GameplayAbilities.AbilitySystemComponent.MakeEffectContext");
 	FGameplayEffectContextHandle ContextHandle;
 	this->ProcessEvent(MakeEffectContextFn, &ContextHandle);
 	return ContextHandle;
-} */
+}
 
 void UAbilitySystemComponent::ServerEndAbility(FGameplayAbilitySpecHandle AbilityToEnd, FGameplayAbilityActivationInfo* ActivationInfo, FPredictionKey* PredictionKey)
 {

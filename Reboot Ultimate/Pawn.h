@@ -29,7 +29,7 @@ public:
 
 	void AddMovementInput(FVector WorldDirection, float ScaleValue, bool bForce)
 	{
-		static auto AddMovementInputFn = FindObject<UFunction>("/Script/Engine.Pawn.AddMovementInput");
+		static auto AddMovementInputFn = FindObject<UFunction>(L"/Script/Engine.Pawn.AddMovementInput");
 
 		struct
 		{

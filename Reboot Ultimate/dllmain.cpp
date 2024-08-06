@@ -196,7 +196,7 @@ unsigned __int8 SpecialEventScript_ActivatePhaseHook(UObject* SpecialEventScript
     static auto ReplicatedActivePhaseIndexOffset = SpecialEventScript->GetOffset("ReplicatedActivePhaseIndex");
     SpecialEventScript->Get<int32>(ReplicatedActivePhaseIndexOffset) = NewPhase;
 
-    static auto OnRep_ReplicatedActivePhaseIndexFn = FindObject<UFunction>("/Script/SpecialEventGameplayRuntime.SpecialEventScript.OnRep_ReplicatedActivePhaseIndex");
+    static auto OnRep_ReplicatedActivePhaseIndexFn = FindObject<UFunction>(L"/Script/SpecialEventGameplayRuntime.SpecialEventScript.OnRep_ReplicatedActivePhaseIndex");
     SpecialEventScript->ProcessEvent(OnRep_ReplicatedActivePhaseIndexFn);
 
     return SpecialEventScript_ActivatePhaseOriginal(SpecialEventScript, NewPhase);
@@ -213,7 +213,7 @@ void ActivatePhaseAtIndexHook(UObject* SpecialEventScript, int Index)
     static auto ReplicatedActivePhaseIndexOffset = SpecialEventScript->GetOffset("ReplicatedActivePhaseIndex");
     SpecialEventScript->Get<int32>(ReplicatedActivePhaseIndexOffset) = Index;
 
-    static auto OnRep_ReplicatedActivePhaseIndexFn = FindObject<UFunction>("/Script/SpecialEventGameplayRuntime.SpecialEventScript.OnRep_ReplicatedActivePhaseIndex");
+    static auto OnRep_ReplicatedActivePhaseIndexFn = FindObject<UFunction>(L"/Script/SpecialEventGameplayRuntime.SpecialEventScript.OnRep_ReplicatedActivePhaseIndex");
     SpecialEventScript->ProcessEvent(OnRep_ReplicatedActivePhaseIndexFn);
 
     auto GameMode = (AFortGameMode*)GetWorld()->GetGameMode();
@@ -231,14 +231,14 @@ void ActivatePhaseAtIndexHook(UObject* SpecialEventScript, int Index)
         {
             if (Index == 0) // Start of Event
             {
-                auto AllSatelliteDishes = UGameplayStatics::GetAllActorsOfClass(GetWorld(), FindObject<UClass>("/Game/Athena/Apollo/Environments/BuildingActors/Complex/Props/Apollo_Complex_Satellite_Dish_Top_01.Apollo_Complex_Satellite_Dish_Top_01_C"));
+                auto AllSatelliteDishes = UGameplayStatics::GetAllActorsOfClass(GetWorld(), FindObject<UClass>(L"/Game/Athena/Apollo/Environments/BuildingActors/Complex/Props/Apollo_Complex_Satellite_Dish_Top_01.Apollo_Complex_Satellite_Dish_Top_01_C"));
 
                 for (int i = 0; i < AllSatelliteDishes.Num(); i++)
                 {
                     AllSatelliteDishes.At(i)->K2_DestroyActor();
                 }
 
-                auto AllSpecialEventMutators = UGameplayStatics::GetAllActorsOfClass(GetWorld(), FindObject<UClass>("/Script/SpecialEventGameplayRuntime.FortAthenaMutator_SpecialEvent"));
+                auto AllSpecialEventMutators = UGameplayStatics::GetAllActorsOfClass(GetWorld(), FindObject<UClass>(L"/Script/SpecialEventGameplayRuntime.FortAthenaMutator_SpecialEvent"));
 
                 for (int i = 0; i < AllSpecialEventMutators.Num(); i++)
                 {
@@ -303,8 +303,8 @@ void ActivatePhaseAtIndexHook(UObject* SpecialEventScript, int Index)
                 {
                     auto CurrentController = ClientConnections.At(i)->GetPlayerController();
                     auto CurrentPawn = ClientConnections.At(i)->GetPlayerController()->GetPawn();
-                    auto PlayerComponent = CurrentPawn->AddComponentByClass(FindObject<UClass>("/Buffet/Gameplay/Blueprints/WrapWorldPrototype/BP_Buffet_Paint_PlayerComponent.BP_Buffet_Paint_PlayerComponent_C"));
-                    auto MovementComponent = CurrentPawn->AddComponentByClass(FindObject<UClass>("/Buffet/Gameplay/Blueprints/WrapWorldPrototype/BP_Buffet_Paint_MovementComponent.BP_Buffet_Paint_MovementComponent_C"));
+                    auto PlayerComponent = CurrentPawn->AddComponentByClass(FindObject<UClass>(L"/Buffet/Gameplay/Blueprints/WrapWorldPrototype/BP_Buffet_Paint_PlayerComponent.BP_Buffet_Paint_PlayerComponent_C"));
+                    auto MovementComponent = CurrentPawn->AddComponentByClass(FindObject<UClass>(L"/Buffet/Gameplay/Blueprints/WrapWorldPrototype/BP_Buffet_Paint_MovementComponent.BP_Buffet_Paint_MovementComponent_C"));
 
                     PlayerComponent->Get<AActor*>(PlayerComponent->GetOffset("OwningPlayerController")) = CurrentController;
 
@@ -345,7 +345,7 @@ void ActivatePhaseAtIndexHook(UObject* SpecialEventScript, int Index)
             }
             if (Index == 4) // Storm King
             {
-                auto StormScript = FindObject<AActor>("/Buffet/Levels/Buffet_Part_6.Buffet_Part_6.PersistentLevel.BP_Buffet_PhaseScripting_4");
+                auto StormScript = FindObject<AActor>(L"/Buffet/Levels/Buffet_Part_6.Buffet_Part_6.PersistentLevel.BP_Buffet_PhaseScripting_4");
                 auto DefaultPlane = FindObject("/Buffet/Gameplay/Blueprints/WolfMother/BP_PlanePrototype.Default__BP_PlanePrototype_C");
                 auto WID = Cast<UFortWorldItemDefinition>(FindObject("WID_Buffet_BeatMatchingBoomBox", nullptr, ANY_PACKAGE)); // Storm King weapon thing
 
@@ -384,8 +384,8 @@ void ActivatePhaseAtIndexHook(UObject* SpecialEventScript, int Index)
                 {
                     auto CurrentPawn = ClientConnections.At(i)->GetPlayerController()->GetPawn();
 
-                    CurrentPawn->AddComponentByClass(FindObject<UClass>("/Buffet/Gameplay/Blueprints/Stars/BP_Buffet_Stars_PlayerComponent.BP_Buffet_Stars_PlayerComponent_C"));
-                    CurrentPawn->AddComponentByClass(FindObject<UClass>("/BuffetPlaylist/Playlist/BuffetCharacterMovementMutatorComponent.BuffetCharacterMovementMutatorComponent_C"));
+                    CurrentPawn->AddComponentByClass(FindObject<UClass>(L"/Buffet/Gameplay/Blueprints/Stars/BP_Buffet_Stars_PlayerComponent.BP_Buffet_Stars_PlayerComponent_C"));
+                    CurrentPawn->AddComponentByClass(FindObject<UClass>(L"/BuffetPlaylist/Playlist/BuffetCharacterMovementMutatorComponent.BuffetCharacterMovementMutatorComponent_C"));
                 }
             }
             if (Index == 8) // Bubbles
@@ -396,9 +396,9 @@ void ActivatePhaseAtIndexHook(UObject* SpecialEventScript, int Index)
                 for (int i = 0; i < ClientConnections.Num(); i++)
                 {
                     auto CurrentPawn = ClientConnections.At(i)->GetPlayerController()->GetPawn();
-                    auto ComponentToRemove = CurrentPawn->GetComponentByClass(FindObject<UClass>("/Buffet/Gameplay/Blueprints/Stars/BP_Buffet_Stars_PlayerComponent.BP_Buffet_Stars_PlayerComponent_C"));
+                    auto ComponentToRemove = CurrentPawn->GetComponentByClass(FindObject<UClass>(L"/Buffet/Gameplay/Blueprints/Stars/BP_Buffet_Stars_PlayerComponent.BP_Buffet_Stars_PlayerComponent_C"));
 
-                    auto BubbleMovementComponent = CurrentPawn->AddComponentByClass(FindObject<UClass>("/Buffet/Gameplay/Blueprints/Bubble/BP_BubblePlayerMovementComponent.BP_BubblePlayerMovementComponent_C"));
+                    auto BubbleMovementComponent = CurrentPawn->AddComponentByClass(FindObject<UClass>(L"/Buffet/Gameplay/Blueprints/Bubble/BP_BubblePlayerMovementComponent.BP_BubblePlayerMovementComponent_C"));
 
                     bool IsMoving = true;
 
@@ -463,7 +463,7 @@ void ActivatePhaseAtIndexHook(UObject* SpecialEventScript, int Index)
                 SendMessageToConsole(CurrentController, L"Gave Event Weapons!");
             }
 
-            auto AllSatelliteDishes = UGameplayStatics::GetAllActorsOfClass(GetWorld(), FindObject<UClass>("/Game/Athena/Apollo/Environments/BuildingActors/Complex/Props/Apollo_Complex_Satellite_Dish_Top_01.Apollo_Complex_Satellite_Dish_Top_01_C"));
+            auto AllSatelliteDishes = UGameplayStatics::GetAllActorsOfClass(GetWorld(), FindObject<UClass>(L"/Game/Athena/Apollo/Environments/BuildingActors/Complex/Props/Apollo_Complex_Satellite_Dish_Top_01.Apollo_Complex_Satellite_Dish_Top_01_C"));
 
             for (int i = 0; i < AllSatelliteDishes.Num(); i++)
             {
@@ -483,7 +483,7 @@ void AttemptFinishPhaseHook(AActor* SpecialEventScript, FGameplayTag PhaseTag)
     static auto ReplicatedActivePhaseIndexOffset = SpecialEventScript->GetOffset("ReplicatedActivePhaseIndex"); // Sets what Map/Phase were replicating to clients.
     auto LastTag = PhaseTag.TagName.ToString();
 
-    static auto OnRep_ReplicatedActivePhaseIndexFn = FindObject<UFunction>("/Script/SpecialEventGameplayRuntime.SpecialEventScript.OnRep_ReplicatedActivePhaseIndex");
+    static auto OnRep_ReplicatedActivePhaseIndexFn = FindObject<UFunction>(L"/Script/SpecialEventGameplayRuntime.SpecialEventScript.OnRep_ReplicatedActivePhaseIndex");
 
     auto Connections = GetWorld()->GetNetDriver()->GetClientConnections();
 
@@ -607,6 +607,65 @@ UObject* GetAIDirectorHook()
     LOG_INFO(LogDev, "WHAT A BOZO GetAIDirectorHook RET: 0x{:x}", __int64(_ReturnAddress()) - __int64(GetModuleHandleW(0)));
 
     return GameMode->Get(AIDirectorOffset);
+}
+
+static inline void (*Athena_MedConsumable_TriggeredOriginal)(UObject* Context, FFrame& Stack, void* Ret);
+static void Athena_MedConsumable_TriggeredHook(UObject* Context, FFrame& Stack, void* Ret)
+{
+    LOG_INFO(LogDev, __FUNCTION__);
+
+    UObject* Athena_MedConsumable = Context;
+
+    if (!Athena_MedConsumable)
+    {
+        LOG_WARN(LogDev, "No Athena_MedConsumable!");
+        return Athena_MedConsumable_TriggeredOriginal(Context, Stack, Ret);
+    }
+
+    auto HealsShieldsOffset = Athena_MedConsumable->GetOffset("HealsShields");
+    auto HealsHealthOffset = Athena_MedConsumable->GetOffset("HealsHealth");
+    auto PlayerPawnOffset = Athena_MedConsumable->GetOffset("PlayerPawn");
+
+    if (HealsShieldsOffset == -1 || HealsHealthOffset == -1 || PlayerPawnOffset == -1)
+    {
+        LOG_WARN(LogDev, "HealsShieldsOffset: {}, PlayerPawnOffset: {}", HealsShieldsOffset, PlayerPawnOffset);
+        return Athena_MedConsumable_TriggeredOriginal(Context, Stack, Ret);
+    }
+
+    bool HealsShields = Athena_MedConsumable->Get<bool>(HealsShieldsOffset);
+    bool HealsHealth = Athena_MedConsumable->Get<bool>(HealsHealthOffset);
+    AFortPlayerPawn* PlayerPawn = Athena_MedConsumable->Get<AFortPlayerPawn*>(PlayerPawnOffset);
+
+    if ((!HealsShields && !HealsHealth) || !PlayerPawn)
+    {
+        LOG_WARN(LogDev, "HealsShields: {}, HealsHealth: {}, PlayerPawn: {}", bool(HealsShields), bool(HealsHealth), bool(__int64(PlayerPawn)));
+        return Athena_MedConsumable_TriggeredOriginal(Context, Stack, Ret);
+    }
+
+    auto PlayerState = Cast<AFortPlayerState>(PlayerPawn->GetPlayerState());
+
+    if (!PlayerState)
+    {
+        LOG_WARN(LogDev, "PlayerState: {}", bool(__int64(PlayerState)));
+        return Athena_MedConsumable_TriggeredOriginal(Context, Stack, Ret);
+    }
+
+    if (HealsShields)
+    {
+        float CurrentShield = PlayerPawn->GetShield();
+
+        PlayerState->ApplySiphonEffect();
+        PlayerPawn->SetShield(CurrentShield);
+    }
+    else
+    {
+        float CurrentHealth = PlayerPawn->GetHealth();
+
+        PlayerState->ApplyHealthEffect();
+        PlayerPawn->SetHealth(CurrentHealth);
+    }
+
+    return Athena_MedConsumable_TriggeredOriginal(Context, Stack, Ret);
 }
 
 void ChangeLevels()
@@ -1200,7 +1259,7 @@ DWORD WINAPI Main(LPVOID)
 
     // Hooking::MinHook::Hook(FindObject<AFortVolumeManager>("/Script/FortniteGame.Default__FortVolumeManager"), FindObject<UFunction>(L"/Script/FortniteGame.FortVolumeManager.SpawnVolume"),
        // AFortVolumeManager::SpawnVolumeHook, (PVOID*)&AFortVolumeManager::SpawnVolumeOriginal, false);
-    // Hooking::MinHook::Hook((PVOID)GetFunctionIdxOrPtr(FindObject<UFunction>("/Script/FortniteGame.PlaysetLevelStreamComponent.SetPlayset"), true), 
+    // Hooking::MinHook::Hook((PVOID)GetFunctionIdxOrPtr(FindObject<UFunction>(L"/Script/FortniteGame.PlaysetLevelStreamComponent.SetPlayset"), true), 
        // UPlaysetLevelStreamComponent::SetPlaysetHook, (PVOID*)&UPlaysetLevelStreamComponent::SetPlaysetOriginal);
 
     Hooking::MinHook::Hook(FortPlayerControllerAthenaDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerController.ServerDropAllItems"),

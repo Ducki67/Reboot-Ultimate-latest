@@ -59,7 +59,7 @@ class AFortAthenaMutator_Ashton : public AFortAthenaMutator
 public:
 	EAshtonStoneStateType GetStoneState(EAshtonStoneType StoneType)
 	{
-		static auto GetStoneStateFn = FindObject<UFunction>("/Script/FortniteGame.FortAthenaMutator_Ashton.GetStoneState");
+		static auto GetStoneStateFn = FindObject<UFunction>(L"/Script/FortniteGame.FortAthenaMutator_Ashton.GetStoneState");
 
 		struct
 		{

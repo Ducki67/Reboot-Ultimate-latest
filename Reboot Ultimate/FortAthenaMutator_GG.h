@@ -14,7 +14,7 @@ struct FGunGameGunEntry
 {
 	static UStruct* GetStruct()
 	{
-		static auto Struct = FindObject<UStruct>("/Script/FortniteGame.GunGameGunEntry");
+		static auto Struct = FindObject<UStruct>(L"/Script/FortniteGame.GunGameGunEntry");
 		return Struct;
 	}
 
@@ -93,7 +93,7 @@ public:
 
 	static UClass* StaticClass()
 	{
-		static auto Class = FindObject<UClass>("/Script/FortniteGame.FortAthenaMutator_GG");
+		static auto Class = FindObject<UClass>(L"/Script/FortniteGame.FortAthenaMutator_GG");
 		return Class;
 	}
 };

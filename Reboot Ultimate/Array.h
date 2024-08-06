@@ -6,6 +6,8 @@
 #include "MemoryOps.h"
 #include "ContainerAllocationPolicies.h"
 
+#define UE_LIFETIMEBOUND [[clang::lifetimebound]]
+
 struct FMemory
 {
 	static inline void* (*Realloc)(void* Original, SIZE_T Count, uint32_t Alignment /* = DEFAULT_ALIGNMENT */);
@@ -41,6 +43,19 @@ public:
 
 	ElementAllocatorType& GetData() const { return Data; }
 	ElementAllocatorType& GetData() { return Data; }
+
+	template <typename ComparisonType>
+	bool Contains(const ComparisonType& Item) const
+	{
+		for (const InElementType* Data = GetData(), *DataEnd = Data + ArrayNum; Data != DataEnd; ++Data)
+		{
+			if (*Data == Item)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 
 	void Reserve(int Number, size_t Size = sizeof(InElementType))
 	{
@@ -417,4 +432,60 @@ public:
 	{
 		return Data[Index];
 	}
+
+	template <typename T>
+	struct TReversePointerIterator
+	{
+		// This iterator type only supports the minimal functionality needed to support
+		// C++ ranged-for syntax.  For example, it does not provide post-increment ++ nor ==.
+
+		/**
+		 * Constructor for TReversePointerIterator.
+		 *
+		 * @param  InPtr  A pointer to the location after the element being referenced.
+		 *
+		 * @note  Like std::reverse_iterator, this points to one past the element being referenced.
+		 *        Therefore, for an array of size N starting at P, the begin iterator should be
+		 *        constructed at (P+N) and the end iterator should be constructed at P.
+		 */
+		constexpr explicit TReversePointerIterator(T* InPtr UE_LIFETIMEBOUND)
+			: Ptr(InPtr)
+		{
+		}
+
+		constexpr inline T& operator*() const
+		{
+			return *(Ptr - 1);
+		}
+
+		constexpr inline TReversePointerIterator& operator++()
+		{
+			--Ptr;
+			return *this;
+		}
+
+		constexpr inline bool operator!=(const TReversePointerIterator& Rhs) const
+		{
+			return Ptr != Rhs.Ptr;
+		}
+
+	private:
+		T* Ptr;
+	};
+
+	typedef                               InElementType* RangedForIteratorType;
+	typedef                         const InElementType* RangedForConstIteratorType;
+	typedef TReversePointerIterator<      InElementType> RangedForReverseIteratorType;
+	typedef TReversePointerIterator<const InElementType> RangedForConstReverseIteratorType;
+
+public:
+
+	FORCEINLINE RangedForIteratorType             begin() { return                                   GetData(); }
+	FORCEINLINE RangedForConstIteratorType        begin() const { return                                   GetData(); }
+	FORCEINLINE RangedForIteratorType             end() { return                                   GetData() + Num(); }
+	FORCEINLINE RangedForConstIteratorType        end() const { return                                   GetData() + Num(); }
+	FORCEINLINE RangedForReverseIteratorType      rbegin() { return RangedForReverseIteratorType(GetData() + Num()); }
+	FORCEINLINE RangedForConstReverseIteratorType rbegin() const { return RangedForConstReverseIteratorType(GetData() + Num()); }
+	FORCEINLINE RangedForReverseIteratorType      rend() { return RangedForReverseIteratorType(GetData()); }
+	FORCEINLINE RangedForConstReverseIteratorType rend() const { return RangedForConstReverseIteratorType(GetData()); }
 };

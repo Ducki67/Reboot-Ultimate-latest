@@ -2,7 +2,7 @@
 
 bool AAIController::RunBehaviorTree(UBehaviorTree* BTAsset)
 {
-	static auto RunBehaviorTreeFn = FindObject<UFunction>("/Script/AIModule.AIController.RunBehaviorTree");
+	static auto RunBehaviorTreeFn = FindObject<UFunction>(L"/Script/AIModule.AIController.RunBehaviorTree");
 
 	struct
 	{
@@ -17,7 +17,7 @@ bool AAIController::RunBehaviorTree(UBehaviorTree* BTAsset)
 
 bool AAIController::UseBlackboard(UBlackboardData* BlackboardAsset, UBlackboardComponent** BlackboardComponent)
 {
-	static auto UseBlackboardFn = FindObject<UFunction>("/Script/AIModule.AIController.UseBlackboard");
+	static auto UseBlackboardFn = FindObject<UFunction>(L"/Script/AIModule.AIController.UseBlackboard");
 
 	struct
 	{
@@ -36,7 +36,7 @@ bool AAIController::UseBlackboard(UBlackboardData* BlackboardAsset, UBlackboardC
 
 void AAIController::OnUsingBlackBoard(UBlackboardComponent* BlackboardComp, UBlackboardData* BlackboardAsset)
 {
-	static auto OnUsingBlackBoardFn = FindObject<UFunction>("/Script/AIModule.AIController.OnUsingBlackBoard");
+	static auto OnUsingBlackBoardFn = FindObject<UFunction>(L"/Script/AIModule.AIController.OnUsingBlackBoard");
 
 	struct
 	{
@@ -49,7 +49,7 @@ void AAIController::OnUsingBlackBoard(UBlackboardComponent* BlackboardComp, UBla
 
 EPathFollowingRequestResult AAIController::MoveToLocation(FVector Dest, float AcceptanceRadius, bool bStopOnOverlap, bool bUsePathfinding, bool bProjectDestinationToNavigation, bool bCanStrafe, TSubclassOf<UNavigationQueryFilter> FilterClass, bool bAllowPartialPath)
 {
-	static auto MoveToLocationFn = FindObject<UFunction>("/Script/AIModule.AIController.MoveToLocation");
+	static auto MoveToLocationFn = FindObject<UFunction>(L"/Script/AIModule.AIController.MoveToLocation");
 
 	struct
 	{
@@ -71,7 +71,7 @@ EPathFollowingRequestResult AAIController::MoveToLocation(FVector Dest, float Ac
 
 EPathFollowingRequestResult AAIController::MoveToActor(AActor* Goal, float AcceptanceRadius, bool bStopOnOverlap, bool bUsePathfinding, bool bCanStrafe, TSubclassOf<UNavigationQueryFilter> FilterClass, bool bAllowPartialPath)
 {
-	static auto MoveToActorFn = FindObject<UFunction>("/Script/AIModule.AIController.MoveToActor");
+	static auto MoveToActorFn = FindObject<UFunction>(L"/Script/AIModule.AIController.MoveToActor");
 
 	struct
 	{
