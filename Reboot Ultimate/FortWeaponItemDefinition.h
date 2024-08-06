@@ -27,6 +27,7 @@ public:
 	}
 
 	int GetClipSize();
+	int GetInitialClips();
 	void RemoveGrantedWeaponAbilities(class AFortPlayerControllerAthena* PlayerController);
 	void GiveGrantedWeaponAbilities(class AFortPlayerControllerAthena* PlayerController);
 

@@ -33,7 +33,11 @@ struct FFortClientMarkerRequest
 
 	FVector& GetWorldPosition()
 	{
-		static auto WorldPositionOffset = FindOffsetStruct("/Script/FortniteGame.FortClientMarkerRequest", "WorldPosition");
+		static auto WorldPositionOffset = FindOffsetStruct("/Script/FortniteGame.FortClientMarkerRequest", "WorldPosition", false);
+
+		if (WorldPositionOffset == -1)
+			WorldPositionOffset = FindOffsetStruct("/Script/FortniteGame.FortClientMarkerRequest", "BasePosition");
+
 		return *(FVector*)(__int64(this) + WorldPositionOffset);
 	}
 
@@ -45,7 +49,11 @@ struct FFortClientMarkerRequest
 
 	FVector& GetWorldPositionOffset()
 	{
-		static auto WorldPositionOffsetOffset = FindOffsetStruct("/Script/FortniteGame.FortClientMarkerRequest", "WorldPositionOffset");
+		static auto WorldPositionOffsetOffset = FindOffsetStruct("/Script/FortniteGame.FortClientMarkerRequest", "WorldPositionOffset", false);
+
+		if (WorldPositionOffsetOffset == -1)
+			WorldPositionOffsetOffset = FindOffsetStruct("/Script/FortniteGame.FortClientMarkerRequest", "BasePositionOffset");
+
 		return *(FVector*)(__int64(this) + WorldPositionOffsetOffset);
 	}
 
@@ -136,6 +144,8 @@ struct FFortWorldMarkerData
 class UAthenaMarkerComponent : public UActorComponent
 {
 public:
+	static inline void (*ServerAddMapMarkerOriginal)(UAthenaMarkerComponent* MarkerComponent, FFortClientMarkerRequest MarkerRequest);
+
 	static void ServerAddMapMarkerHook(UAthenaMarkerComponent* MarkerComponent, FFortClientMarkerRequest MarkerRequest);
 	static void ServerRemoveMapMarkerHook(UAthenaMarkerComponent* MarkerComponent, FMarkerID MarkerID, uint8_t CancelReason);
 };

@@ -23,6 +23,19 @@ struct FGameplayAbilitySpecHandle
 	} */
 };
 
+struct FPredictionKey // todo move
+{
+	// __int64 real;
+
+	static UStruct* GetStruct()
+	{
+		static auto Struct = FindObject<UStruct>(L"/Script/GameplayAbilities.PredictionKey");
+		return Struct;
+	}
+
+	static int GetStructSize() { return GetStruct()->GetPropertiesSize(); }
+};
+
 struct FGameplayAbilityActivationInfo // TODO Move
 {
 	static UStruct* GetStruct()
@@ -32,6 +45,12 @@ struct FGameplayAbilityActivationInfo // TODO Move
 	}
 
 	static int GetStructSize() { return GetStruct()->GetPropertiesSize(); }
+
+	FPredictionKey* GetPredictionKeyWhenActivated()
+	{
+		static auto PredictionKeyWhenActivatedOffset = FindOffsetStruct("/Script/GameplayAbilities.GameplayAbilityActivationInfo", "PredictionKeyWhenActivated");
+		return *(FPredictionKey**)(__int64(this) + PredictionKeyWhenActivatedOffset);
+	}
 };
 
 struct FGameplayAbilitySpec : FFastArraySerializerItem
@@ -55,6 +74,13 @@ struct FGameplayAbilitySpec : FFastArraySerializerItem
 	{
 		static auto HandleOffset = FindOffsetStruct("/Script/GameplayAbilities.GameplayAbilitySpec", "Handle");
 		return *(FGameplayAbilitySpecHandle*)(__int64(this) + HandleOffset);
+	}
+
+	bool GetInputPressed()
+	{
+		static auto InputPressedOffset = FindOffsetStruct("/Script/GameplayAbilities.GameplayAbilitySpec", "InputPressed");
+		static auto InputPressedFieldMask = GetFieldMask(FindPropertyStruct("/Script/GameplayAbilities.GameplayAbilitySpec", "InputPressed"));
+		return ReadBitfield(*(PlaceholderBitfield**)(__int64(this) + InputPressedOffset), InputPressedFieldMask);
 	}
 
 	FGameplayAbilityActivationInfo* GetActivationInfo()

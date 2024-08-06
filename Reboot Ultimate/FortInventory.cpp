@@ -9,6 +9,16 @@
 #include "FortPlayerStateAthena.h"
 #include "GameplayAbilityTypes.h"
 
+static UFortItem* CreateItemInstance(AFortPlayerController* PlayerController, UFortItemDefinition* ItemDefinition, int Count)
+{
+	UFortItem* NewItemInstance = ItemDefinition->CreateTemporaryItemInstanceBP(Count);
+
+	if (NewItemInstance && PlayerController)
+		NewItemInstance->SetOwningControllerForTemporaryItem(PlayerController);
+
+	return NewItemInstance;
+}
+
 std::pair<std::vector<UFortItem*>, std::vector<UFortItem*>> AFortInventory::AddItem(FFortItemEntry* ItemEntry, bool* bShouldUpdate, bool bShowItemToast, int OverrideCount)
 {
 	if (!ItemEntry || !ItemEntry->GetItemDefinition())
@@ -94,19 +104,22 @@ std::pair<std::vector<UFortItem*>, std::vector<UFortItem*>> AFortInventory::AddI
 	if (!PlayerController)
 		return std::make_pair(NewItemInstances, ModifiedItemInstances);
 
-	auto Pawn = Cast<AFortPlayerPawnAthena>(PlayerController->GetPawn());
-
-	if (Pawn)
+	if (Fortnite_Version >= 14)
 	{
-		auto CurrentWeapon = Pawn->GetCurrentWeapon();
+		auto Pawn = Cast<AFortPlayerPawnAthena>(PlayerController->GetPawn());
 
-		if (CurrentWeapon)
+		if (Pawn)
 		{
-			auto CurrentWeaponGuid = CurrentWeapon->GetItemEntryGuid();
-			auto WeaponDefinition = Cast<UFortWeaponItemDefinition>(ItemEntry->GetItemDefinition());
+			auto CurrentWeapon = Pawn->GetCurrentWeapon();
 
-			if (WeaponDefinition && CurrentWeaponGuid != ItemEntry->GetItemGuid())
-				WeaponDefinition->RemoveGrantedWeaponAbilities(Cast<AFortPlayerControllerAthena>(PlayerController));
+			if (CurrentWeapon)
+			{
+				auto& CurrentWeaponGuid = CurrentWeapon->GetItemEntryGuid();
+				auto WeaponDefinition = Cast<UFortWeaponItemDefinition>(ItemEntry->GetItemDefinition());
+
+				if (WeaponDefinition && CurrentWeaponGuid != ItemEntry->GetItemGuid())
+					WeaponDefinition->RemoveGrantedWeaponAbilities(Cast<AFortPlayerControllerAthena>(PlayerController));
+			}
 		}
 	}
 
@@ -138,6 +151,24 @@ std::pair<std::vector<UFortItem*>, std::vector<UFortItem*>> AFortInventory::AddI
 		if (OverrideCount != -1)
 			NewItemInstance->GetItemEntry()->GetCount() = OverrideCount;
 
+		if (auto WeaponDefinition = Cast<UFortWeaponItemDefinition>(ItemDefinition))
+		{
+			static auto bUsesPhantomReserveAmmoOffset = WeaponDefinition->GetOffset("bUsesPhantomReserveAmmo", false);
+
+			if (bUsesPhantomReserveAmmoOffset != -1)
+			{
+				static auto bUsesPhantomReserveAmmoFieldMask = GetFieldMask(WeaponDefinition->GetProperty("bUsesPhantomReserveAmmo"));
+
+				bool bUsesPhantomReserveAmmo = WeaponDefinition->ReadBitfieldValue(bUsesPhantomReserveAmmoOffset, bUsesPhantomReserveAmmoFieldMask);
+
+				if (bUsesPhantomReserveAmmo)
+				{
+					static auto PhantomReserveAmmoOffset = FindOffsetStruct("/Script/FortniteGame.FortItemEntry", "PhantomReserveAmmo");
+					*(int*)(__int64(NewItemInstance->GetItemEntry()) + PhantomReserveAmmoOffset) = (WeaponDefinition->GetInitialClips() - WeaponDefinition->GetClipSize());
+				}
+			}
+		}
+
 		NewItemInstances.push_back(NewItemInstance);
 
 		ItemInstances.Add(NewItemInstance);
@@ -148,7 +179,7 @@ std::pair<std::vector<UFortItem*>, std::vector<UFortItem*>> AFortInventory::AddI
 		{
 			bool AreGadgetsEnabled = Addresses::ApplyGadgetData && Addresses::RemoveGadgetData && Globals::bEnableAGIDs;
 			bool bWasGadget = false;
-			
+
 			if (AreGadgetsEnabled)
 			{
 				if (auto GadgetItemDefinition = Cast<UFortGadgetItemDefinition>(WorldItemDefinition))
@@ -158,11 +189,11 @@ std::pair<std::vector<UFortItem*>, std::vector<UFortItem*>> AFortInventory::AddI
 						FortPlayerController->DropAllItems({ GadgetItemDefinition }, false, false, Fortnite_Version < 7);
 					}
 
-					bool (*ApplyGadgetData)(UFortGadgetItemDefinition* a1, __int64 a2, UFortItem* a3, unsigned __int8 a4) = decltype(ApplyGadgetData)(Addresses::ApplyGadgetData);
+					bool (*ApplyGadgetData)(UFortGadgetItemDefinition * a1, __int64 a2, UFortItem * a3, unsigned __int8 a4) = decltype(ApplyGadgetData)(Addresses::ApplyGadgetData);
 					static auto FortInventoryOwnerInterfaceClass = FindObject<UClass>(L"/Script/FortniteGame.FortInventoryOwnerInterface");
 					auto Interface = __int64(FortPlayerController->GetInterfaceAddress(FortInventoryOwnerInterfaceClass));
 					bool idktbh = true; // Something to do with durability
-					
+
 					bool DidApplyingGadgetSucceed = ApplyGadgetData(GadgetItemDefinition, Interface, NewItemInstance, idktbh);
 					LOG_INFO(LogDev, "DidApplyingGadgetSucceed: {}", DidApplyingGadgetSucceed);
 					bWasGadget = true;
@@ -170,7 +201,8 @@ std::pair<std::vector<UFortItem*>, std::vector<UFortItem*>> AFortInventory::AddI
 			}
 
 			// if (auto WeaponItemDefinition = Cast<UFortWeaponItemDefinition>(WorldItemDefinition))
-				// WeaponItemDefinition->GiveGrantedWeaponAbilities(Cast<AFortPlayerControllerAthena>(FortPlayerController)); // don't do this here since we don't want to enable the abilities if the player isn't holding the item
+			// WeaponItemDefinition->GiveGrantedWeaponAbilities(Cast<AFortPlayerControllerAthena>(FortPlayerController)); // don't do this here since we don't want to enable the abilities if the player isn't holding the item
+
 
 			if (WorldItemDefinition->ShouldFocusWhenAdded()) // Should we also do this for stacking?
 			{
@@ -239,12 +271,6 @@ std::pair<std::vector<UFortItem*>, std::vector<UFortItem*>> AFortInventory::AddI
 
 std::pair<std::vector<UFortItem*>, std::vector<UFortItem*>> AFortInventory::AddItem(UFortItemDefinition* ItemDefinition, bool* bShouldUpdate, int Count, int LoadedAmmo, bool bShowItemToast)
 {
-	if (Count < 1)
-	{
-		std::pair<std::vector<UFortItem*>, std::vector<UFortItem*>> EmptyRet;
-		return EmptyRet;
-	}
-
 	if (LoadedAmmo == -1)
 	{
 		if (auto WeaponDef = Cast<UFortWeaponItemDefinition>(ItemDefinition)) // bPreventDefaultPreload ?
@@ -315,7 +341,7 @@ bool AFortInventory::RemoveItem(const FGuid& ItemGuid, bool* bShouldUpdate, int 
 		if (bIsFinalStack)
 		{
 			NewCount = NewCount < 0 ? 0 : NewCount; // min(NewCount, 0) or something i forgot // hm?
-			
+
 			if (OldItemCount == 0) // hm?
 				bOverrideChangeStackSize = true;
 		}
@@ -365,9 +391,13 @@ bool AFortInventory::RemoveItem(const FGuid& ItemGuid, bool* bShouldUpdate, int 
 						}
 					}
 				}
-				else if (auto WeaponItemDefinition = Cast<UFortWeaponItemDefinition>(ItemDefinition))
+
+				if (Fortnite_Version >= 14)
 				{
-					WeaponItemDefinition->RemoveGrantedWeaponAbilities((AFortPlayerControllerAthena*)this->GetOwner());
+					if (auto WeaponItemDefinition = Cast<UFortWeaponItemDefinition>(ItemDefinition))
+					{
+						WeaponItemDefinition->RemoveGrantedWeaponAbilities((AFortPlayerControllerAthena*)this->GetOwner());
+					}
 				}
 			}
 
@@ -416,7 +446,7 @@ bool AFortInventory::RemoveItem(const FGuid& ItemGuid, bool* bShouldUpdate, int 
 void AFortInventory::SwapItem(const FGuid& ItemGuid, FFortItemEntry* NewItemEntry, int OverrideNewCount, std::pair<FFortItemEntry*, FFortItemEntry*>* outEntries)
 {
 	auto NewCount = OverrideNewCount == -1 ? NewItemEntry->GetCount() : OverrideNewCount;
-	
+
 	auto ItemInstance = FindItemInstance(ItemGuid);
 
 	if (!ItemInstance)
@@ -432,7 +462,7 @@ void AFortInventory::SwapItem(const FGuid& ItemGuid, FFortItemEntry* NewItemEntr
 	static auto FortItemEntrySize = FFortItemEntry::GetStructSize();
 
 	auto& ReplicatedEntries = GetItemList().GetReplicatedEntries();
-	
+
 	for (int i = 0; i < ReplicatedEntries.Num(); i++)
 	{
 		auto& ReplicatedEntry = ReplicatedEntries.At(i, FortItemEntrySize);
@@ -444,7 +474,7 @@ void AFortInventory::SwapItem(const FGuid& ItemGuid, FFortItemEntry* NewItemEntr
 
 			ReplicatedEntry.GetCount() = NewCount;
 			ItemInstance->GetItemEntry()->GetCount() = NewCount;
-			
+
 			if (outEntries)
 				*outEntries = std::make_pair(ItemInstance->GetItemEntry(), &ReplicatedEntry);
 		}
@@ -486,7 +516,7 @@ void AFortInventory::ModifyCount(UFortItem* ItemInstance, int New, bool bRemove,
 	}
 
 	if (outEntries)
-		*outEntries = { ItemInstance->GetItemEntry(), ReplicatedEntry};
+		*outEntries = { ItemInstance->GetItemEntry(), ReplicatedEntry };
 
 	if (bUpdate || !outEntries)
 	{
@@ -512,7 +542,22 @@ UFortItem* AFortInventory::GetPickaxeInstance()
 			return ItemInstance;
 		}
 	}
-	
+
+	return nullptr;
+}
+
+UFortItem* AFortInventory::FindItemInstance(UFortItemDefinition* ItemDefinition)
+{
+	auto& ItemInstances = GetItemList().GetItemInstances();
+
+	for (int i = 0; i < ItemInstances.Num(); i++)
+	{
+		auto ItemInstance = ItemInstances.At(i);
+
+		if (ItemInstance->GetItemEntry()->GetItemDefinition() == ItemDefinition)
+			return ItemInstance;
+	}
+
 	return nullptr;
 }
 
@@ -538,28 +583,6 @@ void AFortInventory::CorrectLoadedAmmo(const FGuid& Guid, int NewAmmoCount)
 	}
 }
 
-void AFortInventory::CorrectLoadedAmmo(UFortItemDefinition* ItemDefinition, int NewAmmoCount)
-{
-	auto CurrentWeaponInstance = FindItemInstance(ItemDefinition);
-
-	if (!CurrentWeaponInstance)
-		return;
-
-	auto CurrentWeaponReplicatedEntry = FindReplicatedEntry(CurrentWeaponInstance->GetItemEntry()->GetItemGuid());
-
-	if (!CurrentWeaponReplicatedEntry)
-		return;
-
-	if (CurrentWeaponReplicatedEntry->GetLoadedAmmo() != NewAmmoCount)
-	{
-		CurrentWeaponInstance->GetItemEntry()->GetLoadedAmmo() = NewAmmoCount;
-		CurrentWeaponReplicatedEntry->GetLoadedAmmo() = NewAmmoCount;
-
-		GetItemList().MarkItemDirty(CurrentWeaponInstance->GetItemEntry());
-		GetItemList().MarkItemDirty(CurrentWeaponReplicatedEntry);
-	}
-}
-
 UFortItem* AFortInventory::FindItemInstance(const FGuid& Guid)
 {
 	auto& ItemInstances = GetItemList().GetItemInstances();
@@ -569,21 +592,6 @@ UFortItem* AFortInventory::FindItemInstance(const FGuid& Guid)
 		auto ItemInstance = ItemInstances.At(i);
 
 		if (ItemInstance->GetItemEntry()->GetItemGuid() == Guid)
-			return ItemInstance;
-	}
-
-	return nullptr;
-}
-
-UFortItem* AFortInventory::FindItemInstance(UFortItemDefinition* ItemDefinition)
-{
-	auto& ItemInstances = GetItemList().GetItemInstances();
-
-	for (int i = 0; i < ItemInstances.Num(); i++)
-	{
-		auto ItemInstance = ItemInstances.At(i);
-
-		if (ItemInstance->GetItemEntry()->GetItemDefinition() == ItemDefinition)
 			return ItemInstance;
 	}
 

@@ -10,22 +10,21 @@
 // using FGameplayEventData = PadHexA8;
 
 // using FPredictionKey = PadHex10; 
-using FGameplayEventData = PadHexB0;
 
-// using FGameplayEventData = __int64;
-
-struct FPredictionKey // todo move
+struct FGameplayEventData
 {
-	// __int64 real;
+	PadHexB0 Pad;
 
 	static UStruct* GetStruct()
 	{
-		static auto Struct = FindObject<UStruct>(L"/Script/GameplayAbilities.PredictionKey");
+		static auto Struct = FindObject<UStruct>(L"/Script/GameplayAbilities.GameplayEventData");
 		return Struct;
 	}
 
 	static int GetStructSize() { return GetStruct()->GetPropertiesSize(); }
 };
+
+// using FGameplayEventData = __int64;
 
 struct FGameplayEffectContextHandle
 {

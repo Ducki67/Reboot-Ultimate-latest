@@ -11,12 +11,22 @@ void UAthenaMarkerComponent::ServerAddMapMarkerHook(UAthenaMarkerComponent* Mark
 	AFortPlayerControllerAthena* PlayerController = Cast<AFortPlayerControllerAthena>(Owner);
 
 	if (!PlayerController)
-		return;
+	{
+		if (Engine_Version < 424)
+			return;
+		else
+			return ServerAddMapMarkerOriginal(MarkerComponent, MarkerRequest);
+	}
 
 	AFortPlayerStateAthena* PlayerState = Cast<AFortPlayerStateAthena>(PlayerController->GetPlayerState());
 
 	if (!PlayerState)
-		return;
+	{
+		if (Engine_Version < 424)
+			return;
+		else
+			return ServerAddMapMarkerOriginal(MarkerComponent, MarkerRequest);
+	}
 
 	auto MarkerRequestPtr = &MarkerRequest;
 
@@ -24,7 +34,7 @@ void UAthenaMarkerComponent::ServerAddMapMarkerHook(UAthenaMarkerComponent* Mark
 	{
 		auto Pawn = PlayerController->GetPawn();
 
-		if (Pawn)
+		if (Pawn && MarkerRequestPtr)
 		{
 			FVector LocationToTeleport = MarkerRequestPtr->GetWorldPosition();
 
@@ -50,6 +60,9 @@ void UAthenaMarkerComponent::ServerAddMapMarkerHook(UAthenaMarkerComponent* Mark
 			Pawn->TeleportTo(GroundLocationToTeleport, Pawn->GetActorRotation() /* Should use Pawn->ControlRotation but it's fine */);
 		}
 	}
+
+	if (Engine_Version >= 424)
+		return ServerAddMapMarkerOriginal(MarkerComponent, MarkerRequest);
 
 	bool bUseRealloc = false;
 	auto MarkerData = Alloc<FFortWorldMarkerData>(FFortWorldMarkerData::GetStructSize(), bUseRealloc);

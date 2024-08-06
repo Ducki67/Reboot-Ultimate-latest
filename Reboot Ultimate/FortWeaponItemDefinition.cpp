@@ -36,6 +36,38 @@ int UFortWeaponItemDefinition::GetClipSize()
 	return *(int*)(__int64(Row) + ClipSizeOffset);
 }
 
+int UFortWeaponItemDefinition::GetInitialClips()
+{
+	static auto WeaponStatHandleOffset = GetOffset("WeaponStatHandle");
+	auto& WeaponStatHandle = Get<FDataTableRowHandle>(WeaponStatHandleOffset);
+
+	auto Table = WeaponStatHandle.DataTable;
+
+	if (!Table)
+		return 0;
+
+	auto& RowMap = Table->GetRowMap();
+
+	void* Row = nullptr;
+
+	for (int i = 0; i < RowMap.Pairs.Elements.Data.Num(); ++i)
+	{
+		auto& Pair = RowMap.Pairs.Elements.Data.at(i).ElementData.Value;
+
+		if (Pair.Key() == WeaponStatHandle.RowName)
+		{
+			Row = Pair.Value();
+			break;
+		}
+	}
+
+	if (!Row)
+		return 0;
+
+	static auto InitialClipsOffset = FindOffsetStruct("/Script/FortniteGame.FortBaseWeaponStats", "InitialClips");
+	return *(int*)(__int64(Row) + InitialClipsOffset);
+}
+
 void UFortWeaponItemDefinition::RemoveGrantedWeaponAbilities(AFortPlayerControllerAthena* PlayerController)
 {
 	if (Fortnite_Version < 14)

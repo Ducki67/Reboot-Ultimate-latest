@@ -1758,6 +1758,17 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else
 				SendMessageToConsole(PlayerController, L"Summoned at zone center!");
 		}
+		else if (Command == "togglemarktoteleport" || Command == "togglemarktotp" || Command == "markertp")
+		{
+			auto Pawn = ReceivingController->GetMyFortPawn();
+
+			bMarkToTeleport = !bMarkToTeleport;
+
+			std::wstring message = L"Marker Teleporting is now ";
+			message += (bMarkToTeleport ? L"on." : L"off.");
+
+			SendMessageToConsole(PlayerController, message.c_str());
+		}
 		else if (Command == "settimeofday" || Command == "time" || Command == "hour")
 		{
 			static auto SetTimeOfDayFn = FindObject<UFunction>(L"/Script/FortniteGame.FortKismetLibrary.SetTimeOfDay");
