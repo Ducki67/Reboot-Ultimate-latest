@@ -32,14 +32,6 @@ void UCheatManager::DestroyAll(TSubclassOf<AActor> AClass)
 	this->ProcessEvent(DestroyAllFn, &UCheatManager_DestroyAll_Params);
 }
 
-void UCheatManager::Mang(std::string Cmd)
-{
-	auto MangFn = FindObject<UFunction>(L"/Script/Engine.CheatManager." + Cmd);
-
-	if (MangFn)
-		this->ProcessEvent(MangFn, nullptr);
-}
-
 UClass* UCheatManager::StaticClass()
 {
 	static auto Class = FindObject<UClass>(L"/Script/Engine.CheatManager");

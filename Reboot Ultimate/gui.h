@@ -46,6 +46,9 @@
 #include "calendar.h"
 #include "botnames.h"
 
+#define PREGAME_GAME_TAB 1
+#define PREGAME_PLAYLIST_TAB 2
+
 #define GAME_TAB 1
 #define PLAYERS_TAB 2
 #define GAMEMODE_TAB 3
@@ -180,6 +183,21 @@ static inline void Restart() // todo move?
 
 	// UGameplayStatics::OpenLevel(GetWorld(), UKismetStringLibrary::Conv_StringToName(LevelA), true, FString());
 }
+
+enum class Playlist : int
+{
+	Solos,
+	Duos,
+	Trios,
+	Squads,
+	TeamRumble,
+	OneShotSolos,
+	OneShotDuos,
+	OneShotSquads,
+	SlideSolos,
+	SlideDuos,
+	Custom
+};
 
 template<typename T>
 static inline T GetRandomItem(std::vector<T>& Vector, int ConnectionIndex)
@@ -504,10 +522,37 @@ static inline void InputVector(const std::string& baseText, FVector* vec)
 #endif
 }
 
+static inline std::string convertToHMS(int TotalSeconds)
+{
+	int Hours = TotalSeconds / 3600;
+	int Minutes = (TotalSeconds % 3600) / 60;
+	int Seconds = TotalSeconds % 60;
+
+	std::string result = "";
+
+	if (Hours > 0)
+	{
+		result += std::to_string(Hours) + "h ";
+	}
+
+	if (Minutes > 0)
+	{
+		result += std::to_string(Minutes) + "m ";
+	}
+
+	if (Seconds > 0 || (Hours == 0 && Minutes == 0))
+	{
+		result += std::to_string(Seconds) + "s";
+	}
+
+	return result;
+}
+
 static int Width = 640;
 static int Height = 480;
 
 static int Tab = 1;
+static int PregameTab = 1;
 static int PlayerTab = -1;
 static bool bIsEditingInventory = false;
 static bool bInformationTab = false;
@@ -543,6 +588,28 @@ static inline void StaticUI()
 	if (Addresses::ApplyGadgetData && Addresses::RemoveGadgetData && Engine_Version < 424)
 	{
 		ImGui::Checkbox("Enable AGIDs", &Globals::bEnableAGIDs);
+	}
+}
+
+static inline void PregameTabs()
+{
+	if (ImGui::BeginTabBar(""))
+	{
+		if (ImGui::BeginTabItem("Game"))
+		{
+			PregameTab = PREGAME_GAME_TAB;
+			PlayerTab = -1;
+			bInformationTab = false;
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Playlist"))
+		{
+			PregameTab = PREGAME_PLAYLIST_TAB;
+			PlayerTab = -1;
+			bInformationTab = false;
+			ImGui::EndTabItem();
+		}
 	}
 }
 
@@ -992,6 +1059,9 @@ static inline void MainUI()
 
 		if (Tab == GAME_TAB)
 		{
+			auto GameMode = (AFortGameModeAthena*)GetWorld()->GetGameMode();
+			auto GameState = Cast<AFortGameStateAthena>(GameMode->GetGameState());
+
 			if (bLoaded)
 			{
 				StaticUI();
@@ -1003,7 +1073,12 @@ static inline void MainUI()
 					SetIsLategame(bWillBeLategame);
 				}
 
+				ImGui::Text(std::format("Uptime: {}", convertToHMS(UGameplayStatics::GetTimeSeconds(GetWorld()))).c_str());
+				ImGui::NewLine();
 				ImGui::Text(std::format("Joinable: {}", Globals::bStartedListening).c_str());
+				ImGui::Text(std::format("Started Bus: {}", bStartedBus).c_str());
+				ImGui::Text(std::format("Ended: {}", GameState->GetGamePhase() > EAthenaGamePhase::Warmup && !GameMode->IsMatchInProgress()).c_str());
+				ImGui::Text(std::format("Gamemode: {}", PlaylistShortName).c_str()); // ralz is stupid
 
 				if (!Globals::bStartedListening) // hm
 				{
@@ -1863,11 +1938,15 @@ static inline void MainUI()
 
 static inline void PregameUI()
 {
-	StaticUI();
+	PregameTabs();
+
+	if (PregameTab == PREGAME_GAME_TAB)
+	{
+		StaticUI();
 
 	if (Fortnite_Version == 11.30 && 11.31 && 12.41)
 	{
-		ImGui::Checkbox("Slomo on game end", &Globals::bOnGameEndSlowmo);
+		ImGui::Checkbox("Slomo on Game End", &Globals::bOnGameEndSlowmo);
 	}
 
 	if (Engine_Version >= 422 && Engine_Version < 424)
@@ -1900,66 +1979,103 @@ static inline void PregameUI()
 	}
 
 	ImGui::SliderInt("Players Required to Start", &WarmupRequiredPlayerCount, 1, 100);
-		
-	if (!Globals::bCreative)
-		ImGui::InputText("Playlist", &PlaylistName);
-}
-
-static inline void TestUI()
-{
-	ImGui::SetCursorScreenPos(ImVec2(0, 1080));
-	ImGui::Begin("Players", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-	if (ImGui::Selectable("Jake (MISSING UMP ACCOUNT DETAILS)"))
-	{
-
 	}
-	ImGui::End();
 
-	ImGui::SetCursorScreenPos(ImVec2(300, 1080));
-	ImGui::Begin("Map", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-	ImGui::End();
-
-	ImGui::SetCursorScreenPos(ImVec2(300, 0));
-	ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-	ImGui::TextColored(ImVec4(1, 0, 0, 1), "No warnings, errors.");
-
-	ImGui::BeginChild("Console Output", ImVec2(0, 150), true);
-	ImGui::Text("[21:15:39] RiftMP - built on Nov 13 2022\n"
-		"[21:15:39] Running on UE 4.26.2-9836822+++UE+Release-4.26\n"
-		"[21:15:39] Waiting for World\n"
-		"[21:16:02] Initializing components\n"
-		"[21:16:13] Listening on port 7777\n"
-		"[21:16:13] Successfully configured GameMode\n"
-		"[21:17:24] jake spawned\n"
-		"[21:17:24] Jake joined the match");
-	ImGui::EndChild();
-
-	static char command[32];
-	ImGui::InputText("", command, IM_ARRAYSIZE(command));
-	ImGui::End();
-
-	ImGui::SetCursorScreenPos(ImVec2(1920, 1080));
-	ImGui::Begin("Match", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-	if (ImGui::TreeNode("Match"))
+	else if (PregameTab == PREGAME_PLAYLIST_TAB)
 	{
-		if (ImGui::TreeNode("Safe Zone"))
+		static int SelectedPlaylist = (int)Playlist::Solos;
+
+		ImGui::RadioButton("Solos", &SelectedPlaylist, (int)Playlist::Solos);
+		ImGui::RadioButton("Duos", &SelectedPlaylist, (int)Playlist::Duos);
+		ImGui::RadioButton("Trios", &SelectedPlaylist, (int)Playlist::Trios);
+		ImGui::RadioButton("Squads", &SelectedPlaylist, (int)Playlist::Squads);
+		ImGui::RadioButton("One Shot Solos", &SelectedPlaylist, (int)Playlist::OneShotSolos);
+		ImGui::RadioButton("One Shot Duos", &SelectedPlaylist, (int)Playlist::OneShotDuos);
+		ImGui::RadioButton("One Shot Squads", &SelectedPlaylist, (int)Playlist::OneShotSquads);
+		ImGui::RadioButton("Slide Solos", &SelectedPlaylist, (int)Playlist::SlideSolos);
+		ImGui::RadioButton("Slide Duos", &SelectedPlaylist, (int)Playlist::SlideDuos);
+		ImGui::RadioButton("Team Rumble", &SelectedPlaylist, (int)Playlist::TeamRumble);
+		ImGui::RadioButton("Custom", &SelectedPlaylist, (int)Playlist::Custom);
+
+		switch (SelectedPlaylist)
 		{
-			ImGui::TreePop();
+		case (int)Playlist::Solos:
+		{
+			PlaylistName = "/Game/Athena/Playlists/Playlist_DefaultSolo.Playlist_DefaultSolo";
+			break;
+		}
+		case (int)Playlist::Duos:
+		{
+			PlaylistName = "/Game/Athena/Playlists/Playlist_DefaultDuo.Playlist_DefaultDuo";
+			break;
+		}
+		case (int)Playlist::Trios:
+		{
+			PlaylistName = "/Game/Athena/Playlists/Trios/Playlist_Trios.Playlist_Trios";
+			break;
+		}
+		case (int)Playlist::Squads:
+		{
+			PlaylistName = "/Game/Athena/Playlists/Playlist_DefaultSquad.Playlist_DefaultSquad";
+			break;
+		}
+		case (int)Playlist::OneShotSolos:
+		{
+			PlaylistName = "/Game/Athena/Playlists/Low/Playlist_Low_Solo.Playlist_Low_Solo";
+			break;
+		}
+		case (int)Playlist::OneShotDuos:
+		{
+			PlaylistName = "/Game/Athena/Playlists/Low/Playlist_Low_Duos.Playlist_Low_Duos";
+			break;
+		}
+		case (int)Playlist::OneShotSquads:
+		{
+			PlaylistName = "/Game/Athena/Playlists/Low/Playlist_Low_Squad.Playlist_Low_Squad";
+			break;
+		}
+		case (int)Playlist::SlideSolos:
+		{
+			PlaylistName = "/Game/Athena/Playlists/Slide/Playlist_Slide_Solo.Playlist_Slide_Solo";
+			break;
+		}
+		case (int)Playlist::SlideDuos:
+		{
+			PlaylistName = "/Game/Athena/Playlists/Slide/Playlist_Slide_Duos.Playlist_Slide_Duos";
+			break;
+		}
+		case (int)Playlist::TeamRumble:
+		{
+			PlaylistName = "/Game/Athena/Playlists/Respawn/Playlist_Respawn_24.Playlist_Respawn_24";
+			break;
+		}
+		case (int)Playlist::Custom:
+		{
+			break;
+		}
+		default:
+		{
+			break;
+		}
 		}
 
-		if (ImGui::TreeNode("Level"))
+		ImGui::NewLine();
+
+		if (Engine_Version >= 422 && Engine_Version < 424)
 		{
-			ImGui::TreePop();
+			ImGui::Checkbox("Creative", &Globals::bCreative);
+			ImGui::NewLine();
 		}
 
-		if (ImGui::TreeNodeEx("Debug & Cheats", ImGuiTreeNodeFlags_DefaultOpen))
+		if (HasEvent())
 		{
-			if (ImGui::Selectable("Build Free", false)) {}
-			if (ImGui::Selectable("Reload Free", false)) {}
-			ImGui::TreePop();
+			ImGui::Checkbox("Play Event", &Globals::bGoingToPlayEvent);
+			ImGui::NewLine();
 		}
+
+		if (!Globals::bCreative && (SelectedPlaylist == (int)Playlist::Custom))
+			ImGui::InputText("Playlist", &PlaylistName);
 	}
-	ImGui::End();
 }
 
 static inline void TheGoodStuff()
@@ -2079,22 +2195,26 @@ static inline void TheGoodStuff()
 	ImGui::End();
 }
 
-static inline HICON LoadIconFromMemory(const char* bytes, int bytes_size, const wchar_t* IconName) {
+static inline HICON LoadIconFromMemory(const char* bytes, int bytes_size, const wchar_t* IconName) 
+{
 	HANDLE hMemory = CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, bytes_size, IconName);
-	if (hMemory == NULL) {
+	if (hMemory == NULL) 
+	{
 		return NULL;
 	}
 
 	LPVOID lpBuffer = MapViewOfFile(hMemory, FILE_MAP_READ, 0, 0, bytes_size);
 
-	if (lpBuffer == NULL) {
+	if (lpBuffer == NULL) 
+	{
 		CloseHandle(hMemory);
 		return NULL;
 	}
 
 	ICONINFO icon_info;
 
-	if (!GetIconInfo((HICON)lpBuffer, &icon_info)) {
+	if (!GetIconInfo((HICON)lpBuffer, &icon_info)) 
+	{
 		UnmapViewOfFile(lpBuffer);
 		CloseHandle(hMemory);
 		return NULL;

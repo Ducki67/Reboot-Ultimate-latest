@@ -693,6 +693,28 @@ bool AFortGameModeAthena::Athena_ReadyToStartMatchHook(AFortGameModeAthena* Game
 		LOG_INFO(LogDev, "Finished presetup!");
 
 		Globals::bInitializedPlaylist = true;
+		{
+			GET_PLAYLIST(GameState);
+
+			if (CurrentPlaylist)
+			{
+				static auto UIDisplayNameOffset = CurrentPlaylist->GetOffset("UIDisplayName");
+				FString PlaylistNameFStr = UKismetTextLibrary::Conv_TextToString(CurrentPlaylist->Get<FText>(UIDisplayNameOffset));
+
+				if (PlaylistNameFStr.Data.Data)
+				{
+					PlaylistShortName = PlaylistNameFStr.ToString();
+
+					static auto UIDisplaySubNameOffset = CurrentPlaylist->GetOffset("UIDisplaySubName");
+					FString PlaylistSubNameFStr = UKismetTextLibrary::Conv_TextToString(CurrentPlaylist->Get<FText>(UIDisplaySubNameOffset));
+
+					if (PlaylistSubNameFStr.Data.Data)
+					{
+						PlaylistShortName += (" " + PlaylistSubNameFStr.ToString());
+					}
+				}
+			}
+		}
 	}
 
 	static int LastNum6 = 1;

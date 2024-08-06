@@ -33,6 +33,7 @@ namespace Globals
 
 extern inline int NumToSubtractFromSquadId = 0; // I think 2?
 
+extern inline std::string PlaylistShortName = "Solos";
 extern inline std::string PlaylistName =
 "/Game/Athena/Playlists/Playlist_DefaultSolo.Playlist_DefaultSolo";
 // "/Game/Athena/Playlists/gg/Playlist_Gg_Reverse.Playlist_Gg_Reverse";
@@ -44,4 +45,4 @@ extern inline std::string PlaylistName =
 // "/Game/Athena/Playlists/Bling/Playlist_Bling_Solo.Playlist_Bling_Solo";
 // "/Game/Athena/Playlists/Creative/Playlist_PlaygroundV2.Playlist_PlaygroundV2";
 // "/Game/Athena/Playlists/Ashton/Playlist_Ashton_Sm.Playlist_Ashton_Sm";
-// "/Game/Athena/Playlists/BattleLab/Playlist_BattleLab.Playlist_BattleLab"; // someone make it do a different gamemode if it's season 11 (no slomo on regular solos on bots)
+// "/Game/Athena/Playlists/BattleLab/Playlist_BattleLab.Playlist_BattleLab";
