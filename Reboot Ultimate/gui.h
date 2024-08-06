@@ -84,7 +84,7 @@ extern inline bool bHandleDeath = true;
 extern inline bool bUseCustomMap = false;
 extern inline std::string CustomMapName = "";
 extern inline int AmountToSubtractIndex = 1;
-extern inline int SecondsUntilTravel = 15;
+extern inline int SecondsUntilTravel = 25;
 extern inline bool bSwitchedInitialLevel = false;
 extern inline bool bIsInAutoRestart = false;
 extern inline float AutoBusStartSeconds = 60;
@@ -571,7 +571,7 @@ static inline void StaticUI()
 		}
 	}
 
-	ImGui::InputInt("Shield/Health for siphon", &Globals::AmountOfHealthSiphon);
+	ImGui::InputInt("Shield/Health for Siphon", &Globals::AmountOfHealthSiphon);
 
 #ifndef PROD
 	ImGui::Checkbox("Log ProcessEvent", &Globals::bLogProcessEvent);
@@ -581,13 +581,13 @@ static inline void StaticUI()
 	ImGui::Checkbox("Infinite Ammo", &Globals::bInfiniteAmmo);
 	ImGui::Checkbox("Infinite Materials", &Globals::bInfiniteMaterials);
 
-	ImGui::Checkbox("Private IP's are Operator", &Globals::bPrivateIPsAreOperator);
+	ImGui::Checkbox("Radmin IP's are Operator", &Globals::bPrivateIPsAreOperator);
 
-	ImGui::Checkbox("No MCP", &Globals::bNoMCP);
+	// ImGui::Checkbox("No MCP", &Globals::bNoMCP);
 
 	if (Addresses::ApplyGadgetData && Addresses::RemoveGadgetData && Engine_Version < 424)
 	{
-		ImGui::Checkbox("Enable AGIDs", &Globals::bEnableAGIDs);
+		ImGui::Checkbox("Enable Gadgets", &Globals::bEnableAGIDs);
 	}
 }
 
@@ -1076,7 +1076,7 @@ static inline void MainUI()
 				ImGui::Text(std::format("Uptime: {}", convertToHMS(UGameplayStatics::GetTimeSeconds(GetWorld()))).c_str());
 				ImGui::NewLine();
 				ImGui::Text(std::format("Joinable: {}", Globals::bStartedListening).c_str());
-				ImGui::Text(std::format("Started Bus: {}", bStartedBus).c_str());
+				ImGui::Text(std::format("Started: {}", bStartedBus).c_str());
 				ImGui::Text(std::format("Ended: {}", GameState->GetGamePhase() > EAthenaGamePhase::Warmup && !GameMode->IsMatchInProgress()).c_str());
 				ImGui::Text(std::format("Gamemode: {}", PlaylistShortName).c_str()); // ralz is stupid
 
@@ -1944,41 +1944,26 @@ static inline void PregameUI()
 	{
 		StaticUI();
 
-	if (Fortnite_Version == 11.30 && 11.31 && 12.41)
-	{
-		ImGui::Checkbox("Slomo on Game End", &Globals::bOnGameEndSlowmo);
-	}
-
-	if (Engine_Version >= 422 && Engine_Version < 424)
-	{
-		ImGui::Checkbox("Creative", &Globals::bCreative);
-	}
-
-	if (Addresses::SetZoneToIndex)
-	{
-		bool bWillBeLategame = Globals::bLateGame.load();
-		ImGui::Checkbox("Lategame", &bWillBeLategame);
-		SetIsLategame(bWillBeLategame);
-	}
-
-	if (HasEvent())
-	{
-		ImGui::Checkbox("Play Event", &Globals::bGoingToPlayEvent);
-	}
-
-	if (!bSwitchedInitialLevel)
-	{
-		// ImGui::Checkbox("Use Custom Map", &bUseCustomMap);
-
-		if (bUseCustomMap)
+		if (Addresses::SetZoneToIndex)
 		{
-			// ImGui::InputText("Custom Map", &CustomMapName);
+			bool bWillBeLategame = Globals::bLateGame.load();
+			ImGui::Checkbox("Lategame", &bWillBeLategame);
+			SetIsLategame(bWillBeLategame);
 		}
 
-		ImGui::SliderInt("Seconds Until Start", &SecondsUntilTravel, 1, 100);
-	}
+		if (!bSwitchedInitialLevel)
+		{
+			/*ImGui::Checkbox("Use Custom Map", &bUseCustomMap);
 
-	ImGui::SliderInt("Players Required to Start", &WarmupRequiredPlayerCount, 1, 100);
+			if (bUseCustomMap)
+			{
+				ImGui::InputText("Custom Map", &CustomMapName);
+			}*/
+
+			ImGui::SliderInt("Seconds Until Start", &SecondsUntilTravel, 1, 100);
+		}
+
+		ImGui::SliderInt("Players Required to Start", &WarmupRequiredPlayerCount, 1, 100);
 	}
 
 	else if (PregameTab == PREGAME_PLAYLIST_TAB)

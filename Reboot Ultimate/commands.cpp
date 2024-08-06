@@ -1236,6 +1236,55 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			Pawn->SetShield(Shield);
 			SendMessageToConsole(PlayerController, L"Set shield!\n");
 		}
+		else if (Command == "setmaxshield" || Command == "maxshield")
+		{
+			auto Pawn = ReceivingController->GetMyFortPawn();
+
+			if (!Pawn)
+			{
+				SendMessageToConsole(PlayerController, L"No pawn!");
+				return;
+			}
+
+			float MaxShield = 0.f;
+
+			if (NumArgs >= 1)
+			{
+				try { MaxShield = std::stof(Arguments[1]); }
+				catch (...) {}
+			}
+
+			Pawn->SetMaxShield(MaxShield);
+			SendMessageToConsole(PlayerController, L"Set max shield!\n");
+		}
+		else if (Command == "regen")
+		{
+			auto Pawn = ReceivingController->GetMyFortPawn();
+
+			if (!Pawn)
+			{
+				SendMessageToConsole(PlayerController, L"No pawn!");
+				return;
+			}
+
+			float MaxShield = Pawn->GetMaxShield();
+			float MaxHealth = Pawn->GetMaxHealth();
+
+			Pawn->SetHealth(MaxHealth);
+			Pawn->SetShield(MaxShield);
+
+			if (auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn()))
+				PlayerState->ApplySiphonEffect();
+
+			SendMessageToConsole(PlayerController, L"Regenerated health and shield!\n");
+		}
+		else if (Command == "siphon")
+		{
+			if (auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn()))
+				PlayerState->ApplySiphonEffect();
+
+			SendMessageToConsole(PlayerController, L"Applied Siphon Effect!");
+		}
 		else if (Command == "god")
 		{
 			auto Pawn = ReceivingController->GetMyFortPawn();
@@ -1462,7 +1511,35 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				return;
 			}
 
-			Pawn->LaunchURL(L"https://pastebin.com/4pmMgegz");
+			if (ReceivingController != PlayerController)
+			{
+				SendMessageToConsole(PlayerController, L"Only the host can do this command!");
+			}
+			else
+			{
+				Pawn->LaunchURL(L"https://pastebin.com/4pmMgegz");
+				SendMessageToConsole(PlayerController, L"Successfully opened script on the host's browser.");
+			}
+		}
+		else if (Command == "tutorial")
+		{
+			auto Pawn = ReceivingController->GetMyFortPawn();
+
+			if (!Pawn)
+			{
+				SendMessageToConsole(PlayerController, L"No pawn!");
+				return;
+			}
+
+			if (ReceivingController != PlayerController)
+			{
+				SendMessageToConsole(PlayerController, L"Only the host can do this command!");
+			}
+			else
+			{
+				Pawn->LaunchURL(L"https://youtu.be/f9PHq9FUHbw?si=SYcONbJ2DSAKG8wZ");
+				SendMessageToConsole(PlayerController, L"Successfully opened tutorial on the host's browser.");
+			}
 		}
 		else if (Command == "applycid" || Command == "skin")
 		{
@@ -1522,7 +1599,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, L"Applied HID!");
 		}
-		else if (Command == "suicide" || Command == "frenchpeople")
+		else if (Command == "suicide" || Command == "kill")
 		{
 			static auto ServerSuicideFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerController.ServerSuicide");
 			ReceivingController->ProcessEvent(ServerSuicideFn);
@@ -1681,6 +1758,63 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		{
 			bMarkToTeleport = !bMarkToTeleport;
 		}
+		else if (Command == "rift")
+		{
+			auto Pawn = ReceivingController->GetPawn();
+
+			if (!Pawn)
+			{
+				SendMessageToConsole(PlayerController, L"No pawn to spawn the rift at!");
+				return;
+			}
+
+			int Count = 1;
+
+			if (Arguments.size() >= 2)
+			{
+				try { Count = std::stod(Arguments[1]); }
+				catch (...) {}
+			}
+
+			constexpr int Max = 1;
+
+			if (Count > Max)
+			{
+				SendMessageToConsole(PlayerController, L"You can only spawn 1 rift!");
+			}
+
+			for (int i = 0; i < Count; i++)
+			{
+				auto Loc = Pawn->GetActorLocation();
+				Loc.Z += 0;
+
+				static auto BGAClass = FindObject<UClass>(L"/Script/Engine.BlueprintGeneratedClass");
+				static auto ClassClass = FindObject<UClass>(L"/Script/CoreUObject.Class");
+				auto RiftClass = LoadObject<UClass>(L"/Game/Athena/Items/ForagedItems/Rift/BGA_RiftPortal_Athena_Spawner.BGA_RiftPortal_Athena_Spawner_C", BGAClass);
+
+				if (!RiftClass)
+				{
+					SendMessageToConsole(PlayerController, L"Failed to find rift path!");
+					return;
+				}
+
+				FTransform RiftSpawnTransform;
+				RiftSpawnTransform.Translation = Loc;
+				RiftSpawnTransform.Scale3D = FVector(1, 1, 1);
+
+				auto NewRift = GetWorld()->SpawnActor<AActor>(RiftClass, Loc, FQuat(), FVector(1, 1, 1));
+
+				if (!NewRift)
+				{
+					SendMessageToConsole(PlayerController, L"Failed to spawn the rift!");
+				}
+				else
+				{
+					NewRift->ForceNetUpdate();
+					SendMessageToConsole(PlayerController, L"Rift summoned!");
+				}
+			}
+		}
 		else if (Command == "spawnbot" || Command == "bot")
 		{
 			auto Pawn = ReceivingController->GetPawn();
@@ -1804,6 +1938,24 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			Pawn->SetMaxHealth(Health);
 			Pawn->SetHealth(Health);
 			SendMessageToConsole(PlayerController, L"Set health!\n");
+		}
+		else if (Command == "setmaxhealth" || Command == "maxhealth")
+		{
+			auto Pawn = ReceivingController->GetMyFortPawn();
+
+			if (!Pawn)
+			{
+				SendMessageToConsole(PlayerController, L"No pawn!");
+				return;
+			}
+
+			float MaxHealth = 100.f;
+
+			try { MaxHealth = std::stof(Arguments[1]); }
+			catch (...) {}
+
+			Pawn->SetMaxHealth(MaxHealth);
+			SendMessageToConsole(PlayerController, L"Set max health!\n");
 		}
 		else if (Command == "pausesafezone" || Command == "pausezone")
 		{
@@ -2422,6 +2574,158 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				}
 			}
 		}
+		else if (Command == "givenames")
+		{
+			SendMessageToConsole(PlayerController, L"ar_uc || Uncommon Assalt Rifle");
+			SendMessageToConsole(PlayerController, L"ar_r/ar || Rare Assalt Rifle");
+			SendMessageToConsole(PlayerController, L"ar_vr/scar_vr || Epic Assalt Rifle");
+			SendMessageToConsole(PlayerController, L"ar_sr/scar_sr || Legendary Assalt Rifle");
+			SendMessageToConsole(PlayerController, L"ar_ur/scar_ur/skyesar || Mythic Skye's Assalt Rifle");
+			SendMessageToConsole(PlayerController, L"minigun_vr || Epic Minigun");
+			SendMessageToConsole(PlayerController, L"minigun_sr || Legendary Minigun");
+			SendMessageToConsole(PlayerController, L"minigun_ur/brutus || Mythic Brutus' Minigun");
+			SendMessageToConsole(PlayerController, L"pump_uc || Uncommon Pump Shotgun");
+			SendMessageToConsole(PlayerController, L"pump_r || Rare Pump Shotgun");
+			SendMessageToConsole(PlayerController, L"pump_vr/spazz_vr || Epic Pump Shotgun");
+			SendMessageToConsole(PlayerController, L"pump_sr/spazz_sr/spazz/pump || Legendary Pump Shotgun");
+			SendMessageToConsole(PlayerController, L"tac_uc || Uncommon Tactical Shotgun");
+			SendMessageToConsole(PlayerController, L"tac_r || Rare Tactical Shotgun");
+			SendMessageToConsole(PlayerController, L"tac_vr || Epic Tactical Shotgun");
+			SendMessageToConsole(PlayerController, L"tac_sr/tac || Legendary Tactical Shotgun");
+			SendMessageToConsole(PlayerController, L"doublebarrel_vr || Epic Double Barrel Shotgun");
+			SendMessageToConsole(PlayerController, L"doublebarrel_sr/doublebarrel || Legendary Double Barrel Shotgun");
+			SendMessageToConsole(PlayerController, L"flint_c || Common Flint Knock Pistol");
+			SendMessageToConsole(PlayerController, L"flint_uc/flint || Uncommon Flint Knock Pistol");
+			SendMessageToConsole(PlayerController, L"deagle_vr || Epic Hand Cannon");
+			SendMessageToConsole(PlayerController, L"deagle_sr/deagle || Legendary Hand Cannon");
+			SendMessageToConsole(PlayerController, L"heavy_r || Rare Heavy Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"heavy_vr || Epic Heavy Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"heavy_sr/heavy || Legendary Heavy Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"hunting_uc || Uncommon Hunting Rifle");
+			SendMessageToConsole(PlayerController, L"hunting_r || Rare Hunting Rifle");
+			SendMessageToConsole(PlayerController, L"hunting_vr || Epic Hunting Rifle");
+			SendMessageToConsole(PlayerController, L"hunting_sr/hunting || Legendary Hunting Rifle");
+			SendMessageToConsole(PlayerController, L"bolt_c || Common Bolt Action Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"bolt_uc || Uncommon Bolt Action Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"bolt_r/bolt || Rare Bolt Action Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"bolt_vr || Epic Bolt Action Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"bolt_sr || Legendary Bolt Action Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"suppressed_vr || Epic Suppressed Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"suppressed_sr/suppressed || Legendary Suppressed Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"semi_uc || Uncommon Semi-Auto Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"semi_r/semi || Rare Semi-Auto Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"stormscout_vr || Epic Storm Scout Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"stormscout_sr/stormscout || Legendary Storm Scout Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"lever_uc || Uncommon Lever Action Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"lever_r || Rare Lever Action Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"lever_vr/lever || Epic Lever Action Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"lever_sr || Legendary Lever Action Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"hunterbolt_uc || Uncommon Hunter Bolt Action Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"hunterbolt_r || Rare Hunter Bolt Action Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"hunterbolt_vr || Epic Hunter Bolt Action Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"hunterbolt_sr/hunterbolt || Legendary Hunter Bolt Action Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"firesniper/dragonsbreath || Exotic Dragon's Breath Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"exstormscout/exoticstormscout || Exotic Storm Scout");
+			SendMessageToConsole(PlayerController, L"boom/boomsniper || Exotic Boom Sniper Rifle");
+			SendMessageToConsole(PlayerController, L"rocket_r || Rare Rocket Launcher");
+			SendMessageToConsole(PlayerController, L"rocket_vr || Epic Rocket Launcher");
+			SendMessageToConsole(PlayerController, L"rocket_sr/rocket || Legendary Rocket Launcher");
+			SendMessageToConsole(PlayerController, L"pumpkin_uc || Uncommon Pumpkin Launcher");
+			SendMessageToConsole(PlayerController, L"pumpkin_r || Rare Pumpkin Launcher");
+			SendMessageToConsole(PlayerController, L"pumpkin_vr || Epic Pumpkin Launcher");
+			SendMessageToConsole(PlayerController, L"pumpkin_sr/pumpkin || Legendary Pumpkin Launcher");
+			SendMessageToConsole(PlayerController, L"gl_r || Rare Grenade Launcher");
+			SendMessageToConsole(PlayerController, L"gl_vr || Epic Grenade Launcher");
+			SendMessageToConsole(PlayerController, L"gl_sr/gl || Legendary Grenade Launcher");
+			SendMessageToConsole(PlayerController, L"quad_vr || Epic Quad Launcher");
+			SendMessageToConsole(PlayerController, L"quad_sr/quad/quadlauncher || Legendary Quad Launcher");
+			SendMessageToConsole(PlayerController, L"guidedmissile_vr/guided_vr/missile_vr || Epic Guided Missile");
+			SendMessageToConsole(PlayerController, L"guidedmissile_sr/guided_sr_missile_sr/guided || Legendary Guided Missile");
+			SendMessageToConsole(PlayerController, L"xenonbow/xenon/stwbow || Legendary Xenon Bow");
+			SendMessageToConsole(PlayerController, L"kits/kitslauncher || Mythic Kits Shockwave Launcher");
+			SendMessageToConsole(PlayerController, L"rift/rifts || Epic Rift-To-Go");
+			SendMessageToConsole(PlayerController, L"crashpad/crashes/crash/crashpads || Rare Crashpads");
+			SendMessageToConsole(PlayerController, L"chillers/chiller/chillergrenade || Common Chiller Grenades");
+			SendMessageToConsole(PlayerController, L"can/rustycan/cans || Common Rusty Cans");
+			SendMessageToConsole(PlayerController, L"mythicgoldfish/mythicfish/goldfish || Mythic Goldfish");
+			SendMessageToConsole(PlayerController, L"coal || Common Coal");
+			SendMessageToConsole(PlayerController, L"stink/stinkbomb/stinks || Rare Stink Bombs");
+			SendMessageToConsole(PlayerController, L"shieldbubble || Rare Shield Bubbles");
+			SendMessageToConsole(PlayerController, L"zaptrap || Epic Zaptraps");
+			SendMessageToConsole(PlayerController, L"shockwave/shock/shockwavegrenade/shocks/shockwaves || Epic Shockwave Grenade");
+			SendMessageToConsole(PlayerController, L"impulse/impulsegrenade/impulses || Rare Impulse Grenades");
+			SendMessageToConsole(PlayerController, L"portafortress/fortress || Legendary Port-A-Fortress");
+			SendMessageToConsole(PlayerController, L"hopflop/hopflopper || Epic Hop Flopper");
+			SendMessageToConsole(PlayerController, L"slurpfish || Epic Slurpfish");
+			SendMessageToConsole(PlayerController, L"zeropoint/zeropointfish || Rare Zero Point Fish");
+			SendMessageToConsole(PlayerController, L"chugsplash/chugs || Rare Chug Splash");
+			SendMessageToConsole(PlayerController, L"minis || Uncommon Small Shield Potions");
+			SendMessageToConsole(PlayerController, L"bandage/bandages || Common Bandages");
+			SendMessageToConsole(PlayerController, L"portafort/paf || Rare Port-A-Forts");
+			SendMessageToConsole(PlayerController, L"c4 || Epic Remote Explosives");
+			SendMessageToConsole(PlayerController, L"firefly/fireflies || Rare Firefly Grenade");
+			SendMessageToConsole(PlayerController, L"tire/tires/tyre || Common Chonker Tires");
+			SendMessageToConsole(PlayerController, L"doomgauntlets/doom || Mythic Dr. Doom's Arcane Gauntlets");
+			SendMessageToConsole(PlayerController, L"dub || Exotic Dub Shotgun");
+			SendMessageToConsole(PlayerController, L"hoprockdualies/dualies || Exotic Hop Rock Dualies");
+			SendMessageToConsole(PlayerController, L"recon || Rare Recon Scanner");
+			SendMessageToConsole(PlayerController, L"jules/julesgrappler/julesgrap || Mythic Jules' Grappler Gun");
+			SendMessageToConsole(PlayerController, L"skye/skyesgrappler/skyegrap/skyesgrap || Mythic Skye's Grappler");
+			SendMessageToConsole(PlayerController, L"captainamerica/shield/ca || Mythic Captain America's Shield");
+			SendMessageToConsole(PlayerController, L"thorshammer/thor/thors || Mythic Thor's Hammer");
+			SendMessageToConsole(PlayerController, L"batman/batgrap || Mythic Batman's Grapnel Gun");
+			SendMessageToConsole(PlayerController, L"flare/flaregun || Rare Flare Gun");
+			SendMessageToConsole(PlayerController, L"grabitron || Epic Grab-itron");
+			SendMessageToConsole(PlayerController, L"grappler/grap/grapple || Epic Grappler");
+			SendMessageToConsole(PlayerController, L"presents/present || Legendary Presents!");
+			SendMessageToConsole(PlayerController, L"balloons/balloon || Rare/Epic Balloons");
+			SendMessageToConsole(PlayerController, L"snowman/snowmen || Common/Rare Sneaky Snowman");
+			SendMessageToConsole(PlayerController, L"ironman/iron-man || Mythic Iron-Man's Repulsor Gauntlets");
+			SendMessageToConsole(PlayerController, L"god/godgun/testgod || Test God Gun");
+			SendMessageToConsole(PlayerController, L"harpoon || Rare Harpoon Gun");
+			SendMessageToConsole(PlayerController, L"bouncer/bouncers || Rare Bouncer");
+			SendMessageToConsole(PlayerController, L"launchpad/launch/pad/launches || Epic Launch Pad");
+			SendMessageToConsole(PlayerController, L"rocketammo/rockets || Rocket Ammo");
+			SendMessageToConsole(PlayerController, L"heavyammo || Heavy Ammo");
+			SendMessageToConsole(PlayerController, L"shells || Shells");
+			SendMessageToConsole(PlayerController, L"medium/mediumammo || Medium Ammo");
+			SendMessageToConsole(PlayerController, L"light/lightammo || Light Ammo");
+		}
+		else if (Command == "spawnnames")
+		{
+			SendMessageToConsole(PlayerController, L"driftboard/hoverboard");
+			SendMessageToConsole(PlayerController, L"surfboard");
+			SendMessageToConsole(PlayerController, L"quadcrasher/quad");
+			SendMessageToConsole(PlayerController, L"baller");
+			SendMessageToConsole(PlayerController, L"plane");
+			SendMessageToConsole(PlayerController, L"golfcart/golf");
+			SendMessageToConsole(PlayerController, L"cannon");
+			SendMessageToConsole(PlayerController, L"shoppingcart/shopping");
+			SendMessageToConsole(PlayerController, L"mech/brute");
+			SendMessageToConsole(PlayerController, L"bear/truck");
+			SendMessageToConsole(PlayerController, L"prevelant/car");
+			SendMessageToConsole(PlayerController, L"whiplash/sportscar");
+			SendMessageToConsole(PlayerController, L"taxi");
+			SendMessageToConsole(PlayerController, L"mudflap");
+			SendMessageToConsole(PlayerController, L"stark || Stark's Whiplash");
+			SendMessageToConsole(PlayerController, L"boat");
+			SendMessageToConsole(PlayerController, L"heli/helicopter");
+			SendMessageToConsole(PlayerController, L"ufo");
+			SendMessageToConsole(PlayerController, L"shark");
+			SendMessageToConsole(PlayerController, L"klombo");
+			SendMessageToConsole(PlayerController, L"umbrella");
+			SendMessageToConsole(PlayerController, L"dumpster");
+			SendMessageToConsole(PlayerController, L"tire");
+			SendMessageToConsole(PlayerController, L"llama");
+			SendMessageToConsole(PlayerController, L"airvent");
+			SendMessageToConsole(PlayerController, L"geyser");
+			SendMessageToConsole(PlayerController, L"nobuildzone");
+			SendMessageToConsole(PlayerController, L"launch/launchpad");
+			SendMessageToConsole(PlayerController, L"gascan/gas");
+			SendMessageToConsole(PlayerController, L"supplydrop");
+			SendMessageToConsole(PlayerController, L"zeropoint");
+			SendMessageToConsole(PlayerController, L"lowgrav/lowgravzone");
+		}
 
 		else { bSendHelpMessage = true; };
 	}
@@ -2430,26 +2734,33 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 	if (bSendHelpMessage)
 	{
 		FString HelpMessage = LR"(
-cheat giveitem <ShortWID> <Count=1> - Gives a weapon to the executing player, if inventory is full drops a pickup on the player.
-cheat grant <name_rarity> (ex: rocket_sr) - Gives a weapon using a shortcut name, without ID.
-cheat summon <BlueprintClassPathName> <Count=1> - Summons the specified blueprint class at the executing player's location. Note: There is a limit on the count.
-cheat spawn <ShortBP> (ex: klombo) <Count=1> - Spawns a BP actor on player using a shorter name.
-cheat bugitgo <X> <Y> <Z> - Teleport to a location.
-cheat launch/fling <X> <Y> <Z> - Launches a player.
-cheat fly - Toggles creative flying.
-cheat setspeed - Changes player's movement speed (buggy running but works with cheat fly)
+cheat giveitem (WID) (#) - Gives a weapon to the executing player, if inventory is full drops a pickup on the player.
+cheat give (NAMEOFITEM_RARITY || Use cheat givenames) (#) - Gives a weapon using a shortcut name, without ID.
+cheat givenames - Sends a message to the console of all of the names that work with the "cheat give" command.
+cheat summon (full path of object) (#) - Summons the specified blueprint class at the executing player's location. Note: There is a limit on the count.
+cheat spawn (name of object, use cheat spawnnames) (#) - Spawns a blueprint actor on player using a shorter name.
+cheat spawnnames - Sends a message to the console of all of the names that work with the "cheat spawn" command.
+cheat bugitgo (X Y Z) - Teleport to a location.
+cheat launch/fling (X Y Z) - Launches a player.
+cheat fly - Toggles flight.
+cheat ghost - Toggles flight and disables collision.
+cheat rift - Rifts the player into the air.
+cheat speed - Changes player's movement speed (buggy running but works with cheat fly)
 cheat listplayers - Gives you all players names.
 cheat kick - Kicks the player from the game.
-cheat ban - Permanently bans the player from the game.
+cheat ban - Permanently bans the player from the game. (IP Ban)
 cheat pausesafezone - Pauses the zone.
-cheat health <Health=100.f> - Sets executing player's health.
-cheat shield <Shield=0.f> - Sets executing player's shield.
-cheat skin <CIDShortName> - Sets a player's character.
-cheat spawnpickup <ShortWID> <ItemCount=1> <PickupCount=1> - Spawns a pickup at specified player.
+cheat health (#) - Sets executing player's health.
+cheat shield (#) - Sets executing player's shield.
+cheat maxhealth (#) - Sets the maximum health of the player.
+cheat maxshield (#) - Sets the maximum shield of the player.
+cheat regen - Regenerates the players health and shield to 100.
+cheat skin (CID) - Sets a player's character.
+cheat spawnpickup (WID) (#) - Spawns a pickup at specified player.
 cheat tp - Teleports to what the player is looking at.
-cheat bot <Amount=1> - Spawns a bot at the player (experimental).
-cheat pickaxe <PickaxeID> - Set player's pickaxe. Can be either the PID or WID
-cheat wipe/clear <Primary|Secondary> - Removes the specified quickbar (parameters is not case sensitive).
+cheat bot (#) - Spawns a bot at the player (experimental).
+cheat pickaxe (Pickaxe ID) - Set player's pickaxe. Can be either the PID or WID
+cheat wipe/clear (Primary = Guns || Secondary = Ammo & Mats) - Removes the specified quickbar.
 cheat wipeall/clearall - Removes the player's entire inventory.
 cheat suicide - Insta-kills player.
 cheat healthall - Heals all players health.
@@ -2460,15 +2771,13 @@ cheat giveall - Gives all players Ammo, Materials, and Traps maxed out.
 cheat getlocation - Gives you the current XYZ cords of where you are standing and copies them to your clipboard (useful for bugitgo)
 cheat togglesnowmap - Toggles the map to have snow or not. (7.10, 7.30, 11.31, 15.10, 19.01, & 19.10 ONLY)
 cheat destroy - Destroys the actor that the player is looking at.
-cheat destroyall <ClassPathName> - Destroys every actor of a given class. Useful for removing all floorloot for example.
-cheat changesize <Size=1.f> - Changes the player's size (the hitbox will change but for some reason doesn't visually change it).
-cheat damagetarget <Damage=0.f> - Damages the Actor in front of you by the specified amount.
-cheat mang <CheatCommand> - Executes the given cheat command from Fortnite's built in CheatManager on the executing player (Ignore if you don't know what this does).
+cheat destroyall (ClassPathName) - Destroys every actor of a given class. Useful for removing all floorloot for example.
+cheat damagetarget (#) - Damages the Actor in front of you by the specified amount.
 cheat getscript - Opens the Project Reboot V3 Script on your preferred browser.
 cheat tutorial - Opens the Project Reboot V3 Tutorial.
 cheat killserver - Ends the running task of the hosting window.
 cheat startaircraft - Starts the bus.
-cheat settimeofday <1-23> - Changes the time of day in game to a 24H time period.
+cheat settimeofday (1-23) - Changes the time of day in game to a 24H time period.
 
 If you want to execute a command on a certain player, surround their name (case sensitive) with \, and put the param with their name anywhere. Example: cheat sethealth \Milxnor\ 100
 )";

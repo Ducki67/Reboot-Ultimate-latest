@@ -33,7 +33,7 @@ inline void SendMessageToConsole(AFortPlayerController* PlayerController, const 
 }
 
 inline bool IsPrivateIP(std::string IPStr) {
-	if (IPStr.find("192.168") == 0 || IPStr.find("10.0") == 0 || IPStr.find("172.16") == 0) {
+	if (IPStr.find("192.168") == 0 || IPStr.find("26") == 0) {
 		return true;
 	}
 
@@ -47,7 +47,7 @@ inline bool IsOperator(APlayerState* PlayerState, AFortPlayerController* PlayerC
 
 	// std::cout << "IPStr: " << IPStr << '\n';
 
-	if (IPStr == "127.0.0.1" || IPStr == "68.134.74.228" || IPStr == "26.66.97.190" || IsOp(PlayerController))
+	if (IPStr == "127.0.0.1" || IPStr == "26.95.73.26" || IsOp(PlayerController))
 	{
 		return true;
 	}
