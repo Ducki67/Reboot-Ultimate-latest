@@ -6,12 +6,17 @@
 
 namespace Globals
 {
+	extern inline int UPTime = 0;
+	extern inline int tickTime = 0;
+
+	extern inline bool bIsTickTiming = false;
+	extern inline bool UPTimeStarted = false;
+
 	extern inline bool bCreative = false;
 	extern inline bool bGoingToPlayEvent = false;
 	extern inline bool bEnableAGIDs = true;
 	extern inline bool bNoMCP = false;
 	extern inline bool bLogProcessEvent = false;
-	extern inline bool bOnGameEndSlowmo = false;
 	// extern inline bool bLateGame = false;
 	extern inline std::atomic<bool> bLateGame(false);
 

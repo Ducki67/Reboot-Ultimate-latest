@@ -237,11 +237,26 @@ void AFortPlayerController::ServerLoadingScreenDroppedHook(UObject* Context, FFr
 	LOG_INFO(LogDev, "ServerLoadingScreenDroppedHook!");
 
 	auto PlayerController = (AFortPlayerController*)Context;
-	auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
-	auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
-	auto WorldInventory = PlayerController->GetWorldInventory();
 
 	PlayerController->ApplyCosmeticLoadout();
+
+	if (Fortnite_Version >= 11)
+	{
+		auto PlayerState = Cast<AFortPlayerStateAthena>(PlayerController->GetPlayerState());
+		auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
+		auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
+		auto WorldInventory = PlayerController->GetWorldInventory();
+
+		PlayerController->GetXPComponent()->IsRegisteredWithQuestManager() = true;
+		PlayerController->GetXPComponent()->OnRep_bRegisteredWithQuestManager();
+
+		auto XPComponent = PlayerController->GetXPComponent();
+
+		XPComponent->IsRegisteredWithQuestManager() = true;
+		XPComponent->OnRep_bRegisteredWithQuestManager();
+		PlayerState->GetSeasonLevelUIDisplay() = PlayerController->GetXPComponent()->GetCurrentLevel();
+		PlayerState->OnRep_SeasonLevelUIDisplay();
+	}
 
 	LoopMutators([&](AFortAthenaMutator* Mutator)
 		{
@@ -249,6 +264,7 @@ void AFortPlayerController::ServerLoadingScreenDroppedHook(UObject* Context, FFr
 			{
 				bool bShouldUpdate = false;
 
+				auto WorldInventory = PlayerController->GetWorldInventory();
 				WorldInventory->AddItem(GG_Mutator->GetWeaponEntries()[0].GetWeapon(), &bShouldUpdate, 1, Cast<UFortWeaponItemDefinition>(GG_Mutator->GetWeaponEntries()[0].GetWeapon())->GetClipSize());
 				
 				if (bShouldUpdate)
@@ -894,12 +910,18 @@ void AFortPlayerController::ServerAttemptAircraftJumpHook(AFortPlayerController*
 
 	auto NewPawnAsFort = PlayerController->GetMyFortPawn();
 
-	if (Fortnite_Version >= 18) // TODO (Milxnor) Find a better fix and move this
+	if (Fortnite_Version >= 18)
 	{
-		static auto StormEffectClass = FindObject<UClass>(L"/Game/Athena/SafeZone/GE_OutsideSafeZoneDamage.GE_OutsideSafeZoneDamage_C");
-		auto PlayerState = PlayerController->GetPlayerStateAthena();
+		auto& ClientConnections = GetWorld()->GetNetDriver()->GetClientConnections();
 
-		PlayerState->GetAbilitySystemComponent()->RemoveActiveGameplayEffectBySourceEffect(StormEffectClass, 1, PlayerState->GetAbilitySystemComponent());
+		for (int i = 0; i < ClientConnections.Num(); i++)
+		{
+			auto CurrentController = (AFortPlayerControllerAthena*)ClientConnections.At(i)->GetPlayerController();
+
+			static auto StormEffectClass = FindObject<UClass>(L"/Game/Athena/SafeZone/GE_OutsideSafeZoneDamage.GE_OutsideSafeZoneDamage_C");
+			auto PlayerState = CurrentController->GetPlayerStateAthena();
+			PlayerState->GetAbilitySystemComponent()->RemoveActiveGameplayEffectBySourceEffect(StormEffectClass, 1, PlayerState->GetAbilitySystemComponent());
+		}
 	}
 
 	if (NewPawnAsFort)

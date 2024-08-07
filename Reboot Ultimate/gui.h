@@ -107,6 +107,7 @@ extern inline float* CannonXMultiplier = &DefaultCannonMultiplier;
 extern inline float* CannonYMultiplier = &DefaultCannonMultiplier;
 extern inline float* CannonZMultiplier = &DefaultCannonMultiplier;
 extern inline bool bMarkToTeleport = false;
+extern inline int Tick = 0;
 extern inline std::map<std::string, TArray<ItemRow>> CustomLootpoolMap{};
 
 // THE BASE CODE IS FROM IMGUI GITHUB
@@ -227,8 +228,6 @@ static std::vector Tertiaries = {
 	"WID_Sniper_Standard_Scope_Athena_VR_Ore_T03",
 	"WID_Sniper_Suppressed_Scope_Athena_SR_Ore_T03",
 	"WID_Sniper_Suppressed_Scope_Athena_VR_Ore_T03",
-	"WID_Sniper_Weather_Athena_VR",
-	"WID_Sniper_Weather_Athena_SR",
 	"WID_WaffleTruck_Sniper_StormScout",
 	"WID_WaffleTruck_Sniper_DragonBreath"
 	"WID_Sniper_CoreSniper_Athena_SR",
@@ -250,19 +249,7 @@ static std::vector Secondaries = {
 	"WID_Shotgun_SemiAuto_Athena_VR_Ore_T03",
 	"WID_Shotgun_HighSemiAuto_Athena_VR_Ore_T03",
 	"WID_Shotgun_HighSemiAuto_Athena_SR_Ore_T03",
-	"WID_Shotgun_SlugFire_Athena_VR",
-	"WID_Shotgun_SlugFire_Athena_SR",
 	"WID_Shotgun_Charge_Athena_UC_Ore_T03",
-	"WID_Shotgun_Charge_Athena_R_Ore_T03",
-	"WID_Shotgun_Charge_Athena_VR_Ore_T03",
-	"WID_Shotgun_Charge_Athena_SR_Ore_T03",
-	"WID_Shotgun_Combat_Athena_R_Ore_T03",
-	"WID_Shotgun_Combat_Athena_VR_Ore_T03",
-	"WID_Shotgun_Combat_Athena_SR_Ore_T03",
-	"WID_Shotgun_Swing_Athena_UC",
-	"WID_Shotgun_Swing_Athena_R",
-	"WID_Shotgun_Swing_Athena_VR",
-	"WID_Shotgun_Swing_Athena_SR",
 	"WID_Shotgun_Charge_Athena_R_Ore_T03",
 	"WID_Shotgun_Charge_Athena_VR_Ore_T03",
 	"WID_Shotgun_Charge_Athena_SR_Ore_T03",
@@ -281,11 +268,6 @@ static std::vector Primaries = {
 	"WID_Assault_SemiAuto_Athena_SR_Ore_T03",
 	"WID_Assault_Suppressed_Athena_VR_Ore_T03",
 	"WID_Assault_Suppressed_Athena_SR_Ore_T03",
-	"WID_Assault_Infantry_Athena_VR",
-	"WID_Assault_Infantry_Athena_SR",
-	"WID_Assault_Heavy_Athena_R_Ore_T03",
-	"WID_Assault_Heavy_Athena_VR_Ore_T03",
-	"WID_Assault_Heavy_Athena_SR_Ore_T03",
 	"WID_Assault_PistolCaliber_AR_Athena_R_Ore_T03",
 	"WID_Assault_PistolCaliber_AR_Athena_VR_Ore_T03",
 	"WID_Assault_PistolCaliber_AR_Athena_SR_Ore_T03",
@@ -546,6 +528,24 @@ static inline std::string convertToHMS(int TotalSeconds)
 	}
 
 	return result;
+}
+
+static inline DWORD WINAPI UPTime(LPVOID)
+{
+	while (true)
+	{
+		Sleep(1000);
+		Globals::UPTime += 1;
+	}
+}
+
+static inline DWORD WINAPI tickTime(LPVOID)
+{
+	while (true)
+	{
+		Sleep(1000);
+		Globals::tickTime += 1;
+	}
 }
 
 static int Width = 640;
@@ -1019,7 +1019,7 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 		WorldInventory->AddItem(WoodItemData, nullptr, (std::rand() % 646) + 186);
 		WorldInventory->AddItem(StoneItemData, nullptr, (std::rand() % 646) + 186);
 		WorldInventory->AddItem(MetalItemData, nullptr, (std::rand() % 646) + 186);
-		WorldInventory->AddItem(Gold, nullptr, (std::rand() % 7500) + 1200);
+		WorldInventory->AddItem(Gold, nullptr, Gold->GetMaxStackSize());
 		WorldInventory->AddItem(Primary, nullptr, 1);
 		WorldInventory->AddItem(Secondary, nullptr, 1);
 		WorldInventory->AddItem(Tertiary, nullptr, 1);
@@ -1073,7 +1073,19 @@ static inline void MainUI()
 					SetIsLategame(bWillBeLategame);
 				}
 
-				ImGui::Text(std::format("Uptime: {}", convertToHMS(UGameplayStatics::GetTimeSeconds(GetWorld()))).c_str());
+				if (Globals::bStartedListening && !Globals::UPTimeStarted)
+				{
+					Globals::UPTimeStarted = true;
+					CreateThread(0, 0, UPTime, 0, 0, 0);
+				}
+
+				if (!Globals::bIsTickTiming)
+				{
+					Globals::bIsTickTiming = true;
+					CreateThread(0, 0, tickTime, 0, 0, 0);
+				}
+
+				ImGui::Text(std::format("UPTIME: {}", convertToHMS(Globals::UPTime)).c_str());
 				ImGui::NewLine();
 				ImGui::Text(std::format("Joinable: {}", Globals::bStartedListening).c_str());
 				ImGui::Text(std::format("Started: {}", bStartedBus).c_str());
@@ -1169,10 +1181,7 @@ static inline void MainUI()
 
 				if (!bStartedBus)
 				{
-					if (Globals::bLateGame.load()
-						|| (Fortnite_Version >= 11 // Its been a minute but iirc it just wouldnt start when countdown ended or crash? cant remember
-							// && false
-							))
+					if (Globals::bLateGame.load() || Fortnite_Version >= 11)
 					{
 						if (ImGui::Button("Start Bus"))
 						{
