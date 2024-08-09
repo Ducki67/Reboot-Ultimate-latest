@@ -74,17 +74,6 @@ void AFortPlayerState::ApplyHealthEffect()
 	GetAbilitySystemComponent()->NetMulticast_InvokeGameplayCueExecuted(GameplayCueTag);
 }
 
-void AFortPlayerState::ApplyCrownEffect()
-{
-	if (!GetAbilitySystemComponent())
-		return;
-
-	static auto BGAClass = FindObject<UClass>(L"/Script/Engine.BlueprintGeneratedClass");
-	UClass* GE_Class = LoadObject<UClass>(L"/VictoryCrownsGameplay/Items/GE_CrownVisuals.GE_CrownVisuals_C", BGAClass);
-
-	GetAbilitySystemComponent()->ApplyGameplayEffectToSelf(GE_Class, -1.f);
-}
-
 bool AFortPlayerState::AreUniqueIDsIdentical(FUniqueNetIdRepl* A, FUniqueNetIdRepl* B)
 {
 	return A->IsIdentical(B);

@@ -237,25 +237,26 @@ void AFortPlayerController::ServerLoadingScreenDroppedHook(UObject* Context, FFr
 	LOG_INFO(LogDev, "ServerLoadingScreenDroppedHook!");
 
 	auto PlayerController = (AFortPlayerController*)Context;
-	auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
-	auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
-	auto WorldInventory = PlayerController->GetWorldInventory();
 
 	PlayerController->ApplyCosmeticLoadout();
 
-	LoopMutators([&](AFortAthenaMutator* Mutator)
-		{
-			if (auto GG_Mutator = Cast<AFortAthenaMutator_GG>(Mutator))
-			{
-				bool bShouldUpdate = false;
+	if (Fortnite_Version >= 11)
+	{
+		auto PlayerState = Cast<AFortPlayerStateAthena>(PlayerController->GetPlayerState());
+		auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
+		auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
+		auto WorldInventory = PlayerController->GetWorldInventory();
 
-				WorldInventory->AddItem(GG_Mutator->GetWeaponEntries()[0].GetWeapon(), &bShouldUpdate, 1, Cast<UFortWeaponItemDefinition>(GG_Mutator->GetWeaponEntries()[0].GetWeapon())->GetClipSize());
-				
-				if (bShouldUpdate)
-					WorldInventory->Update();
-			}
-		}
-	);
+		PlayerController->GetXPComponent()->IsRegisteredWithQuestManager() = true;
+		PlayerController->GetXPComponent()->OnRep_bRegisteredWithQuestManager();
+
+		auto XPComponent = PlayerController->GetXPComponent();
+
+		XPComponent->IsRegisteredWithQuestManager() = true;
+		XPComponent->OnRep_bRegisteredWithQuestManager();
+		PlayerState->GetSeasonLevelUIDisplay() = PlayerController->GetXPComponent()->GetCurrentLevel();
+		PlayerState->OnRep_SeasonLevelUIDisplay();
+	}
 
 	return ServerLoadingScreenDroppedOriginal(Context, Stack, Ret);
 }
@@ -894,12 +895,18 @@ void AFortPlayerController::ServerAttemptAircraftJumpHook(AFortPlayerController*
 
 	auto NewPawnAsFort = PlayerController->GetMyFortPawn();
 
-	if (Fortnite_Version >= 18) // TODO (Milxnor) Find a better fix and move this
+	if (Fortnite_Version >= 18)
 	{
-		static auto StormEffectClass = FindObject<UClass>(L"/Game/Athena/SafeZone/GE_OutsideSafeZoneDamage.GE_OutsideSafeZoneDamage_C");
-		auto PlayerState = PlayerController->GetPlayerStateAthena();
+		auto& ClientConnections = GetWorld()->GetNetDriver()->GetClientConnections();
 
-		PlayerState->GetAbilitySystemComponent()->RemoveActiveGameplayEffectBySourceEffect(StormEffectClass, 1, PlayerState->GetAbilitySystemComponent());
+		for (int i = 0; i < ClientConnections.Num(); i++)
+		{
+			auto CurrentController = (AFortPlayerControllerAthena*)ClientConnections.At(i)->GetPlayerController();
+
+			static auto StormEffectClass = FindObject<UClass>(L"/Game/Athena/SafeZone/GE_OutsideSafeZoneDamage.GE_OutsideSafeZoneDamage_C");
+			auto PlayerState = CurrentController->GetPlayerStateAthena();
+			PlayerState->GetAbilitySystemComponent()->RemoveActiveGameplayEffectBySourceEffect(StormEffectClass, 1, PlayerState->GetAbilitySystemComponent());
+		}
 	}
 
 	if (NewPawnAsFort)
@@ -1349,6 +1356,34 @@ DWORD WINAPI RestartThread(LPVOID)
 	return 0;
 }
 
+void VictoryCrownSlowmo()
+{
+	static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
+	auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
+	auto& ClientConnections = WorldNetDriver->GetClientConnections();
+
+	for (int z = 0; z < ClientConnections.Num(); z++)
+	{
+		auto ClientConnection = ClientConnections.at(z);
+		auto FortPC = Cast<AFortPlayerController>(ClientConnection->GetPlayerController());
+
+		if (!FortPC)
+			continue;
+
+		auto WorldInventory = FortPC->GetWorldInventory();
+
+		if (!WorldInventory)
+			continue;
+
+		static auto Crown = FindObject<UFortItemDefinition>(
+			L"/VictoryCrownsGameplay/Items/AGID_VictoryCrown.AGID_VictoryCrown");
+
+		WorldInventory->AddItem(Crown, nullptr, 1);
+
+		WorldInventory->Update();
+	}
+}
+
 void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerController, void* DeathReport)
 {
 	auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
@@ -1363,6 +1398,10 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 		return ClientOnPawnDiedOriginal(PlayerController, DeathReport);
 
 	auto DeathLocation = DeadPawn->GetActorLocation();
+
+	std::thread victory(VictoryCrownSlowmo);
+
+	victory.detach();
 
 	static auto FallDamageEnumValue = 1;
 

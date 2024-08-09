@@ -43,6 +43,16 @@ public:
 	}
 };
 
+struct FBuildingFoundationStreamingData
+{
+public:
+	FVector& GetFoundationLocation()
+	{
+		static auto FoundationLocationOffset = FindOffsetStruct("/Script/FortniteGame.BuildingFoundationStreamingData", "FoundationLocation");
+		return *(FVector*)(__int64(this) + FoundationLocationOffset);
+	}
+};
+
 class ABuildingFoundation : public ABuildingSMActor
 {
 public:
@@ -65,6 +75,12 @@ public:
 	{
 		static auto DynamicFoundationTypeOffset = GetOffset("DynamicFoundationType");
 		return Get<EDynamicFoundationType>(DynamicFoundationTypeOffset);
+	}
+
+	FBuildingFoundationStreamingData& GetStreamingData()
+	{
+		static auto StreamingDataOffset = GetOffset("StreamingData");
+		return Get<FBuildingFoundationStreamingData>(StreamingDataOffset);
 	}
 
 	FDynamicBuildingFoundationRepData& GetDynamicFoundationRepData()
