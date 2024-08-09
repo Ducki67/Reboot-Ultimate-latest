@@ -258,21 +258,6 @@ void AFortPlayerController::ServerLoadingScreenDroppedHook(UObject* Context, FFr
 		PlayerState->OnRep_SeasonLevelUIDisplay();
 	}
 
-	LoopMutators([&](AFortAthenaMutator* Mutator)
-		{
-			if (auto GG_Mutator = Cast<AFortAthenaMutator_GG>(Mutator))
-			{
-				bool bShouldUpdate = false;
-
-				auto WorldInventory = PlayerController->GetWorldInventory();
-				WorldInventory->AddItem(GG_Mutator->GetWeaponEntries()[0].GetWeapon(), &bShouldUpdate, 1, Cast<UFortWeaponItemDefinition>(GG_Mutator->GetWeaponEntries()[0].GetWeapon())->GetClipSize());
-				
-				if (bShouldUpdate)
-					WorldInventory->Update();
-			}
-		}
-	);
-
 	return ServerLoadingScreenDroppedOriginal(Context, Stack, Ret);
 }
 

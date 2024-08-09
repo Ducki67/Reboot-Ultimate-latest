@@ -1097,7 +1097,8 @@ static inline void MainUI()
 				ImGui::Text(std::format("Joinable: {}", Globals::bStartedListening).c_str());
 				ImGui::Text(std::format("Started: {}", bStartedBus).c_str());
 				ImGui::Text(std::format("Ended: {}", GameState->GetGamePhase() > EAthenaGamePhase::Warmup && !GameMode->IsMatchInProgress()).c_str());
-				ImGui::Text(std::format("Gamemode: {}", PlaylistShortName).c_str()); // ralz is stupid
+				ImGui::Text(std::format("Gamemode: {}", PlaylistShortName).c_str());
+				ImGui::Text(std::format("Players: {}", GameState->GetPlayersLeft()).c_str());
 
 				if (!Globals::bStartedListening) // hm
 				{
@@ -1120,45 +1121,6 @@ static inline void MainUI()
 					UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), cmd, nullptr);
 				}
 
-				/* if (ImGui::Button("Spawn BGAs"))
-				{
-					SpawnBGAs();
-				} */
-
-				/*
-				if (ImGui::Button("New"))
-				{
-					static auto NextFn = FindObject<UFunction>(L"/Game/Athena/Prototype/Blueprints/Cube/CUBE.CUBE_C.Next");
-					static auto NewFn = FindObject<UFunction>(L"/Game/Athena/Prototype/Blueprints/Cube/CUBE.CUBE_C.New");					
-					auto Loader = GetEventLoader("/Game/Athena/Prototype/Blueprints/Cube/CUBE.CUBE_C");
-
-					LOG_INFO(LogDev, "Loader: {}", __int64(Loader));
-
-					if (Loader)
-					{
-						int32 NewParam = 1;
-						// Loader->ProcessEvent(NextFn, &NewParam);
-						Loader->ProcessEvent(NewFn, &NewParam);
-					}
-				}
-
-				if (ImGui::Button("Next"))
-				{
-					static auto NextFn = FindObject<UFunction>(L"/Game/Athena/Prototype/Blueprints/Cube/CUBE.CUBE_C.Next");
-					static auto NewFn = FindObject<UFunction>(L"/Game/Athena/Prototype/Blueprints/Cube/CUBE.CUBE_C.New");
-					auto Loader = GetEventLoader("/Game/Athena/Prototype/Blueprints/Cube/CUBE.CUBE_C");
-
-					LOG_INFO(LogDev, "Loader: {}", __int64(Loader));
-
-					if (Loader)
-					{
-						int32 NewParam = 1;
-						Loader->ProcessEvent(NextFn, &NewParam);
-						// Loader->ProcessEvent(NewFn, &NewParam);
-					}
-				}
-				*/
-
 				if (!bIsInAutoRestart && Engine_Version < 424 && ImGui::Button("Restart"))
 				{
 					if (Engine_Version < 424)
@@ -1172,23 +1134,12 @@ static inline void MainUI()
 					}
 				}
 
-				/*
-				if (ImGui::Button("Test bruh"))
-				{
-					__int64 bruh;
-					__int64* (*sub_7FF7476F4458)(__int64* a1, UWorld* a2, __int64 a3) = decltype(sub_7FF7476F4458)(Addresses::GetSessionInterface);
-
-					sub_7FF7476F4458(&bruh, GetWorld(), 0);
-
-					LOG_INFO(LogDev, "bruh: 0x{:x}", bruh);
-					auto VFT = *(__int64*)bruh;
-					LOG_INFO(LogDev, "VFT: 0x{:x}", VFT - __int64(GetModuleHandleW(0)));
-				}
-				*/
-
 				if (!bStartedBus)
 				{
-					if (Globals::bLateGame.load() || Fortnite_Version >= 11)
+					if (Globals::bLateGame.load()
+						|| (Fortnite_Version >= 11 // Its been a minute but iirc it just wouldnt start when countdown ended or crash? cant remember
+							// && false
+							))
 					{
 						if (ImGui::Button("Start Bus"))
 						{
@@ -1960,7 +1911,7 @@ static inline void PregameUI()
 	{
 		StaticUI();
 
-		if (Addresses::SetZoneToIndex)
+		if (Addresses::SetZoneToIndex && Fortnite_Version != 19)
 		{
 			bool bWillBeLategame = Globals::bLateGame.load();
 			ImGui::Checkbox("Lategame", &bWillBeLategame);
