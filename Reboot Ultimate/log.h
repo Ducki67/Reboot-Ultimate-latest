@@ -53,7 +53,7 @@ inline void InitLogger()
 
     FILE* stream = nullptr;
 
-    bool bStopFortniteOutput = true;
+    bool bStopFortniteOutput = false;
 
     if (bStopFortniteOutput)
     {

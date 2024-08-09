@@ -20,15 +20,6 @@ enum class EFortCustomPartType : uint8_t // todo move
 	EFortCustomPartType_MAX = 7
 };
 
-enum class EFortCustomGender : uint8_t // todo move
-{
-	Invalid = 0,
-	Male = 1,
-	Female = 2,
-	Both = 3,
-	EFortCustomGender_MAX = 4,
-};
-
 enum class ETryExitVehicleBehavior : uint8_t
 {
 	DoNotForce = 0,
@@ -58,7 +49,6 @@ public:
 
 	struct FFortAthenaLoadout* GetCosmeticLoadout();
 	void ServerChoosePart(EFortCustomPartType Part, class UObject* ChosenCharacterPart);
-	void ServerChooseGender(EFortCustomGender Gender);
 	void ForceLaunchPlayerZipline(); // Thanks android
 	AActor* ServerOnExitVehicle(ETryExitVehicleBehavior ExitForceBehavior); // actually returns AFortAthenaVehicle
 

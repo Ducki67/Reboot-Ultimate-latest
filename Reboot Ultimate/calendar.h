@@ -112,6 +112,8 @@ namespace Calendar
 				SnowSetup->ProcessEvent(UpdateSnowVisualsOnClientFn);
 				LOG_INFO(LogDev, "Called UpdateSnowVisualsOnClientFn!");
 			}
+
+			LOG_INFO(LogDev, "Called SetSnow!");
 		}
 		else
 		{

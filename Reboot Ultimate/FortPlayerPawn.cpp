@@ -157,21 +157,6 @@ void AFortPlayerPawn::ServerChoosePart(EFortCustomPartType Part, UObject* Chosen
 	this->ProcessEvent(fn, &AFortPlayerPawn_ServerChoosePart_Params);
 }
 
-void AFortPlayerPawn::ServerChooseGender(EFortCustomGender Gender)
-{
-	static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerPawn.ServerChooseGender");
-
-	if (!fn)
-		return;
-
-	struct
-	{
-		EFortCustomGender Gender;
-	} AFortPlayerPawn_ServerChooseGender_Params{ Gender };
-
-	this->ProcessEvent(fn, &AFortPlayerPawn_ServerChooseGender_Params);
-}
-
 void AFortPlayerPawn::ForceLaunchPlayerZipline() // Thanks android
 {
 	float ZiplineJumpDampening = -0.5f;

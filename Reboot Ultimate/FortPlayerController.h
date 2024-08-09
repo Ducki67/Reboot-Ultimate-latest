@@ -396,7 +396,7 @@ public:
 		static auto WeaponDefinitionOffset = FindOffsetStruct("/Script/FortniteGame.AthenaPickaxeItemDefinition", "WeaponDefinition");
 
 		auto PickaxeDefinition = /* WeaponDefinitionOffset != -1 && */ CosmeticLoadoutPickaxe ? CosmeticLoadoutPickaxe->Get<UFortItemDefinition*>(WeaponDefinitionOffset)
-			: FindObject<UFortItemDefinition>(L"/Game/Athena/Items/Weapons/WID_Harvest_HalloweenScythe_Athena_C_T01.WID_Harvest_HalloweenScythe_Athena_C_T01");
+			: FindObject<UFortItemDefinition>(L"/Game/Athena/Items/Weapons/WID_Harvest_Pickaxe_Athena_C_T01.WID_Harvest_Pickaxe_Athena_C_T01");
 
 		auto WorldInventory = GetWorldInventory();
 
