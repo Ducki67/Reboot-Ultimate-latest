@@ -334,18 +334,25 @@ static std::vector Consumables1 = {
 static std::vector Consumables2 = {
 	"Athena_ShieldSmall",
 	"Athena_Shields",
-	"Athena_SuperMedkit",
+	"Athena_Bandage",
 	"Athena_Medkit",
 	"Athena_PurpleStuff",
 	"Athena_ChillBronco",
-	"WID_Athena_SpicySoda",
-	"WID_Athena_ShieldHops",
 	"WID_Athena_Flopper",
 	"WID_Athena_Flopper_Effective",
 	"WID_Athena_Flopper_HopFlopper",
-	"WID_Athena_SpicySoda",
 	"WID_Athena_ShieldGenerator",
-	"WID_Athena_HealSpray"
+	"Athena_ShieldSmall",
+	"Athena_Shields",
+	"Athena_Bandage",
+	"Athena_Medkit",
+	"Athena_PurpleStuff",
+	"Athena_ChillBronco",
+	"WID_Athena_Flopper",
+	"WID_Athena_Flopper_Effective",
+	"WID_Athena_Flopper_HopFlopper",
+	"WID_Athena_ShieldGenerator",
+	"WID_Athena_SpicySoda"
 };
 
 static std::vector Traps = {

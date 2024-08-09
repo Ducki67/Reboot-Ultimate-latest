@@ -11,7 +11,7 @@
 #include "SoftClassPtr.h"
 #include "FortScriptedAction.h"
 
-static void ApplyHID(AFortPlayerPawn* Pawn, UObject* HeroDefinition, bool bUseServerChoosePart = false)
+static void ApplyHID(AFortPlayerPawn* Pawn, UObject* HeroDefinition, bool bUseServerChoosePart = false, EFortCustomGender CustomGender = EFortCustomGender::Invalid)
 {
 	using UFortHeroSpecialization = UObject;
 
@@ -19,9 +19,6 @@ static void ApplyHID(AFortPlayerPawn* Pawn, UObject* HeroDefinition, bool bUseSe
 	auto& Specializations = HeroDefinition->Get<TArray<TSoftObjectPtr<UFortHeroSpecialization>>>(SpecializationsOffset);
 
 	auto PlayerState = Pawn->GetPlayerState();
-
-	static auto HeroTypeOffset = PlayerState->GetOffset("HeroType");
-	PlayerState->Get(HeroTypeOffset) = HeroDefinition;
 
 	for (int i = 0; i < Specializations.Num(); i++)
 	{
@@ -32,6 +29,8 @@ static void ApplyHID(AFortPlayerPawn* Pawn, UObject* HeroDefinition, bool bUseSe
 
 		if (Specialization)
 		{
+			Pawn->ServerChooseGender(CustomGender);
+
 			static auto Specialization_CharacterPartsOffset = Specialization->GetOffset("CharacterParts");
 			auto& CharacterParts = Specialization->Get<TArray<TSoftObjectPtr<UObject>>>(Specialization_CharacterPartsOffset);
 
@@ -113,7 +112,14 @@ static bool ApplyCID(AFortPlayerPawn* Pawn, UObject* CID, bool bUseServerChooseP
 	static auto HeroDefinitionOffset = CID->GetOffset("HeroDefinition");
 	auto HeroDefinition = CID->Get(HeroDefinitionOffset);
 
-	ApplyHID(Pawn, HeroDefinition, bUseServerChoosePart);
+	static auto GenderOffset = CID->GetOffset("Gender");
+
+	EFortCustomGender Gender;
+
+	if (GenderOffset != -1)
+		Gender = CID->Get<EFortCustomGender>(GenderOffset);
+
+	ApplyHID(Pawn, HeroDefinition, bUseServerChoosePart, Gender);
 
 	// static auto HeroTypeOffset = PlayerState->GetOffset("HeroType");
 	// PlayerState->Get(HeroTypeOffset) = HeroDefinition;

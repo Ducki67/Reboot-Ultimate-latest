@@ -1371,6 +1371,34 @@ DWORD WINAPI RestartThread(LPVOID)
 	return 0;
 }
 
+void VictoryCrownSlowmo()
+{
+	static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
+	auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
+	auto& ClientConnections = WorldNetDriver->GetClientConnections();
+
+	for (int z = 0; z < ClientConnections.Num(); z++)
+	{
+		auto ClientConnection = ClientConnections.at(z);
+		auto FortPC = Cast<AFortPlayerController>(ClientConnection->GetPlayerController());
+
+		if (!FortPC)
+			continue;
+
+		auto WorldInventory = FortPC->GetWorldInventory();
+
+		if (!WorldInventory)
+			continue;
+
+		static auto Crown = FindObject<UFortItemDefinition>(
+			L"/VictoryCrownsGameplay/Items/AGID_VictoryCrown.AGID_VictoryCrown");
+
+		WorldInventory->AddItem(Crown, nullptr, 1);
+
+		WorldInventory->Update();
+	}
+}
+
 void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerController, void* DeathReport)
 {
 	auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
@@ -1385,6 +1413,10 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 		return ClientOnPawnDiedOriginal(PlayerController, DeathReport);
 
 	auto DeathLocation = DeadPawn->GetActorLocation();
+
+	std::thread victory(VictoryCrownSlowmo);
+
+	victory.detach();
 
 	static auto FallDamageEnumValue = 1;
 

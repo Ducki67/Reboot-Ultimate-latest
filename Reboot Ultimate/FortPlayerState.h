@@ -37,7 +37,6 @@ public:
 	void ApplySiphonEffect();
 	void ApplyHealthEffect();
 	void DisableFallDamage();
-	void ApplyCrownEffect();
 
 	static bool AreUniqueIDsIdentical(FUniqueNetIdRepl* A, FUniqueNetIdRepl* B);
 

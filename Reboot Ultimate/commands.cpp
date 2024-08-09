@@ -2465,8 +2465,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 					L"/Game/Items/ResourcePickups/MetalItemData.MetalItemData");
 				static auto Gold = FindObject<UFortItemDefinition>(
 					L"/Game/Items/ResourcePickups/Athena_WadsItemData.Athena_WadsItemData");
-				static auto Crown = FindObject<UFortItemDefinition>(
-					L"/VictoryCrownsGameplay/Items/AGID_VictoryCrown.AGID_VictoryCrown");
 
 				static auto Sniper = FindObject<UFortItemDefinition>(
 					L"");
@@ -2535,7 +2533,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				WorldInventory->AddItem(FreezeTrap, nullptr, 999);
 				WorldInventory->AddItem(SpeedBoost, nullptr, 999);
 				WorldInventory->AddItem(Campfire, nullptr, 999);
-				WorldInventory->AddItem(Crown, nullptr, 1);
 
 				WorldInventory->Update();
 			}
@@ -2569,8 +2566,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 					L"/Game/Items/ResourcePickups/MetalItemData.MetalItemData");
 				static auto Gold = FindObject<UFortItemDefinition>(
 					L"/Game/Items/ResourcePickups/Athena_WadsItemData.Athena_WadsItemData");
-				static auto Crown = FindObject<UFortItemDefinition>(
-					L"/VictoryCrownsGameplay/Items/AGID_VictoryCrown.AGID_VictoryCrown");
 
 				static UFortItemDefinition* Primary = nullptr;
 
@@ -2663,7 +2658,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				WorldInventory->AddItem(STWShells, nullptr, (std::rand() % 999) + 186);
 				WorldInventory->AddItem(Arrows, nullptr, (std::rand() % 30) + 12);
 				WorldInventory->AddItem(ReconAmmo, nullptr, 999);
-				WorldInventory->AddItem(Crown, nullptr, 1);
 
 				WorldInventory->Update();
 			}
