@@ -361,7 +361,7 @@ public:
 			KillerState->ClientReportKill(PlayerState);
 		}
 
-		if (KillerPawn && KillerPawn != Pawn && KillerController && Cast<AController>(KillerController) != Cast<AController>(AIBotController))
+		if (KillerPawn && KillerPawn != Pawn && KillerController && KillerPlayerState && KillerPlayerState->GetAbilitySystemComponent() && Cast<AController>(KillerController) != Cast<AController>(AIBotController))
 		{
 			if (Globals::AmountOfHealthSiphon != 0)
 			{
@@ -420,7 +420,7 @@ public:
 
 				if ((MaxShield - Shield) >= 0 && AmountGiven < Globals::AmountOfHealthSiphon)
 				{
-					// KillerPlayerState->ApplySiphonEffect();
+					KillerPlayerState->ApplySiphonEffect();
 
 					if (MaxShield - Shield > 0)
 					{

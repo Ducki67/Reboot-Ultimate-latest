@@ -1,4 +1,5 @@
 #include "commands.h"
+
 #include "calendar.h"
 #include "FortPawn.h"
 #include "TSubclassOf.h"
@@ -8,6 +9,9 @@
 #include "AIBlueprintHelperLibrary.h"
 #include "FortServerBotManagerAthena.h"
 #include "FortAthenaAIBotSpawnerData.h"
+
+#include <iomanip>
+#include <sstream>
 
 enum class EMovementMode : uint8_t
 {
@@ -861,6 +865,63 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			AbilitySystemComponent->ApplyGameplayEffectToSelf(AbilityClassToGive, 1.f);
 		}
+		else if (Command == "giveability" || Command == "givega")
+		{
+			auto PlayerState = ReceivingController->GetPlayerStateAthena();
+
+			if (!PlayerState)
+			{
+				SendMessageToConsole(ReceivingController, L"No PlayerState!");
+				return;
+			}
+
+			auto AbilitySystemComponent = PlayerState->GetAbilitySystemComponent();
+
+			if (!AbilitySystemComponent)
+			{
+				SendMessageToConsole(ReceivingController, L"No AbilitySystemComponent!");
+				return;
+			}
+
+			UClass* AbilityClassToGive = nullptr;
+
+			if (NumArgs >= 1)
+			{
+				static auto BGAClass = FindObject<UClass>(L"/Script/Engine.BlueprintGeneratedClass");
+				AbilityClassToGive = LoadObject<UClass>(Arguments[1], BGAClass);
+			}
+
+			AbilitySystemComponent->GiveAbilityEasy(AbilityClassToGive);
+		}
+		/*else if (Command == "applytag")
+		{
+			auto PlayerState = ReceivingController->GetPlayerStateAthena();
+
+			if (!PlayerState)
+			{
+				SendMessageToConsole(ReceivingController, L"No PlayerState!");
+				return;
+			}
+
+			auto AbilitySystemComponent = PlayerState->GetAbilitySystemComponent();
+
+			if (!AbilitySystemComponent)
+			{
+				SendMessageToConsole(ReceivingController, L"No AbilitySystemComponent!");
+				return;
+			}
+
+			if (NumArgs >= 1)
+			{
+				std::string TagStrToApply = Arguments[1];
+
+				FGameplayTag TagToApply = FGameplayTag();
+				TagToApply.TagName = UKismetStringLibrary::Conv_StringToName(std::wstring(TagStrToApply.begin(), TagStrToApply.end()).c_str());
+
+				AbilitySystemComponent->NetMulticast_InvokeGameplayCueAdded(TagToApply, FPredictionKey(), AbilitySystemComponent->MakeEffectContext());
+				AbilitySystemComponent->NetMulticast_InvokeGameplayCueExecuted(TagToApply, FPredictionKey(), AbilitySystemComponent->MakeEffectContext());
+			}
+		}*/
 		else if (Command == "setpickaxe" || Command == "pickaxe")
 		{
 			if (NumArgs < 1)
@@ -1837,7 +1898,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			bool bShouldSpawnAtZoneCenter = false;
 
-			if (NumArgs >= 3 && Arguments[2] == "zonecenter")
+			if (NumArgs >= 3 && Arguments[2] == "center")
 				bShouldSpawnAtZoneCenter = true;
 
 			if (bShouldSpawnAtZoneCenter && GameMode->GetGameStateAthena()->GetGamePhaseStep() <= EAthenaGamePhaseStep::BusFlying)
@@ -1903,6 +1964,27 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, message.c_str());
 		}
+		else if (Command == "demospeed")
+		{
+			float SpeedMultiplier = 1.0f;
+
+			if (NumArgs >= 1)
+			{
+				try { SpeedMultiplier = std::stof(Arguments[1]); }
+				catch (...) { SpeedMultiplier = 1.0f; }
+			}
+
+			std::wstring CommandString = L"demospeed ";
+			CommandString += std::to_wstring(SpeedMultiplier);
+
+			UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), CommandString.c_str(), nullptr);
+
+			std::wstringstream ss;
+			ss << std::fixed << std::setprecision(0) << SpeedMultiplier;
+
+			std::wstring Message = L"Demospeed set to " + ss.str() + L"!\n";
+			SendMessageToConsole(PlayerController, Message.c_str());
+		}
 		else if (Command == "settimeofday" || Command == "time" || Command == "hour")
 		{
 			static auto SetTimeOfDayFn = FindObject<UFunction>(L"/Script/FortniteGame.FortKismetLibrary.SetTimeOfDay");
@@ -1963,8 +2045,17 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
 
 			UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"pausesafezone", nullptr);
+
 			SendMessageToConsole(PlayerController, L"Paused/Unpaused Zone.");
-			// GameMode->PauseSafeZone(GameState->IsSafeZonePaused() == 0);
+
+			/*if (!GameState->IsSafeZonePaused())
+			{
+				SendMessageToConsole(PlayerController, L"Paused Zone.");
+			}
+			else if (GameState->IsSafeZonePaused())
+			{
+				SendMessageToConsole(PlayerController, L"Unpaused Zone.");
+			}*/
 		}
 		else if (Command == "teleport" || Command == "tp" || Command == "to")
 		{
@@ -2872,6 +2963,7 @@ cheat listplayers - Gives you all players names.
 cheat kick - Kicks the player from the game.
 cheat ban - Permanently bans the player from the game. (IP Ban)
 cheat pausesafezone - Pauses the zone.
+cheat demospeed - Speeds up/slows down the speed of the game.
 cheat health (#) - Sets executing player's health.
 cheat shield (#) - Sets executing player's shield.
 cheat maxhealth (#) - Sets the maximum health of the player.

@@ -450,6 +450,7 @@ public:
 	static void ServerAttemptInteractHook(UObject* Context, FFrame* Stack);
 
 	static void ServerAttemptAircraftJumpHook(AFortPlayerController* PC, FRotator ClientRotation);
+	// static void FixRiftPatch();
 	// static void ServerCreateBuildingActorHook(AFortPlayerController* PlayerController, FCreateBuildingActorData CreateBuildingData);
 	static void ServerCreateBuildingActorHook(UObject* Context, FFrame* Stack, void* Ret);
 	static AActor* SpawnToyInstanceHook(UObject* Context, FFrame* Stack, AActor** Ret);
