@@ -46,6 +46,7 @@ UFortWeaponItemDefinition* AFortAthenaVehicle::GetVehicleWeaponForSeat(int SeatI
 		static auto InCannonWeaponItemDefinition = FindObject<UFortWeaponItemDefinition>(L"/Game/Athena/Items/Weapons/Vehicles/ShipCannon_Weapon_InCannon.ShipCannon_Weapon_InCannon");
 		static auto CannonWeaponItemDefinition = FindObject<UFortWeaponItemDefinition>(L"/Game/Athena/Items/Weapons/Vehicles/ShipCannon_Weapon.ShipCannon_Weapon");
 		static auto TurretWeaponItemDefinition = FindObject<UFortWeaponItemDefinition>(L"/Game/Athena/Items/Traps/MountedTurret/MountedTurret_Weapon.MountedTurret_Weapon");
+		static auto OstrichWeaponItemDefinition = FindObject<UFortWeaponItemDefinition>(L"/Game/Athena/Items/Weapons/Vehicles/WID_OstrichShotgunTest2.WID_OstrichShotgunTest2");
 
 		auto ReceivingActorName = this->GetName();
 
@@ -70,6 +71,11 @@ UFortWeaponItemDefinition* AFortAthenaVehicle::GetVehicleWeaponForSeat(int SeatI
 		else if (ReceivingActorName.contains("MountedTurret"))
 		{
 			VehicleWeaponDefinition = TurretWeaponItemDefinition;
+		}
+
+		else if (ReceivingActorName.contains("Ostrich" || "TestMechVehicle")) // can't remember which one its asking for
+		{
+			VehicleWeaponDefinition = OstrichWeaponItemDefinition;
 		}
 	}
 

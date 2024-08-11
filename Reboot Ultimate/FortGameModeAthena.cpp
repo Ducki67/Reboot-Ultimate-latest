@@ -1049,7 +1049,7 @@ bool AFortGameModeAthena::Athena_ReadyToStartMatchHook(AFortGameModeAthena* Game
 
 		LOG_INFO(LogDev, "bShouldUseReplicationGraph: {}", Globals::bShouldUseReplicationGraph);
 
-		CreateThread(0, 0, InitBotNames, 0, 0, 0);
+		InitBotNames();
 
 		Globals::bStartedListening = true;
 	}

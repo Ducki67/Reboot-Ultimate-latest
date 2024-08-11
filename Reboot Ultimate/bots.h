@@ -120,52 +120,66 @@ public:
 		}
 	}
 
-	void ChangeName()
+	void SetName(const FString& NewName)
 	{
-		bool bUseOverrideName = false;
-
-		FString NewName;
-
-		if (bUseOverrideName)
+		if (// true ||
+			Fortnite_Version < 9
+			)
 		{
-			NewName = L"Override";
+			if (auto PlayerController = Cast<APlayerController>(Controller))
+			{
+				PlayerController->ServerChangeName(NewName);
+			}
 		}
 		else
 		{
-			static int CurrentBotNum = 1;
-			std::wstring BotNumWStr;
+			auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
+			GameMode->ChangeName(Controller, NewName, true);
+		}
 
-			if (Fortnite_Version < 9)
+		PlayerState->OnRep_PlayerName();
+	}
+
+	FString GetRandomName()
+	{
+		static int CurrentBotNum = 1;
+		std::wstring BotNumWStr;
+		FString NewName;
+
+		if (Fortnite_Version < 9)
+		{
+			BotNumWStr = std::to_wstring(CurrentBotNum++);
+			NewName = (L"RebootBot" + BotNumWStr).c_str();
+		}
+		else
+		{
+			if (Fortnite_Version < 11)
 			{
-				BotNumWStr = std::to_wstring(CurrentBotNum++);
-				NewName = (L"RebootBot" + BotNumWStr).c_str();
-
-				if (auto PlayerController = Cast<AFortPlayerController>(Controller))
-					PlayerController->ServerChangeName(NewName);
+				BotNumWStr = std::to_wstring(CurrentBotNum++ + 200);
+				NewName = (std::format(L"Anonymous[{}]", BotNumWStr)).c_str();
 			}
 			else
 			{
-				if (Fortnite_Version < 11)
+				if (!PlayerBotNames.empty())
 				{
-					BotNumWStr = std::to_wstring(CurrentBotNum++ + 200);
-					NewName = (std::format(L"Anonymous[{}]", BotNumWStr)).c_str();
-				}
-				else
-				{
-					if (!PlayerBotNames.empty())
-					{
-						int RandomIndex = std::rand() % PlayerBotNames.size();
-						std::string RandomBotName = PlayerBotNames[RandomIndex];
-						NewName = std::wstring(RandomBotName.begin(), RandomBotName.end()).c_str();
-						PlayerBotNames.erase(PlayerBotNames.begin() + RandomIndex);
-					}
-				}
+					// std::shuffle(PlayerBotNames.begin(), PlayerBotNames.end(), std::default_random_engine((unsigned int)time(0)));
 
-				PlayerState->SetPlayerName(NewName);
+					int RandomIndex = std::rand() % (PlayerBotNames.size() - 1);
+					NewName = PlayerBotNames[RandomIndex];
+					PlayerBotNames.erase(PlayerBotNames.begin() + RandomIndex);
+				}
 			}
 		}
 
-		LOG_INFO(LogBots, "NewName: {}", NewName.ToString());
+		return NewName;
+	}
+
+	void ChangeName()
+	{
+		auto BotNewName = GetRandomName();
+
+		LOG_INFO(LogBots, "BotNewName: {}", BotNewName.ToString());
+		SetName(BotNewName);
 	}
 
 public:
@@ -223,8 +237,6 @@ public:
 
 		if (Fortnite_Version >= 20)
 			LOG_INFO(LogBots, "Bot spawned at {}", Pawn->GetActorLocation().ToString().ToString());
-
-		ChangeName();
 
 		if (Addresses::PickTeam)
 			PlayerState->GetTeamIndex() = GameMode->Athena_PickTeamHook(GameMode, 0, Controller ? Controller : AIBotController);
