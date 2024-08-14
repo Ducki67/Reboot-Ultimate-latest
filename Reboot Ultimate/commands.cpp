@@ -1229,6 +1229,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		{
 			float X = 0.0f, Y = 0.0f, Z = 0.0f;
 
+			bool bIgnoreFallDamage = true;
+
 			int argCount = Arguments.size();
 
 			try
@@ -1270,7 +1272,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				FVector LaunchVelocity; // (Parm, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash, NativeAccessSpecifierPublic)
 				bool bXYOverride;       // (Parm, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash, NativeAccessSpecifierPublic)
 				bool bZOverride;        // (Parm, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash, NativeAccessSpecifierPublic)
-			} ACharacter_LaunchCharacter_Params{ FVector(X, Y, Z), false, false };
+				bool bIgnoreFallDamage; // (Parm, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash, NativeAccessSpecifierPublic)
+			} ACharacter_LaunchCharacter_Params{ FVector(X, Y, Z), false, false, bIgnoreFallDamage }; // i dont think bIgnoreFallDamage works icl
 
 			Pawn->ProcessEvent(LaunchCharacterFn, &ACharacter_LaunchCharacter_Params);
 
@@ -1339,12 +1342,30 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, L"Regenerated health and shield!\n");
 		}
-		else if (Command == "siphon")
+		else if (Command == "siphonanim" || Command == "siphoneffect")
 		{
 			if (auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn()))
 				PlayerState->ApplySiphonEffect();
 
 			SendMessageToConsole(PlayerController, L"Applied Siphon Effect!");
+		}
+		else if (Command == "siphon")
+		{
+			float Siphon = 0.f;
+
+			if (NumArgs >= 1)
+			{
+				try { Siphon = std::stof(Arguments[1]); }
+				catch (...) {}
+			}
+
+			Globals::AmountOfHealthSiphon = Siphon;
+
+			std::wstringstream ss;
+			ss << std::fixed << std::setprecision(0) << Siphon;
+
+			std::wstring Message = L"Siphon amount set to " + ss.str() + L"!\n";
+			SendMessageToConsole(PlayerController, Message.c_str());
 		}
 		else if (Command == "god")
 		{
@@ -2968,7 +2989,8 @@ cheat health (#) - Sets executing player's health.
 cheat shield (#) - Sets executing player's shield.
 cheat maxhealth (#) - Sets the maximum health of the player.
 cheat maxshield (#) - Sets the maximum shield of the player.
-cheat regen - Regenerates the players health and shield to 100.
+cheat regen - Regenerates the players health and shield to their max.
+cheat siphon (#) - Changes the amount of health and shield a player gets for killing someone.
 cheat skin (CID) - Sets a player's character.
 cheat spawnpickup (WID) (#) - Spawns a pickup at specified player.
 cheat tp - Teleports to what the player is looking at.

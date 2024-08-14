@@ -1330,16 +1330,24 @@ static inline void MainUI()
 
 		else if (Tab == TRICKSHOT_TAB)
 		{
-			ImGui::Checkbox("Enable Cannon Animations", &bEnableCannonAnimations);
-
-			ImGui::NewLine();
-
-			if (!bEnableCannonAnimations)
+			if (Fortnite_Version == 8)
 			{
-				ImGui::Text("FMod Cannon Launch Velocity");
-				ImGui::InputFloat("X", CannonXMultiplier);
-				ImGui::InputFloat("Y", CannonYMultiplier);
-				ImGui::InputFloat("Z", CannonZMultiplier);
+				ImGui::Checkbox("Enable Cannon Animations", &bEnableCannonAnimations);
+
+				ImGui::NewLine();
+
+				if (!bEnableCannonAnimations)
+				{
+					ImGui::Text("FMod Cannon Launch Velocity");
+					ImGui::InputFloat("X", CannonXMultiplier);
+					ImGui::InputFloat("Y", CannonYMultiplier);
+					ImGui::InputFloat("Z", CannonZMultiplier);
+				}
+			}
+
+			if (Fortnite_Version >= 19.01)
+			{
+				ImGui::Checkbox("Toggle Victory Crown Slowmo", &Globals::bCrownSlowmo);
 			}
 		}
 

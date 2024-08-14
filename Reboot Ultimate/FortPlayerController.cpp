@@ -1435,9 +1435,12 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 
 	auto DeathLocation = DeadPawn->GetActorLocation();
 
-	std::thread victory(VictoryCrownSlowmo);
+	if (Globals::bCrownSlowmo)
+	{
+		std::thread victory(VictoryCrownSlowmo);
 
-	victory.detach();
+		victory.detach();
+	}
 
 	static auto FallDamageEnumValue = 1;
 

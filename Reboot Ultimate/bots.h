@@ -148,8 +148,8 @@ public:
 
 		if (Fortnite_Version < 9)
 		{
-			BotNumWStr = std::to_wstring(CurrentBotNum++);
-			NewName = (L"RebootBot" + BotNumWStr).c_str();
+			BotNumWStr = std::to_wstring(CurrentBotNum++ + 200);
+			NewName = (std::format(L"Anonymous[{}]", BotNumWStr)).c_str();
 		}
 		else
 		{
@@ -253,6 +253,7 @@ public:
 		Pawn->SetHealth(21);
 		Pawn->SetMaxHealth(21);
 		Pawn->SetShield(21);
+		Pawn->SetMaxShield(21);
 
 		auto PlayerAbilitySet = GetPlayerAbilitySet();
 		auto AbilitySystemComponent = PlayerState->GetAbilitySystemComponent();
@@ -285,6 +286,9 @@ public:
 		AFortPlayerControllerAthena* KillerController = nullptr;
 		AFortPlayerStateAthena* KillerPlayerState = nullptr;
 		AFortPawn* KillerPawn = nullptr;
+
+		auto DeadPawn = Cast<AFortPlayerPawn>(Controller->GetPawn());
+		auto DeadPlayerState = Cast<AFortPlayerStateAthena>(Controller->GetPlayerState());
 
 		if (KillerState)
 		{
@@ -386,7 +390,9 @@ public:
 				static auto StoneItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/StoneItemData.StoneItemData");
 				static auto MetalItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/MetalItemData.MetalItemData");
 
-				int MaxMaterials = 999;
+				int MaxWood = WoodItemData->GetMaxStackSize();
+				int MaxStone = StoneItemData->GetMaxStackSize();
+				int MaxMetal = MetalItemData->GetMaxStackSize();
 
 				auto WoodInstance = WorldInventory->FindItemInstance(WoodItemData);
 				auto WoodCount = WoodInstance ? WoodInstance->GetItemEntry()->GetCount() : 0;
@@ -397,19 +403,19 @@ public:
 				auto MetalInstance = WorldInventory->FindItemInstance(MetalItemData);
 				auto MetalCount = MetalInstance ? MetalInstance->GetItemEntry()->GetCount() : 0;
 
-				if (WoodCount < MaxMaterials)
+				if (WoodCount < MaxWood)
 				{
-					int WoodToAdd = FMath::Min(50, MaxMaterials - WoodCount);
+					int WoodToAdd = FMath::Min(50, MaxWood - WoodCount);
 					WorldInventory->AddItem(WoodItemData, nullptr, WoodToAdd);
 				}
-				if (StoneCount < MaxMaterials)
+				if (StoneCount < MaxStone)
 				{
-					int StoneToAdd = FMath::Min(50, MaxMaterials - StoneCount);
+					int StoneToAdd = FMath::Min(50, MaxStone - StoneCount);
 					WorldInventory->AddItem(StoneItemData, nullptr, StoneToAdd);
 				}
-				if (MetalCount < MaxMaterials)
+				if (MetalCount < MaxMetal)
 				{
-					int MetalToAdd = FMath::Min(50, MaxMaterials - MetalCount);
+					int MetalToAdd = FMath::Min(50, MaxMetal - MetalCount);
 					WorldInventory->AddItem(MetalItemData, nullptr, MetalToAdd);
 				}
 
@@ -432,7 +438,7 @@ public:
 
 				if ((MaxShield - Shield) >= 0 && AmountGiven < Globals::AmountOfHealthSiphon)
 				{
-					KillerPlayerState->ApplySiphonEffect();
+					KillerPlayerState->ApplySiphonEffect(); // why doesnt this work on chapter 2 adiubawuybdawbdab
 
 					if (MaxShield - Shield > 0)
 					{
