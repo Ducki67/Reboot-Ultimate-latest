@@ -2,7 +2,7 @@
 
 # What is Reboot Ultimate?
 
-Reboot is a rewrite of the original [Project Reboot 3.0](https://github.com/Milxnor/Project-Reboot-3.0). This version of Reboot strives for adding new things to Reboot, while keeping it all stable.
+Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github.com/Milxnor/Project-Reboot-3.0). This version of Reboot strives for adding new things to Reboot, while keeping it all stable.
 
 # What does this reboot have?
 
