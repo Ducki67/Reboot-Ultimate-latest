@@ -11,8 +11,7 @@ public:
 	void DestroyTarget();
 	void God();
 	void DestroyAll(TSubclassOf<AActor> AClass);
-
-	void Mang(std::string Cmd);
+	void ChangeSize(float F);
 
 	static UClass* StaticClass();
 };

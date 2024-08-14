@@ -20,6 +20,18 @@ void UCheatManager::God()
 	this->ProcessEvent(GodFn, nullptr);
 }
 
+void UCheatManager::ChangeSize(float F)
+{
+	static auto ChangeSizeFn = FindObject<UFunction>("/Script/Engine.CheatManager.ChangeSize");
+
+	struct
+	{
+		float                              F;                                                                // (Parm, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash, NativeAccessSpecifierPublic)
+	}UCheatManager_ChangeSize_Params{ F };
+
+	this->ProcessEvent(ChangeSizeFn, &UCheatManager_ChangeSize_Params);
+}
+
 void UCheatManager::DestroyAll(TSubclassOf<AActor> AClass)
 {
 	static auto DestroyAllFn = FindObject<UFunction>(L"/Script/Engine.CheatManager.DestroyAll");

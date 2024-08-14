@@ -864,6 +864,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			}
 
 			AbilitySystemComponent->ApplyGameplayEffectToSelf(AbilityClassToGive, 1.f);
+
+			SendMessageToConsole(PlayerController, L"Applied effect!");
 		}
 		else if (Command == "giveability" || Command == "givega")
 		{
@@ -892,6 +894,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			}
 
 			AbilitySystemComponent->GiveAbilityEasy(AbilityClassToGive);
+
+			SendMessageToConsole(PlayerController, L"Applied Ability!");
 		}
 		/*else if (Command == "applytag")
 		{
@@ -986,7 +990,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		{
 			if (!Globals::bCreative)
 			{
-				SendMessageToConsole(PlayerController, L"It is not creative!");
+				SendMessageToConsole(PlayerController, L"You are not playing creative!");
 				return;
 			}
 
@@ -1122,6 +1126,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		else if (Command == "logprocessevent")
 		{
 			Globals::bLogProcessEvent = !Globals::bLogProcessEvent;
+			SendMessageToConsole(PlayerController, L"Toggled logprocessevent!");
 		}
 		else if (Command == "fakewin")
 		{
@@ -1129,6 +1134,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			PlayerController->PlayWinEffects(PlayerController->GetPawn(), PlayerController->GetMyFortPawn()->GetCurrentWeapon()->GetWeaponData(), 1, false);
 			PlayerController->ClientNotifyWon(PlayerController->GetPawn(), PlayerController->GetMyFortPawn()->GetCurrentWeapon()->GetWeaponData(), 1);
 			PlayerController->ClientNotifyTeamWon(PlayerController->GetPawn(), PlayerController->GetMyFortPawn()->GetCurrentWeapon()->GetWeaponData(), 1);
+
+			SendMessageToConsole(PlayerController, L"You won!");
 		}
 		else if (Command == "startaircraft")
 		{
@@ -1190,7 +1197,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		{
 			if (!Globals::bCreative)
 			{
-				SendMessageToConsole(PlayerController, L"It's not creative!");
+				SendMessageToConsole(PlayerController, L"You are not playing creative!");
 				return;
 			}
 
@@ -1201,6 +1208,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				__int64 idk = 1;
 
 				StartGame(idk);
+
+				SendMessageToConsole(PlayerController, L"Creative game started!");
 			}
 		}
 		else if (Command == "listplayers")
@@ -1298,7 +1307,12 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			}
 
 			Pawn->SetShield(Shield);
-			SendMessageToConsole(PlayerController, L"Set shield!\n");
+
+			std::wstringstream ss;
+			ss << std::fixed << std::setprecision(0) << Shield;
+
+			std::wstring Message = L"Shield set to " + ss.str() + L"!\n";
+			SendMessageToConsole(PlayerController, Message.c_str());
 		}
 		else if (Command == "setmaxshield" || Command == "maxshield")
 		{
@@ -1319,7 +1333,12 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			}
 
 			Pawn->SetMaxShield(MaxShield);
-			SendMessageToConsole(PlayerController, L"Set max shield!\n");
+
+			std::wstringstream ss;
+			ss << std::fixed << std::setprecision(0) << MaxShield;
+
+			std::wstring Message = L"Max shield set to " + ss.str() + L"!\n";
+			SendMessageToConsole(PlayerController, Message.c_str());
 		}
 		else if (Command == "regen")
 		{
@@ -1515,7 +1534,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				SendMessageToConsole(PlayerController, L"Failed to summon!");
 			}
 		}
-		/*
 		else if (Command == "changesize") // This works but doesn't visually update on the client (If done fully on the client with Rift or Cranium (No gameserver) it fully works)
 		{
 			if (NumArgs < 1)
@@ -1542,9 +1560,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			ReceivingController->GetMyFortPawn()->ForceNetUpdate();
 
-			SendMessageToConsole(PlayerController, L"Changed size!");
+			SendMessageToConsole(PlayerController, L"Changed size/hitbox!");
 		}
-		*/
 		else if (Command == "destroyall")
 		{
 			if (NumArgs < 1)
@@ -1565,6 +1582,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			CheatManager->DestroyAll(AClass);
 			CheatManager = nullptr;
+
+			SendMessageToConsole(PlayerController, L"Destroyed class!");
 		}
 		else if (Command == "destroyfishingholes")
 		{
@@ -1579,6 +1598,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				auto FishingHole = AllFishingHoles.at(i);
 
 				FishingHole->K2_DestroyActor();
+
+				SendMessageToConsole(PlayerController, L"Destroyed fishing holes.");
 
 				LOG_INFO(LogDev, "Destroyed Fishing Hole {}", FishingHole->GetFullName());
 			}
@@ -1595,7 +1616,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			if (ReceivingController != PlayerController)
 			{
-				SendMessageToConsole(PlayerController, L"Only the host can do this command!");
+				SendMessageToConsole(PlayerController, L"Only the host can run this command!");
 			}
 			else
 			{
@@ -1615,7 +1636,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			if (ReceivingController != PlayerController)
 			{
-				SendMessageToConsole(PlayerController, L"Only the host can do this command!");
+				SendMessageToConsole(PlayerController, L"Only the host can run this command!");
 			}
 			else
 			{
@@ -1685,6 +1706,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		{
 			static auto ServerSuicideFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerController.ServerSuicide");
 			ReceivingController->ProcessEvent(ServerSuicideFn);
+
+			SendMessageToConsole(PlayerController, L"Killed player!");
 		}
 		else if (Command == "spawn" || Command == "summon")
 		{
@@ -2022,6 +2045,12 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			}params{ GetWorld() , NewTimeOfDay };
 
 			UFortKismetLibrary::StaticClass()->ProcessEvent(SetTimeOfDayFn, &params);
+
+			std::wstringstream ss;
+			ss << std::fixed << std::setprecision(0) << NewTimeOfDay;
+
+			std::wstring Message = L"Time of day set to " + ss.str() + L"!\n";
+			SendMessageToConsole(PlayerController, Message.c_str());
 		}
 		else if (Command == "sethealth" || Command == "health")
 		{
@@ -2038,9 +2067,13 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			try { Health = std::stof(Arguments[1]); }
 			catch (...) {}
 
-			Pawn->SetMaxHealth(Health);
 			Pawn->SetHealth(Health);
-			SendMessageToConsole(PlayerController, L"Set health!\n");
+
+			std::wstringstream ss;
+			ss << std::fixed << std::setprecision(0) << Health;
+
+			std::wstring Message = L"Health set to " + ss.str() + L"!\n";
+			SendMessageToConsole(PlayerController, Message.c_str());
 		}
 		else if (Command == "setmaxhealth" || Command == "maxhealth")
 		{
@@ -2058,7 +2091,12 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			catch (...) {}
 
 			Pawn->SetMaxHealth(MaxHealth);
-			SendMessageToConsole(PlayerController, L"Set max health!\n");
+
+			std::wstringstream ss;
+			ss << std::fixed << std::setprecision(0) << MaxHealth;
+
+			std::wstring Message = L"Max health set to " + ss.str() + L"!\n";
+			SendMessageToConsole(PlayerController, Message.c_str());
 		}
 		else if (Command == "pausesafezone" || Command == "pausezone")
 		{
@@ -2123,6 +2161,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 					if (SetMovementModeFn)
 					{
 						CharMovement->ProcessEvent(SetMovementModeFn, &NewMode);
+						SendMessageToConsole(PlayerController, L"Toggled flight!");
 					}
 				}
 				else
@@ -2170,6 +2209,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 					if (SetMovementModeFn)
 					{
 						CharMovement->ProcessEvent(SetMovementModeFn, &NewMode);
+						SendMessageToConsole(PlayerController, L"Toggled ghost!");
 					}
 				}
 				else
@@ -2259,6 +2299,12 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			}
 
 			Pawn->ProcessEvent(SetMovementSpeedFn, &Speed);
+
+			std::wstringstream ss;
+			ss << std::fixed << std::setprecision(0) << Speed;
+
+			std::wstring Message = L"Speed set to " + ss.str() + L"!\n";
+			SendMessageToConsole(PlayerController, Message.c_str());
 		}
 		else if (Command == "startcreativegame")
 		{
