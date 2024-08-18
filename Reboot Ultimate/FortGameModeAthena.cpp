@@ -1330,7 +1330,7 @@ void AFortGameModeAthena::Athena_HandleStartingNewPlayerHook(AFortGameModeAthena
 			UObject* OverrideBattleBusSkin = nullptr;
 			UClass* OverrideSupplyDropClass = LoadObject<UClass>(L"/Game/Athena/SupplyDrops/AthenaSupplyDrop.AthenaSupplyDrop_C", BGAClass); // wrong for some builds but its ok
 
-			if (Fortnite_Version == 1.11 || Fortnite_Version == 7.30 || Fortnite_Version == 11.31 || Fortnite_Version == 15.10 || Fortnite_Version == 19.10)
+			if (Fortnite_Version == 1.11 || Fortnite_Version >= 7.10 && Fortnite_Version <= 7.30 || Fortnite_Version == 11.31 || Fortnite_Version == 15.10 || Fortnite_Version == 19.01 || Fortnite_Version == 19.10)
 			{
 				OverrideBattleBusSkin = FindObject(L"/Game/Athena/Items/Cosmetics/BattleBuses/BBID_WinterBus.BBID_WinterBus"); // Winterfest
 				OverrideSupplyDropClass = LoadObject<UClass>(L"/Game/Athena/SupplyDrops/AthenaSupplyDrop_Holiday.AthenaSupplyDrop_Holiday_C", BGAClass);
@@ -1352,6 +1352,14 @@ void AFortGameModeAthena::Athena_HandleStartingNewPlayerHook(AFortGameModeAthena
 			else if (Fortnite_Version == 9.30)
 			{
 				OverrideBattleBusSkin = FindObject(L"/Game/Athena/Items/Cosmetics/BattleBuses/BBID_WorldCupBus.BBID_WorldCupBus"); // World Cup
+			}
+			else if (Fortnite_Version == 14.30)
+			{
+				OverrideBattleBusSkin = FindObject(L"/Game/Athena/Items/Cosmetics/BattleBuses/BBID_BusUpgrade1.BBID_BusUpgrade1"); // Stark Bus Upgrade 1
+			}
+			else if (Fortnite_Version == 14.50 || Fortnite_Version == 14.60)
+			{
+				OverrideBattleBusSkin = FindObject(L"/Game/Athena/Items/Cosmetics/BattleBuses/BBID_BusUpgrade2.BBID_BusUpgrade2"); // Stark Bus Upgrade 2
 			}
 
 			if (OverrideBattleBusSkin)
@@ -1548,10 +1556,14 @@ void AFortGameModeAthena::Athena_HandleStartingNewPlayerHook(AFortGameModeAthena
 			static auto headPart = LoadObject("/Game/Characters/CharacterParts/Female/Medium/Heads/F_Med_Head1.F_Med_Head1", CustomCharacterPartClass);
 			static auto bodyPart = LoadObject("/Game/Characters/CharacterParts/Female/Medium/Bodies/F_Med_Soldier_01.F_Med_Soldier_01", CustomCharacterPartClass);
 			static auto backpackPart = LoadObject("/Game/Characters/CharacterParts/Backpacks/NoBackpack.NoBackpack", CustomCharacterPartClass);
+			static auto hatPart = LoadObject("/Game/Characters/CharacterParts/Hats/Empty_None.Empty_None", CustomCharacterPartClass);
+			static auto accessoryPart = LoadObject("/Game/Characters/CharacterParts/FaceAccessories/CP_F_FaceAcc_Empty.CP_F_FaceAcc_Empty", CustomCharacterPartClass);
 
 			Parts[(int)EFortCustomPartType::Head] = headPart;
 			Parts[(int)EFortCustomPartType::Body] = bodyPart;
 			Parts[(int)EFortCustomPartType::Backpack] = backpackPart;
+			Parts[(int)EFortCustomPartType::Hat] = hatPart;
+			Parts[(int)EFortCustomPartType::Face] = accessoryPart;
 
 			static auto OnRep_CharacterPartsFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerState.OnRep_CharacterParts");
 			PlayerStateAthena->ProcessEvent(OnRep_CharacterPartsFn);

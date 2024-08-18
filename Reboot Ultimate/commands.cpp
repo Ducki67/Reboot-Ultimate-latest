@@ -1340,6 +1340,41 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			std::wstring Message = L"Max shield set to " + ss.str() + L"!\n";
 			SendMessageToConsole(PlayerController, Message.c_str());
 		}
+		/*else if (Command == "setbotmaxshield" || Command == "botmaxshield")
+		{
+			AFortPlayerPawnAthena* BotPawn = nullptr;
+
+			if (!ShouldUseAIBotController())
+			{
+				BotPawn = Cast<AFortPlayerPawnAthena>(Controller->GetPawn());
+			}
+			else
+			{
+				BotPawn = Cast<AFortPlayerPawnAthena>(AIBotController->GetPawn());
+			}
+
+			if (!BotPawn)
+			{
+				SendMessageToConsole(PlayerController, L"No bot pawn found!");
+				return;
+			}
+
+			float MaxShield = 0.f;
+
+			if (NumArgs >= 1)
+			{
+				try { MaxShield = std::stof(Arguments[1]); }
+				catch (...) {}
+			}
+
+			BotPawn->SetMaxShield(MaxShield);
+
+			std::wstringstream ss;
+			ss << std::fixed << std::setprecision(0) << MaxShield;
+
+			std::wstring Message = L"Bot max shield set to " + ss.str() + L"!\n";
+			SendMessageToConsole(PlayerController, Message.c_str());
+		}*/
 		else if (Command == "regen")
 		{
 			auto Pawn = ReceivingController->GetMyFortPawn();
@@ -1368,7 +1403,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, L"Applied Siphon Effect!");
 		}
-		else if (Command == "siphon")
+		else if (Command == "siphon" || Command == "amountofhealthshield" || Command == "setsiphon")
 		{
 			float Siphon = 0.f;
 
@@ -1419,6 +1454,19 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				Health.GetMinimum() = 0;
 				SendMessageToConsole(PlayerController, L"God OFF.");
 			}
+		}
+		else if (Command == "oldgod" || Command == "canbedamaged")
+		{
+			auto Pawn = ReceivingController->GetMyFortPawn();
+
+			if (!Pawn)
+			{
+				SendMessageToConsole(PlayerController, L"No pawn!");
+				return;
+			}
+
+			Pawn->SetCanBeDamaged(!Pawn->CanBeDamaged());
+			SendMessageToConsole(PlayerController, std::wstring(L"God set to " + std::to_wstring(!(bool)Pawn->CanBeDamaged())).c_str());
 		}
 		else if (Command == "spawnaifromclass")
 		{
@@ -1997,7 +2045,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else
 				SendMessageToConsole(PlayerController, L"Summoned at zone center!");
 		}
-		else if (Command == "togglemarktoteleport" || Command == "togglemarktotp" || Command == "markertp")
+		else if (Command == "marktoteleport" || Command == "marktotp" || Command == "markertp" || Command == "marktp")
 		{
 			auto Pawn = ReceivingController->GetMyFortPawn();
 
@@ -2797,7 +2845,16 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				WorldInventory->AddItem(WoodItemData, nullptr, (std::rand() % 646) + 186);
 				WorldInventory->AddItem(StoneItemData, nullptr, (std::rand() % 646) + 186);
 				WorldInventory->AddItem(MetalItemData, nullptr, (std::rand() % 646) + 186);
-				WorldInventory->AddItem(Gold, nullptr, (std::rand() % 7500) + 1200);
+
+				if (Fortnite_Version < 15)
+				{
+					WorldInventory->AddItem(Gold, nullptr, (std::rand() % 7500) + 1200);
+				}
+				else
+				{
+					WorldInventory->AddItem(Gold, nullptr, Gold->GetMaxStackSize());
+				}
+
 				WorldInventory->AddItem(Primary, nullptr, 1);
 				WorldInventory->AddItem(Secondary, nullptr, 1);
 				WorldInventory->AddItem(Tertiary, nullptr, 1);
@@ -2823,6 +2880,43 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			SendMessageToConsole(PlayerController, L"Randomized all player loadouts!\n");
 		}
 		else if (Command == "godall")
+		{
+			for (int i = 0; i < ClientConnections.Num(); i++)
+			{
+				auto Pawn = ReceivingController->GetMyFortPawn();
+
+				if (!Pawn)
+				{
+					SendMessageToConsole(PlayerController, L"No pawn!");
+					return;
+				}
+
+				float MaxHealth = Pawn->GetMaxHealth();
+
+				auto HealthSet = Pawn->GetHealthSet();
+
+				if (!HealthSet)
+				{
+					SendMessageToConsole(PlayerController, L"No HealthSet!");
+					return;
+				}
+
+				static auto HealthOffset = HealthSet->GetOffset("Health");
+				auto& Health = HealthSet->Get<FFortGameplayAttributeData>(HealthOffset);
+
+				if (Health.GetMinimum() != MaxHealth)
+				{
+					Health.GetMinimum() = MaxHealth;
+					SendMessageToConsole(PlayerController, L"God of all players ON.");
+				}
+				else
+				{
+					Health.GetMinimum() = 0;
+					SendMessageToConsole(PlayerController, L"God of all players OFF.");
+				}
+			}
+		}
+		else if (Command == "oldgodall" || Command == "canbedamagedall")
 		{
 			for (int i = 0; i < ClientConnections.Num(); i++)
 			{

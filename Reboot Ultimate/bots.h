@@ -287,9 +287,6 @@ public:
 		AFortPlayerStateAthena* KillerPlayerState = nullptr;
 		AFortPawn* KillerPawn = nullptr;
 
-		auto DeadPawn = Cast<AFortPlayerPawn>(Controller->GetPawn());
-		auto DeadPlayerState = Cast<AFortPlayerStateAthena>(Controller->GetPlayerState());
-
 		if (KillerState)
 		{
 			KillerController = Cast<AFortPlayerControllerAthena>(KillerState->GetOwner());

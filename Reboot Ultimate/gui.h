@@ -60,7 +60,6 @@
 #define DUMP_TAB 9
 #define UNBAN_TAB 10
 #define FUN_TAB 11
-#define LATEGAME_TAB 12
 #define DEVELOPER_TAB 13
 #define DEBUGLOG_TAB 14
 #define SETTINGS_TAB 15
@@ -131,6 +130,11 @@ static inline void SetIsLategame(bool Value)
 static inline bool HasAnyCalendarModification()
 {
 	return Calendar::HasSnowModification() || Calendar::HasNYE() || std::floor(Fortnite_Version) == 13;
+}
+
+static inline bool TrickshotTabCheck()
+{
+	return std::floor(Fortnite_Version) == 8 || std::floor(Fortnite_Version) == 19;
 }
 
 static inline void Restart() // todo move?
@@ -681,7 +685,7 @@ static inline void MainTabs()
 			ImGui::EndTabItem();
 		}
 
-		if (ImGui::BeginTabItem("Trickshot"))
+		if (TrickshotTabCheck() && ImGui::BeginTabItem("Trickshot"))
 		{
 			Tab = TRICKSHOT_TAB;
 			PlayerTab = -1;
@@ -700,14 +704,6 @@ static inline void MainTabs()
 		if (ImGui::BeginTabItem("Fun"))
 		{
 			Tab = FUN_TAB;
-			PlayerTab = -1;
-			bInformationTab = false;
-			ImGui::EndTabItem();
-		}
-
-		if (Globals::bLateGame.load() && ImGui::BeginTabItem("Lategame"))
-		{
-			Tab = LATEGAME_TAB;
 			PlayerTab = -1;
 			bInformationTab = false;
 			ImGui::EndTabItem();
@@ -1330,7 +1326,7 @@ static inline void MainUI()
 
 		else if (Tab == TRICKSHOT_TAB)
 		{
-			if (Fortnite_Version == 8)
+			if (std::floor(Fortnite_Version) == 8)
 			{
 				ImGui::Checkbox("Enable Cannon Animations", &bEnableCannonAnimations);
 
@@ -1345,7 +1341,7 @@ static inline void MainUI()
 				}
 			}
 
-			if (Fortnite_Version >= 19.01)
+			if (std::floor(Fortnite_Version) == 19)
 			{
 				ImGui::Checkbox("Toggle Victory Crown Slowmo", &Globals::bCrownSlowmo);
 			}
@@ -1382,6 +1378,17 @@ static inline void MainUI()
 				{
 					SafeZoneIndicator->SkipShrinkSafeZone();
 				}
+			}
+
+			if (bEnableReverseZone)
+				ImGui::Text(std::format("Currently {}eversing zone", bZoneReversing ? "R" : "Not R").c_str());
+
+			ImGui::Checkbox("Enable Reverse Zone (EXPERIMENTAL)", &bEnableReverseZone);
+
+			if (bEnableReverseZone)
+			{
+				ImGui::InputInt("Start Reversing Phase", &StartReverseZonePhase);
+				ImGui::InputInt("End Reversing Phase", &EndReverseZonePhase);
 			}
 		}
 
@@ -1614,19 +1621,6 @@ static inline void MainUI()
 						CurrentPlaylist->GetRespawnType() = (EAthenaRespawnType)bRespawning;
 					}
 				}
-			}
-		}
-		else if (Tab == LATEGAME_TAB)
-		{
-			if (bEnableReverseZone)
-				ImGui::Text(std::format("Currently {}eversing zone", bZoneReversing ? "r" : "not r").c_str());
-
-			ImGui::Checkbox("Enable Reverse Zone (EXPERIMENTAL)", &bEnableReverseZone);
-
-			if (bEnableReverseZone)
-			{
-				ImGui::InputInt("Start Reversing Phase", &StartReverseZonePhase);
-				ImGui::InputInt("End Reversing Phase", &EndReverseZonePhase);
 			}
 		}
 		else if (Tab == DEVELOPER_TAB)

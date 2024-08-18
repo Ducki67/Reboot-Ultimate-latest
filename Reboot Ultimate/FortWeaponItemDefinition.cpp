@@ -70,7 +70,7 @@ int UFortWeaponItemDefinition::GetInitialClips()
 
 void UFortWeaponItemDefinition::RemoveGrantedWeaponAbilities(AFortPlayerControllerAthena* PlayerController)
 {
-	if (Fortnite_Version < 14)
+	if (Fortnite_Version < 14 && Fortnite_Version < 17)
 		return;
 
 	auto EquippedAbilitySet = this->GetEquippedAbilitySet();
@@ -131,16 +131,16 @@ void UFortWeaponItemDefinition::RemoveGrantedWeaponAbilities(AFortPlayerControll
 		FGameplayAbilitySpec* AbilitySpec = nullptr;
 
 		auto CompareAbilities = [&AbilitySpec, &Ability](FGameplayAbilitySpec* Spec)
-		{
-			auto CurrentAbility = Spec->GetAbility();
-
-			// LOG_INFO(LogDev, "CurrentAbility->ClassPrivate->GetName(): {}, Ability->GetName(): {}", CurrentAbility->ClassPrivate->GetName(), Ability->GetName());
-
-			if (CurrentAbility->ClassPrivate->GetName() == Ability->GetName())
 			{
-				AbilitySpec = Spec;
-			}
-		};
+				auto CurrentAbility = Spec->GetAbility();
+
+				// LOG_INFO(LogDev, "CurrentAbility->ClassPrivate->GetName(): {}, Ability->GetName(): {}", CurrentAbility->ClassPrivate->GetName(), Ability->GetName());
+
+				if (CurrentAbility->ClassPrivate->GetName() == Ability->GetName())
+				{
+					AbilitySpec = Spec;
+				}
+			};
 
 		LoopSpecs(AbilitySystemComponent, CompareAbilities);
 
@@ -158,7 +158,7 @@ void UFortWeaponItemDefinition::RemoveGrantedWeaponAbilities(AFortPlayerControll
 
 void UFortWeaponItemDefinition::GiveGrantedWeaponAbilities(AFortPlayerControllerAthena* PlayerController)
 {
-	if (Fortnite_Version < 14)
+	if (Fortnite_Version < 14 && Fortnite_Version < 17)
 		return;
 
 	auto EquippedAbilitySet = this->GetEquippedAbilitySet();
@@ -166,7 +166,7 @@ void UFortWeaponItemDefinition::GiveGrantedWeaponAbilities(AFortPlayerController
 
 	auto PlayerState = PlayerController->GetPlayerStateAthena();
 	auto AbilitySystemComponent = PlayerState->GetAbilitySystemComponent();
-	
+
 	if (EquippedAbilitySet.Get())
 		EquippedAbilitySet.Get()->GiveToAbilitySystem(AbilitySystemComponent);
 
