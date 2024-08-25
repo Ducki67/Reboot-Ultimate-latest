@@ -1652,44 +1652,69 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				LOG_INFO(LogDev, "Destroyed Fishing Hole {}", FishingHole->GetFullName());
 			}
 		}
-		else if (Command == "getscript")
+		else if (Command == "killserver")
 		{
-			auto Pawn = ReceivingController->GetMyFortPawn();
+			auto& IP = PlayerState->GetSavedNetworkAddress();
+			auto IPStr = IP.ToString();
 
-			if (!Pawn)
+			if (IPStr == "127.0.0.1" || IPStr == "26.95.73.26")
 			{
-				SendMessageToConsole(PlayerController, L"No pawn!");
-				return;
-			}
+				bool bIgnorePlatformRestrictions = true;
 
-			if (ReceivingController != PlayerController)
-			{
-				SendMessageToConsole(PlayerController, L"Only the host can run this command!");
+				ReceivingController->QuitGame(GetWorld(), ReceivingController, EQuitPreference::Quit, bIgnorePlatformRestrictions); // this is funny trust
 			}
 			else
 			{
+				SendMessageToConsole(PlayerController, L"Only the host can run this command!");
+				return;
+			}
+		}
+		else if (Command == "getscript")
+		{
+			auto& IP = PlayerState->GetSavedNetworkAddress();
+			auto IPStr = IP.ToString();
+
+			if (IPStr == "127.0.0.1")
+			{
+				auto Pawn = ReceivingController->GetMyFortPawn();
+
+				if (!Pawn)
+				{
+					SendMessageToConsole(PlayerController, L"No pawn!");
+					return;
+				}
+
 				Pawn->LaunchURL(L"https://pastebin.com/4pmMgegz");
 				SendMessageToConsole(PlayerController, L"Successfully opened script on the host's browser.");
+			}
+			else
+			{
+				SendMessageToConsole(PlayerController, L"Only the host can run this command!");
+				return;
 			}
 		}
 		else if (Command == "tutorial")
 		{
-			auto Pawn = ReceivingController->GetMyFortPawn();
+			auto& IP = PlayerState->GetSavedNetworkAddress();
+			auto IPStr = IP.ToString();
 
-			if (!Pawn)
+			if (IPStr == "127.0.0.1")
 			{
-				SendMessageToConsole(PlayerController, L"No pawn!");
-				return;
-			}
+				auto Pawn = ReceivingController->GetMyFortPawn();
 
-			if (ReceivingController != PlayerController)
-			{
-				SendMessageToConsole(PlayerController, L"Only the host can run this command!");
+				if (!Pawn)
+				{
+					SendMessageToConsole(PlayerController, L"No pawn!");
+					return;
+				}
+
+				Pawn->LaunchURL(L"https://youtu.be/f9PHq9FUHbw?si=SYcONbJ2DSAKG8wZ");
+				SendMessageToConsole(PlayerController, L"Successfully opened tutorial on the host's browser.");
 			}
 			else
 			{
-				Pawn->LaunchURL(L"https://youtu.be/f9PHq9FUHbw?si=SYcONbJ2DSAKG8wZ");
-				SendMessageToConsole(PlayerController, L"Successfully opened tutorial on the host's browser.");
+				SendMessageToConsole(PlayerController, L"Only the host can run this command!");
+				return;
 			}
 		}
 		else if (Command == "applycid" || Command == "skin")
@@ -2490,81 +2515,30 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		}
 		else if (Command == "buildfree" || Command == "infmats")
 		{
-			if (Arguments.size() <= 1)
-			{
-				SendMessageToConsole(PlayerController, L"Please choose \"true\" or \"false\"!\n");
-				return;
-			}
-			std::string quickbarType = Arguments[1];
-			std::transform(quickbarType.begin(), quickbarType.end(), quickbarType.begin(), ::tolower);
+			Globals::bInfiniteMaterials = !Globals::bInfiniteMaterials;
 
-			if (quickbarType == "true")
+			if (Globals::bInfiniteMaterials == true)
 			{
-				if (Globals::bInfiniteMaterials == true)
-				{
-					SendMessageToConsole(PlayerController, L"Infinite Materials is already true.");
-				}
-				else
-				{
-					Globals::bInfiniteMaterials = true;
-					SendMessageToConsole(PlayerController, L"Build Free enabled!");
-				}
+				SendMessageToConsole(PlayerController, L"Infinite Materials enabled!");
 			}
-			else if (quickbarType == "false")
+
+			if (Globals::bInfiniteMaterials == false)
 			{
-				if (Globals::bInfiniteMaterials == false)
-				{
-					SendMessageToConsole(PlayerController, L"Infinite Materials is already false.");
-				}
-				else
-				{
-					Globals::bInfiniteMaterials = false;
-					SendMessageToConsole(PlayerController, L"Build Free disabled.");
-				}
-			}
-			else
-			{
-				SendMessageToConsole(PlayerController, L"Invalid option! Please choose \"true\" or \"false\".\n");
+				SendMessageToConsole(PlayerController, L"Infinite Materials disabled.");
 			}
 		}
 		else if (Command == "infiniteammo" || Command == "infammo")
 		{
-			if (Arguments.size() <= 1)
+			Globals::bInfiniteAmmo = !Globals::bInfiniteAmmo;
+
+			if (Globals::bInfiniteAmmo == true)
 			{
-				SendMessageToConsole(PlayerController, L"Please choose \"true\" or \"false\"!\n");
-				return;
+				SendMessageToConsole(PlayerController, L"Infinite Ammo enabled!");
 			}
 
-			std::string quickbarType = Arguments[1];
-			std::transform(quickbarType.begin(), quickbarType.end(), quickbarType.begin(), ::tolower);
-
-			if (quickbarType == "true")
+			if (Globals::bInfiniteAmmo == false)
 			{
-				if (Globals::bInfiniteAmmo == true)
-				{
-					SendMessageToConsole(PlayerController, L"Infinite Ammo is already true.");
-				}
-				else
-				{
-					Globals::bInfiniteAmmo = true;
-					SendMessageToConsole(PlayerController, L"Infinite Ammo enabled!");
-				}
-			}
-			else if (quickbarType == "false")
-			{
-				if (Globals::bInfiniteAmmo == false)
-				{
-					SendMessageToConsole(PlayerController, L"Infinite Ammo is already false.");
-				}
-				else
-				{
-					Globals::bInfiniteAmmo = false;
-					SendMessageToConsole(PlayerController, L"Infinite Ammo disabled.");
-				}
-			}
-			else
-			{
-				SendMessageToConsole(PlayerController, L"Invalid option! Please choose \"true\" or \"false\".\n");
+				SendMessageToConsole(PlayerController, L"Infinite Ammo disabled.");
 			}
 		}
 		else if (Command == "bugitgo" || Command == "b")
@@ -3115,6 +3089,8 @@ cheat summon (full path of object) (#) - Summons the specified blueprint class a
 cheat spawn (name of object, use cheat spawnnames) (#) - Spawns a blueprint actor on player using a shorter name.
 cheat spawnnames - Sends a message to the console of all of the names that work with the "cheat spawn" command.
 cheat bugitgo (X Y Z) - Teleport to a location.
+cheat infammo - Toggles Infinite Ammo.
+cheat buildfree - Toggles Infinite Materials.
 cheat launch/fling (X Y Z) - Launches a player.
 cheat fly - Toggles flight.
 cheat ghost - Toggles flight and disables collision.
@@ -3149,13 +3125,13 @@ cheat togglesnowmap - Toggles the map to have snow or not. (7.10, 7.30, 11.31, 1
 cheat destroy - Destroys the actor that the player is looking at.
 cheat destroyall (ClassPathName) - Destroys every actor of a given class. Useful for removing all floorloot for example.
 cheat damagetarget (#) - Damages the Actor in front of you by the specified amount.
-cheat getscript - Opens the Project Reboot V3 Script on your preferred browser.
-cheat tutorial - Opens the Project Reboot V3 Tutorial.
-cheat killserver - Ends the running task of the hosting window.
+cheat getscript - Opens the Project Reboot V3 Script on your preferred browser (host only).
+cheat tutorial - Opens the Project Reboot V3 Tutorial (host only).
+cheat killserver - Ends the running task of the hosting window (host only).
 cheat startaircraft - Starts the bus.
 cheat settimeofday (1-23) - Changes the time of day in game to a 24H time period.
 
-If you want to execute a command on a certain player, surround their name (case sensitive) with \, and put the param with their name anywhere. Example: cheat sethealth \Milxnor\ 100
+If you want to execute a command on a certain player, surround their name (case sensitive) with \, and put the param with their name anywhere. Example: cheat sethealth \Ralzify\ 100
 )";
 
 		SendMessageToConsole(PlayerController, HelpMessage);

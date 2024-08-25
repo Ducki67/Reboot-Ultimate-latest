@@ -11,6 +11,13 @@
 #include "SoftClassPtr.h"
 #include "FortScriptedAction.h"
 
+enum class EQuitPreference : uint8
+{
+	Quit = 0,
+	Background = 1,
+	EQuitPreference_MAX = 2,
+};
+
 static void ApplyHID(AFortPlayerPawn* Pawn, UObject* HeroDefinition, bool bUseServerChoosePart = false, EFortCustomGender CustomGender = EFortCustomGender::Invalid)
 {
 	using UFortHeroSpecialization = UObject;
@@ -573,6 +580,21 @@ public:
 
 		static auto bMarkedAliveFieldMask = GetFieldMask(GetProperty("bMarkedAlive"));
 		return ReadBitfieldValue(bMarkedAliveOffset, bMarkedAliveFieldMask);
+	}
+
+	void QuitGame(class UObject* WorldContextObject, class APlayerController* SpecificPlayer, enum class EQuitPreference QuitPreference, bool bIgnorePlatformRestrictions)
+	{
+		auto QuitGameFn = FindObject<UFunction>("/Script/Engine.KismetSystemLibrary.QuitGame");
+
+		struct
+		{
+			class UObject* WorldContextObject;																	//(Parm, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash, NativeAccessSpecifierPublic)
+			class APlayerController*			SpecificPlayer;                                                   //(Parm, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash, NativeAccessSpecifierPublic)
+			enum class EQuitPreference         QuitPreference;                                                   //(Parm, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash, NativeAccessSpecifierPublic)
+			bool                               bIgnorePlatformRestrictions;                                      //(Parm, ZeroConstructor, IsPlainOldData, NoDestructor, HasGetValueTypeHash, NativeAccessSpecifierPublic)
+		}UKismetSystemLibrary_QuitGame_Params{ WorldContextObject , SpecificPlayer , QuitPreference , bIgnorePlatformRestrictions };
+
+		this->ProcessEvent(QuitGameFn, &UKismetSystemLibrary_QuitGame_Params);
 	}
 
 	static void StartGhostModeHook(UObject* Context, FFrame* Stack, void* Ret); // we could native hook this but eh

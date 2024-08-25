@@ -134,7 +134,7 @@ static inline bool HasAnyCalendarModification()
 
 static inline bool TrickshotTabCheck()
 {
-	return std::floor(Fortnite_Version) == 8 || std::floor(Fortnite_Version) == 19;
+	return std::floor(Fortnite_Version) == 8 || std::floor(Fortnite_Version) == 19 || std::floor(Fortnite_Version >= 11 && Fortnite_Version <= 17);
 }
 
 static inline void Restart() // todo move?
@@ -1341,6 +1341,13 @@ static inline void MainUI()
 				}
 			}
 
+			if (std::floor(Fortnite_Version >= 11 && Fortnite_Version <= 15))
+			{
+				Globals::bBotSwags = true;
+
+				if (ImGui::Checkbox("Toggle Bot PC (May Crash Some Versions)", &Globals::bBotSwags));
+			}
+
 			if (std::floor(Fortnite_Version) == 19)
 			{
 				ImGui::Checkbox("Toggle Victory Crown Slowmo", &Globals::bCrownSlowmo);
@@ -1379,6 +1386,8 @@ static inline void MainUI()
 					SafeZoneIndicator->SkipShrinkSafeZone();
 				}
 			}
+
+			ImGui::NewLine;
 
 			if (bEnableReverseZone)
 				ImGui::Text(std::format("Currently {}eversing zone", bZoneReversing ? "R" : "Not R").c_str());
@@ -1786,7 +1795,7 @@ static inline void MainUI()
 		}
 		else if (Tab == SETTINGS_TAB)
 		{
-			if (ImGui::Checkbox("Use Custom Lootpool (EXPERIMENTAL)", &Globals::bCustomLootpool))
+			/*if (ImGui::Checkbox("Use Custom Lootpool (EXPERIMENTAL)", &Globals::bCustomLootpool))
 			{
 				if (Globals::bCustomLootpool)
 				{
@@ -1897,7 +1906,7 @@ static inline void MainUI()
 				{
 					CustomLootpoolMap.clear();
 				}
-			}
+			}*/
 		}
 	}
 }
