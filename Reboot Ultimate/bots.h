@@ -27,7 +27,7 @@ public:
 
 	static bool ShouldUseAIBotController()
 	{
-		return Fortnite_Version >= 11 && Engine_Version < 500 && Globals::bBotSwags == false;
+		return Fortnite_Version >= 11 && Engine_Version < 500 && Globals::bBotSwags == true;
 	}
 
 	void PickRandomLoadout()

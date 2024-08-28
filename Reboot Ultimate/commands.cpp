@@ -1852,7 +1852,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				ActorName = "/Game/Athena/DrivableVehicles/Meatball/Meatball_Large/MeatballVehicle_L.MeatballVehicle_L_C";
 			else if (ActorName == "heli" || ActorName == "helicopter")
 				ActorName = "/Hoagie/HoagieVehicle.HoagieVehicle_C";
-			else if (ActorName == "ufo")
+			else if (ActorName == "ufo" || ActorName == "alien")
 				ActorName = "/Nevada/Blueprints/Vehicle/Nevada_Vehicle_V2.Nevada_Vehicle_V2_C";
 			else if (ActorName == "shark")
 				ActorName = "/SpicySake/Pawns/NPC_Pawn_SpicySake_Parent.NPC_Pawn_SpicySake_Parent_C";
@@ -1916,16 +1916,15 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 					if (!NewActor)
 					{
-						SendMessageToConsole(PlayerController, (L"Failed to spawn a{}!", (SpawnBots ? L" bot" : L"n actor!")));
+						SendMessageToConsole(PlayerController, (L"Failed to spawn actor!"));
 					}
 					else
 					{
 						NewActor->ForceNetUpdate();
 						AmountSpawned++;
+						SendMessageToConsole(PlayerController, L"Summoned!");
 					}
 				}
-
-				SendMessageToConsole(PlayerController, L"Summoned!");
 			}
 			else
 			{

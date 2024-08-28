@@ -134,7 +134,7 @@ static inline bool HasAnyCalendarModification()
 
 static inline bool TrickshotTabCheck()
 {
-	return std::floor(Fortnite_Version) == 8 || std::floor(Fortnite_Version) == 19 || std::floor(Fortnite_Version >= 11 && Fortnite_Version <= 17);
+	return std::floor(Fortnite_Version) == 8 || std::floor(Fortnite_Version) == 19;
 }
 
 static inline void Restart() // todo move?
@@ -599,6 +599,11 @@ static inline void StaticUI()
 	if (Addresses::ApplyGadgetData && Addresses::RemoveGadgetData && Engine_Version < 424)
 	{
 		ImGui::Checkbox("Enable Gadgets", &Globals::bEnableAGIDs);
+	}
+
+	if (std::floor(Fortnite_Version > 10 && Fortnite_Version < 18) && !Globals::bStartedListening)
+	{
+		if (ImGui::Checkbox("Toggle Bot PC", &Globals::bBotSwags));
 	}
 }
 
@@ -1339,13 +1344,6 @@ static inline void MainUI()
 					ImGui::InputFloat("Y", CannonYMultiplier);
 					ImGui::InputFloat("Z", CannonZMultiplier);
 				}
-			}
-
-			if (std::floor(Fortnite_Version >= 11 && Fortnite_Version <= 15))
-			{
-				Globals::bBotSwags = true;
-
-				if (ImGui::Checkbox("Toggle Bot PC (May Crash Some Versions)", &Globals::bBotSwags));
 			}
 
 			if (std::floor(Fortnite_Version) == 19)
