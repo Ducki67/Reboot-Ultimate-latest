@@ -136,7 +136,7 @@ void UFortWeaponItemDefinition::RemoveGrantedWeaponAbilities(AFortPlayerControll
 
 				// LOG_INFO(LogDev, "CurrentAbility->ClassPrivate->GetName(): {}, Ability->GetName(): {}", CurrentAbility->ClassPrivate->GetName(), Ability->GetName());
 
-				if (CurrentAbility->ClassPrivate->GetName() == Ability->GetName())
+				if (CurrentAbility->ClassPrivate == Ability)
 				{
 					AbilitySpec = Spec;
 				}

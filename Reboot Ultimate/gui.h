@@ -706,7 +706,7 @@ static inline void MainTabs()
 			ImGui::EndTabItem();
 		}
 
-		if (ImGui::BeginTabItem("Fun"))
+		if (ImGui::BeginTabItem("Extra"))
 		{
 			Tab = FUN_TAB;
 			PlayerTab = -1;
@@ -724,13 +724,13 @@ static inline void MainTabs()
 		}
 #endif
 
-		if (ImGui::BeginTabItem(("Settings")))
+		/*if (ImGui::BeginTabItem(("Settings")))
 		{
 			Tab = SETTINGS_TAB;
 			PlayerTab = -1;
 			bInformationTab = false;
 			ImGui::EndTabItem();
-		}
+		}*/
 
 		// maybe a Replication Stats for >3.3?
 

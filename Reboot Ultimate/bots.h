@@ -228,9 +228,13 @@ public:
 			Pawn = BotManager->GetCachedBotMutator()->SpawnBot(PawnClass, SpawnActor, SpawnTransform.Translation, SpawnTransform.Rotation.Rotator(), false);
 
 			if (Fortnite_Version < 17)
+			{
 				AIBotController = Cast<AFortAthenaAIBotController>(Pawn->GetController());
+			}
 			else
+			{
 				AIBotController = GetWorld()->SpawnActor<AFortAthenaAIBotController>(Pawn->GetAIControllerClass());
+			}
 
 			PlayerState = Cast<AFortPlayerStateAthena>(AIBotController->GetPlayerState());
 		}
