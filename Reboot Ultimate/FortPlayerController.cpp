@@ -353,15 +353,9 @@ void AFortPlayerController::ServerExecuteInventoryItemHook(AFortPlayerController
 		{
 			LOG_INFO(LogDev, "Should unequip trap!");
 
-			LOG_INFO(LogDev, "Pawn->GetCurrentWeapon()->GetItemEntryGuid(): {}", Pawn->GetCurrentWeapon()->GetItemEntryGuid().ToString());
-			LOG_INFO(LogDev, "ItemGuid: {}", ItemGuid.ToString());
-			LOG_INFO(LogDev, "ItemDefinition: {}", ItemDefinition->GetFullName());
-			LOG_INFO(LogDev, "ItemInstance->GetItemEntry()->GetItemGuid(): {}", ItemInstance->GetItemEntry()->GetItemGuid().ToString());
-
 			Pawn->GetCurrentWeapon()->GetItemEntryGuid() = ItemGuid;
 			Pawn->EquipWeaponDefinition((UFortWeaponItemDefinition*)ItemDefinition, ItemInstance->GetItemEntry()->GetItemGuid());
 
-			LOG_INFO(LogDev, "Pawn->GetCurrentWeapon()->GetItemEntryGuid(): {}", Pawn->GetCurrentWeapon()->GetItemEntryGuid().ToString());
 			LOG_INFO(LogDev, "Pawn->GetCurrentWeapon()->GetFullName(): {}", Pawn->GetCurrentWeapon()->GetFullName());
 		}
 	}
@@ -370,16 +364,19 @@ void AFortPlayerController::ServerExecuteInventoryItemHook(AFortPlayerController
 
 	static auto FortGadgetItemDefinitionClass = FindObject<UClass>(L"/Script/FortniteGame.FortGadgetItemDefinition");
 
-	if (OldItemDefinition && !OldItemDefinition->IsA(FortGadgetItemDefinitionClass))
+	if (Fortnite_Version >= 14)
 	{
-		if (auto OldWeaponItemDefinition = Cast<UFortWeaponItemDefinition>(OldItemDefinition))
-			OldWeaponItemDefinition->RemoveGrantedWeaponAbilities(Cast<AFortPlayerControllerAthena>(PlayerController));
-	}
+		if (OldItemDefinition && !OldItemDefinition->IsA(FortGadgetItemDefinitionClass))
+		{
+			if (auto OldWeaponItemDefinition = Cast<UFortWeaponItemDefinition>(OldItemDefinition))
+				OldWeaponItemDefinition->RemoveGrantedWeaponAbilities(Cast<AFortPlayerControllerAthena>(PlayerController));
+		}
 
-	if (!ItemDefinition->IsA(FortGadgetItemDefinitionClass))
-	{
-		if (auto WeaponItemDefinition = Cast<UFortWeaponItemDefinition>(ItemDefinition))
-			WeaponItemDefinition->GiveGrantedWeaponAbilities(Cast<AFortPlayerControllerAthena>(PlayerController));
+		if (!ItemDefinition->IsA(FortGadgetItemDefinitionClass))
+		{
+			if (auto WeaponItemDefinition = Cast<UFortWeaponItemDefinition>(ItemDefinition))
+				WeaponItemDefinition->GiveGrantedWeaponAbilities(Cast<AFortPlayerControllerAthena>(PlayerController));
+		}
 	}
 
 	UFortGadgetItemDefinition* GadgetItemDefinition = Cast<UFortGadgetItemDefinition>(ItemDefinition);

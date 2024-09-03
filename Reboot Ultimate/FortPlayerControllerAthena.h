@@ -3,7 +3,6 @@
 #include "FortPlayerController.h"
 #include "FortPlayerStateAthena.h"
 #include "FortPlayerPawn.h"
-#include "SoftObjectPtr.h"
 #include "FortKismetLibrary.h"
 #include "AthenaMarkerComponent.h"
 #include "FortVolume.h"

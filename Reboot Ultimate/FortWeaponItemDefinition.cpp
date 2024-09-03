@@ -68,35 +68,72 @@ int UFortWeaponItemDefinition::GetInitialClips()
 	return *(int*)(__int64(Row) + InitialClipsOffset);
 }
 
+UFortWorldItemDefinition* UFortWeaponItemDefinition::GetAmmoData()
+{
+	static auto AmmoDataOffset = GetOffset("AmmoData");
+	auto AmmoData = GetPtr<TSoftObjectPtr<UFortWorldItemDefinition>>(AmmoDataOffset);
+	return AmmoData->Get();
+}
+
 void UFortWeaponItemDefinition::RemoveGrantedWeaponAbilities(AFortPlayerControllerAthena* PlayerController)
 {
-	if (Fortnite_Version < 14 && Fortnite_Version < 17)
-		return;
-
-	auto EquippedAbilitySet = this->GetEquippedAbilitySet();
-	auto EquippedAbilities = this->GetEquippedAbilities();
-
-	auto PlayerState = PlayerController->GetPlayerStateAthena();
-	auto AbilitySystemComponent = PlayerState->GetAbilitySystemComponent();
-
-	if (EquippedAbilitySet.Get())
+	if (Fortnite_Version >= 14 && Fortnite_Version < 17)
 	{
-		auto GrantedGameplayEffects = EquippedAbilitySet.Get()->GetGrantedGameplayEffects();
-		auto GameplayAbilities = EquippedAbilitySet.Get()->GetGameplayAbilities();
+		auto EquippedAbilitySet = this->GetEquippedAbilitySet();
+		auto EquippedAbilities = this->GetEquippedAbilities();
 
-		for (int i = 0; i < GrantedGameplayEffects->Num(); i++)
+		auto PlayerState = PlayerController->GetPlayerStateAthena();
+		auto AbilitySystemComponent = PlayerState->GetAbilitySystemComponent();
+
+		if (EquippedAbilitySet.Get())
 		{
-			auto& EffectToGrant = GrantedGameplayEffects->at(i, FGameplayEffectApplicationInfoHard::GetStructSize());
+			auto GrantedGameplayEffects = EquippedAbilitySet.Get()->GetGrantedGameplayEffects();
+			auto GameplayAbilities = EquippedAbilitySet.Get()->GetGameplayAbilities();
 
-			if (!EffectToGrant.GameplayEffect)
-				continue;
+			for (int i = 0; i < GrantedGameplayEffects->Num(); i++)
+			{
+				auto& EffectToGrant = GrantedGameplayEffects->at(i, FGameplayEffectApplicationInfoHard::GetStructSize());
 
-			AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(EffectToGrant.GameplayEffect, 1, AbilitySystemComponent);
+				if (!EffectToGrant.GameplayEffect)
+					continue;
+
+				AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(EffectToGrant.GameplayEffect, 1, AbilitySystemComponent);
+			}
+
+			for (int i = 0; i < GameplayAbilities->Num(); i++)
+			{
+				auto Ability = GameplayAbilities->at(i);
+				FGameplayAbilitySpec* AbilitySpec = nullptr;
+
+				auto CompareAbilities = [&AbilitySpec, &Ability](FGameplayAbilitySpec* Spec)
+					{
+						auto CurrentAbility = Spec->GetAbility();
+
+						// LOG_INFO(LogDev, "CurrentAbility->ClassPrivate->GetName(): {}, Ability->GetName(): {}", CurrentAbility->ClassPrivate->GetName(), Ability->GetName());
+
+						if (CurrentAbility->ClassPrivate->GetName() == Ability->GetName())
+						{
+							AbilitySpec = Spec;
+						}
+					};
+
+				LoopSpecs(AbilitySystemComponent, CompareAbilities);
+
+				if (!AbilitySpec)
+					continue;
+
+				LOG_INFO(LogDev, "Removing Ability {}", Ability->GetName());
+
+				AbilitySystemComponent->ClientCancelAbility(AbilitySpec->GetHandle(), AbilitySpec->GetActivationInfo());
+				AbilitySystemComponent->ClientEndAbility(AbilitySpec->GetHandle(), AbilitySpec->GetActivationInfo());
+				AbilitySystemComponent->ServerEndAbility(AbilitySpec->GetHandle(), AbilitySpec->GetActivationInfo(), nullptr);
+				AbilitySystemComponent->ClearAbility(AbilitySpec->GetHandle());
+			}
 		}
 
-		for (int i = 0; i < GameplayAbilities->Num(); i++)
+		for (int i = 0; i < EquippedAbilities.Num(); i++)
 		{
-			auto Ability = GameplayAbilities->at(i);
+			auto Ability = EquippedAbilities.at(i).Get();
 			FGameplayAbilitySpec* AbilitySpec = nullptr;
 
 			auto CompareAbilities = [&AbilitySpec, &Ability](FGameplayAbilitySpec* Spec)
@@ -105,7 +142,7 @@ void UFortWeaponItemDefinition::RemoveGrantedWeaponAbilities(AFortPlayerControll
 
 					// LOG_INFO(LogDev, "CurrentAbility->ClassPrivate->GetName(): {}, Ability->GetName(): {}", CurrentAbility->ClassPrivate->GetName(), Ability->GetName());
 
-					if (CurrentAbility->ClassPrivate->GetName() == Ability->GetName())
+					if (CurrentAbility->ClassPrivate == Ability)
 					{
 						AbilitySpec = Spec;
 					}
@@ -124,43 +161,10 @@ void UFortWeaponItemDefinition::RemoveGrantedWeaponAbilities(AFortPlayerControll
 			AbilitySystemComponent->ClearAbility(AbilitySpec->GetHandle());
 		}
 	}
-
-	for (int i = 0; i < EquippedAbilities.Num(); i++)
-	{
-		auto Ability = EquippedAbilities.at(i).Get();
-		FGameplayAbilitySpec* AbilitySpec = nullptr;
-
-		auto CompareAbilities = [&AbilitySpec, &Ability](FGameplayAbilitySpec* Spec)
-			{
-				auto CurrentAbility = Spec->GetAbility();
-
-				// LOG_INFO(LogDev, "CurrentAbility->ClassPrivate->GetName(): {}, Ability->GetName(): {}", CurrentAbility->ClassPrivate->GetName(), Ability->GetName());
-
-				if (CurrentAbility->ClassPrivate == Ability)
-				{
-					AbilitySpec = Spec;
-				}
-			};
-
-		LoopSpecs(AbilitySystemComponent, CompareAbilities);
-
-		if (!AbilitySpec)
-			continue;
-
-		LOG_INFO(LogDev, "Removing Ability {}", Ability->GetName());
-
-		AbilitySystemComponent->ClientCancelAbility(AbilitySpec->GetHandle(), AbilitySpec->GetActivationInfo());
-		AbilitySystemComponent->ClientEndAbility(AbilitySpec->GetHandle(), AbilitySpec->GetActivationInfo());
-		AbilitySystemComponent->ServerEndAbility(AbilitySpec->GetHandle(), AbilitySpec->GetActivationInfo(), nullptr);
-		AbilitySystemComponent->ClearAbility(AbilitySpec->GetHandle());
-	}
 }
 
 void UFortWeaponItemDefinition::GiveGrantedWeaponAbilities(AFortPlayerControllerAthena* PlayerController)
 {
-	if (Fortnite_Version < 14 && Fortnite_Version < 17)
-		return;
-
 	auto EquippedAbilitySet = this->GetEquippedAbilitySet();
 	auto EquippedAbilities = this->GetEquippedAbilities();
 
@@ -168,7 +172,33 @@ void UFortWeaponItemDefinition::GiveGrantedWeaponAbilities(AFortPlayerController
 	auto AbilitySystemComponent = PlayerState->GetAbilitySystemComponent();
 
 	if (EquippedAbilitySet.Get())
-		EquippedAbilitySet.Get()->GiveToAbilitySystem(AbilitySystemComponent);
+	{
+		auto GrantedGameplayEffects = EquippedAbilitySet.Get()->GetGrantedGameplayEffects();
+		auto GameplayAbilities = EquippedAbilitySet.Get()->GetGameplayAbilities();
+
+		for (int i = 0; i < GrantedGameplayEffects->Num(); i++)
+		{
+			auto& EffectToGrant = GrantedGameplayEffects->at(i, FGameplayEffectApplicationInfoHard::GetStructSize());
+
+			if (!EffectToGrant.GameplayEffect)
+				continue;
+
+			FGameplayEffectContextHandle EffectContext{};
+			AbilitySystemComponent->ApplyGameplayEffectToSelf(EffectToGrant.GameplayEffect, EffectToGrant.Level, EffectContext);
+		}
+
+		for (int i = 0; i < GameplayAbilities->Num(); i++)
+		{
+			UClass* AbilityClass = (UClass*)GameplayAbilities->At(i);
+
+			if (!AbilityClass)
+				continue;
+
+			LOG_INFO(LogDev, "Giving AbilityClass {}", AbilityClass->GetName());
+
+			AbilitySystemComponent->GiveAbilityEasy(AbilityClass);
+		}
+	}
 
 	for (int i = 0; i < EquippedAbilities.Num(); i++)
 	{

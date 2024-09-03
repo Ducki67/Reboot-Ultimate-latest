@@ -137,10 +137,10 @@ public:
 			GameMode->ChangeName(Controller, NewName, true);
 		}
 
-		PlayerState->OnRep_PlayerName();
+		PlayerState->OnRep_PlayerName(); // ?
 	}
 
-	FString GetRandomName()
+	FString GetRandomName() // Todo SetName(GetRandomName())
 	{
 		static int CurrentBotNum = 1;
 		std::wstring BotNumWStr;
@@ -148,14 +148,14 @@ public:
 
 		if (Fortnite_Version < 9)
 		{
-			BotNumWStr = std::to_wstring(CurrentBotNum++ + 200);
+			BotNumWStr = std::to_wstring(CurrentBotNum++ + 262);
 			NewName = (std::format(L"Anonymous[{}]", BotNumWStr)).c_str();
 		}
 		else
 		{
 			if (Fortnite_Version < 11)
 			{
-				BotNumWStr = std::to_wstring(CurrentBotNum++ + 200);
+				BotNumWStr = std::to_wstring(CurrentBotNum++ + 262);
 				NewName = (std::format(L"Anonymous[{}]", BotNumWStr)).c_str();
 			}
 			else
@@ -172,14 +172,6 @@ public:
 		}
 
 		return NewName;
-	}
-
-	void ChangeName()
-	{
-		auto BotNewName = GetRandomName();
-
-		LOG_INFO(LogBots, "BotNewName: {}", BotNewName.ToString());
-		SetName(BotNewName);
 	}
 
 public:
