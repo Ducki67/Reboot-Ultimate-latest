@@ -8,7 +8,6 @@
 #include "FortAthenaAISpawnerData.h"
 #include "KismetTextLibrary.h"
 #include "KismetMathLibrary.h"
-#include "FortBotNameSettings.h"
 #include "AIStimulus.h"
 
 #include "botnames.h"
@@ -243,6 +242,11 @@ public:
 			PlayerState->GetSquadId() = PlayerState->GetTeamIndex() - NumToSubtractFromSquadId;
 
 		GameState->AddPlayerStateToGameMemberInfo(PlayerState);
+
+		FString BotNewName = GetRandomName();
+
+		LOG_INFO(LogBots, "BotNewName: {}", BotNewName.ToString());
+		SetName(BotNewName);
 
 		PlayerState->SetIsBot(true);
 
