@@ -92,9 +92,9 @@ void AFortAthenaAIBotController::OnPossesedPawnDiedHook(AFortAthenaAIBotControll
 
 void AFortAthenaAIBotController::OnPerceptionSensedHook(AFortAthenaAIBotController* PlayerController, AActor* SourceActor, FAIStimulus& Stim)
 {
-	if (SourceActor->IsA(AFortPlayerPawnAthena::StaticClass()) && Cast<AFortPlayerPawnAthena>(SourceActor)->GetController() && !Cast<AFortPlayerPawnAthena>(SourceActor)->GetController()->IsA(AFortAthenaAIBotController::StaticClass()))
+	/*if (SourceActor->IsA(AFortPlayerPawnAthena::StaticClass()) && Cast<AFortPlayerPawnAthena>(SourceActor)->GetController() && !Cast<AFortPlayerPawnAthena>(SourceActor)->GetController()->IsA(AFortAthenaAIBotController::StaticClass()))
 	{
-		for (auto& Boss : AllBossesToTick)
+		for (auto& Boss : AllBossesToTick) // crash
 		{
 			if (Boss.Controller == PlayerController)
 			{
@@ -103,7 +103,7 @@ void AFortAthenaAIBotController::OnPerceptionSensedHook(AFortAthenaAIBotControll
 		}
 	}
 
-	return OnPerceptionSensedOriginal(PlayerController, SourceActor, Stim);
+	return OnPerceptionSensedOriginal(PlayerController, SourceActor, Stim);*/
 }
 
 void AFortAthenaAIBotController::OnAlertLevelChangedHook(AFortAthenaAIBotController* PlayerController, EAlertLevel OldAlertLevel, EAlertLevel NewAlertLevel)
