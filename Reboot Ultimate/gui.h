@@ -601,7 +601,7 @@ static inline void StaticUI()
 		ImGui::Checkbox("Enable Gadgets", &Globals::bEnableAGIDs);
 	}
 
-	if (std::floor(Fortnite_Version > 10 && Fortnite_Version < 18) && !Globals::bStartedListening)
+	if (Fortnite_Version >= 11 && Engine_Version < 500 && !Globals::bStartedListening)
 	{
 		if (ImGui::Checkbox("Toggle Bot PC", &Globals::bBotSwags));
 	}

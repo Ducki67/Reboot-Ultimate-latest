@@ -224,7 +224,7 @@ public:
 			}
 			else
 			{
-				AIBotController = GetWorld()->SpawnActor<AFortAthenaAIBotController>(Pawn->GetAIControllerClass());
+				AIBotController = GetWorld()->SpawnActor<AFortAthenaAIBotController>(Pawn->GetAIControllerClass()); // blep 1
 			}
 
 			PlayerState = Cast<AFortPlayerStateAthena>(AIBotController->GetPlayerState());
@@ -581,11 +581,11 @@ inline std::vector<PlayerBot> AllPlayerBotsToTick;
 
 namespace Bots
 {
-	static AController* SpawnBot(FTransform SpawnTransform, AActor* SourceActor = nullptr)
+	static AController* SpawnBot(FTransform SpawnTransform, AActor* SourceActor = nullptr) // spawnbot calls this function
 	{
 		auto playerBot = PlayerBot();
 		playerBot.Initialize(SpawnTransform, SourceActor);
-		AllPlayerBotsToTick.push_back(playerBot);
+		AllPlayerBotsToTick.push_back(playerBot); // blep 2
 		return playerBot.Controller;
 	}
 }

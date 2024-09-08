@@ -1830,6 +1830,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				ActorName = "/Game/Athena/DrivableVehicles/Biplane/BluePrints/FerretVehicle.FerretVehicle_C";
 			else if (ActorName == "golfcart" || ActorName == "golf")
 				ActorName = "/Game/Athena/DrivableVehicles/Golf_Cart/Golf_Cart_Base/Blueprints/GolfCartVehicleSK.GolfCartVehicleSK_C";
+			else if (ActorName == "ufo")
+				ActorName = "/Nevada/Blueprints/Vehicle/Nevada_Vehicle_V2.Nevada_Vehicle_V2_C";
 			else if (ActorName == "cannon")
 				ActorName = "/Game/Athena/DrivableVehicles/PushCannon.PushCannon_C";
 			else if (ActorName == "shoppingcart" || ActorName == "shopping")
@@ -1852,8 +1854,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				ActorName = "/Game/Athena/DrivableVehicles/Meatball/Meatball_Large/MeatballVehicle_L.MeatballVehicle_L_C";
 			else if (ActorName == "heli" || ActorName == "helicopter")
 				ActorName = "/Hoagie/HoagieVehicle.HoagieVehicle_C";
-			else if (ActorName == "ufo" || ActorName == "alien")
-				ActorName = "/Nevada/Blueprints/Vehicle/Nevada_Vehicle_V2.Nevada_Vehicle_V2_C";
 			else if (ActorName == "shark")
 				ActorName = "/SpicySake/Pawns/NPC_Pawn_SpicySake_Parent.NPC_Pawn_SpicySake_Parent_C";
 			else if (ActorName == "klombo")
@@ -1959,38 +1959,56 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				SendMessageToConsole(PlayerController, L"You can only spawn 1 rift!");
 			}
-
-			for (int i = 0; i < Count; i++)
+			else
 			{
-				auto Loc = Pawn->GetActorLocation();
-				Loc.Z += 0;
-
-				static auto BGAClass = FindObject<UClass>(L"/Script/Engine.BlueprintGeneratedClass");
-				static auto ClassClass = FindObject<UClass>(L"/Script/CoreUObject.Class");
-				auto RiftClass = LoadObject<UClass>(L"/Game/Athena/Items/ForagedItems/Rift/BGA_RiftPortal_Athena_Spawner.BGA_RiftPortal_Athena_Spawner_C", BGAClass);
-
-				if (!RiftClass)
+				for (int i = 0; i < Count; i++)
 				{
-					SendMessageToConsole(PlayerController, L"Failed to find rift path!");
-					return;
-				}
+					auto Loc = Pawn->GetActorLocation();
+					Loc.Z += 0;
 
-				FTransform RiftSpawnTransform;
-				RiftSpawnTransform.Translation = Loc;
-				RiftSpawnTransform.Scale3D = FVector(1, 1, 1);
+					static auto BGAClass = FindObject<UClass>(L"/Script/Engine.BlueprintGeneratedClass");
+					static auto ClassClass = FindObject<UClass>(L"/Script/CoreUObject.Class");
+					auto RiftClass = LoadObject<UClass>(L"/Game/Athena/Items/ForagedItems/Rift/BGA_RiftPortal_Athena_Spawner.BGA_RiftPortal_Athena_Spawner_C", BGAClass);
 
-				auto NewRift = GetWorld()->SpawnActor<AActor>(RiftClass, Loc, FQuat(), FVector(1, 1, 1));
+					if (!RiftClass)
+					{
+						SendMessageToConsole(PlayerController, L"Failed to find rift path!");
+						return;
+					}
 
-				if (!NewRift)
-				{
-					SendMessageToConsole(PlayerController, L"Failed to spawn the rift!");
-				}
-				else
-				{
-					NewRift->ForceNetUpdate();
-					SendMessageToConsole(PlayerController, L"Rift summoned!");
+					FTransform RiftSpawnTransform;
+					RiftSpawnTransform.Translation = Loc;
+					RiftSpawnTransform.Scale3D = FVector(1, 1, 1);
+
+					auto NewRift = GetWorld()->SpawnActor<AActor>(RiftClass, Loc, FQuat(), FVector(1, 1, 1));
+
+					if (!NewRift)
+					{
+						SendMessageToConsole(PlayerController, L"Failed to spawn the rift!");
+					}
+					else
+					{
+						NewRift->ForceNetUpdate();
+						SendMessageToConsole(PlayerController, L"Rift summoned!");
+					}
 				}
 			}
+		}
+		else if (Command == "tptomaxheight" || Command == "max" || Command == "tptomax")
+		{
+			auto Pawn = ReceivingController->GetPawn();
+
+			if (!Pawn)
+			{
+				SendMessageToConsole(PlayerController, L"No pawn available!");
+				return;
+			}
+
+			Pawn->TeleportTo(FVector{ 0,0,105000 }, FRotator{ 0,0,0 });
+
+			float height = 2000;
+
+			Pawn->ProcessEvent(Pawn->FindFunction("TeleportToSkyDive"), &height);
 		}
 		else if (Command == "spawnbot" || Command == "bot")
 		{
@@ -2889,6 +2907,20 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				}
 			}
 		}
+		else if (Command == "tpalltomax" || Command == "allmax")
+		{
+			for (int i = 0; i < ClientConnections.Num(); i++)
+			{
+				auto PlayerController = Cast<AFortPlayerController>(ClientConnections.at(i)->GetPlayerController());
+				auto Pawn = PlayerController->GetMyFortPawn();
+
+				Pawn->TeleportTo(FVector{ 0,0,105000 }, FRotator{ 0,0,0 });
+
+				float height = 2000;
+
+				Pawn->ProcessEvent(Pawn->FindFunction("TeleportToSkyDive"), &height);
+			}
+		}
 		else if (Command == "oldgodall" || Command == "canbedamagedall")
 		{
 			for (int i = 0; i < ClientConnections.Num(); i++)
@@ -3100,6 +3132,7 @@ cheat kick - Kicks the player from the game.
 cheat ban - Permanently bans the player from the game. (IP Ban)
 cheat pausesafezone - Pauses the zone.
 cheat demospeed - Speeds up/slows down the speed of the game.
+cheat tptomax - Teleports player to max height, in the middle of the map.
 cheat health (#) - Sets executing player's health.
 cheat shield (#) - Sets executing player's shield.
 cheat maxhealth (#) - Sets the maximum health of the player.
@@ -3119,6 +3152,7 @@ cheat shieldall - Heals all players shield.
 cheat regenall - Heals all players health and shield.
 cheat godall - Gods all players.
 cheat giveall - Gives all players Ammo, Materials, and Traps maxed out.
+cheat tpalltomax - Teleports everyone to max height, in the middle of the map.
 cheat getlocation - Gives you the current XYZ cords of where you are standing and copies them to your clipboard (useful for bugitgo)
 cheat togglesnowmap - Toggles the map to have snow or not. (7.10, 7.30, 11.31, 15.10, 19.01, & 19.10 ONLY)
 cheat destroy - Destroys the actor that the player is looking at.
