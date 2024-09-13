@@ -2190,6 +2190,13 @@ static inline DWORD WINAPI GuiThread(LPVOID)
 	::RegisterClassEx(&wc);
 	HWND hwnd = ::CreateWindowExW(0L, wc.lpszClassName, L"Reboot Ultimate", (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX), 100, 100, Width, Height, NULL, NULL, wc.hInstance, NULL);
 
+	if (hwnd == NULL)
+	{
+		MessageBoxA(0, ("Failed to create GUI window " + std::to_string(GetLastError()) + "!").c_str(), "Reboot Ultimate", MB_ICONERROR);
+		::UnregisterClass(wc.lpszClassName, wc.hInstance);
+		return 1;
+	}
+
 	if (false) // idk why this dont work
 	{
 		auto hIcon = LoadIconFromMemory((const char*)reboot_icon_data, strlen((const char*)reboot_icon_data), L"RebootIco");
@@ -2202,6 +2209,7 @@ static inline DWORD WINAPI GuiThread(LPVOID)
 	// Initialize Direct3D
 	if (!CreateDeviceD3D(hwnd))
 	{
+		MessageBoxA(0, "Failed to create D3D Device!", "Reboot Ultimate", MB_ICONERROR);
 		CleanupDeviceD3D();
 		::UnregisterClass(wc.lpszClassName, wc.hInstance);
 		return 1;

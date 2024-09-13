@@ -376,7 +376,7 @@ public:
 
 		if (KillerPawn && KillerPawn != Pawn && KillerController && KillerPlayerState && KillerPlayerState->GetAbilitySystemComponent() && Cast<AController>(KillerController) != Cast<AController>(AIBotController))
 		{
-			if (Globals::AmountOfHealthSiphon != 0)
+			if (Globals::AmountOfHealthSiphon > 0)
 			{
 				auto WorldInventory = KillerController->GetWorldInventory();
 
