@@ -14,7 +14,7 @@ static inline void InitBotNames()
     PlayerBotNames.clear();
 
     PlayerBotNames.push_back(L"qwertyouriop");
-    PlayerBotNames.push_back(L"willdey");
+    PlayerBotNames.push_back(L"Sweefy");
     PlayerBotNames.push_back(L"Soggs");
     PlayerBotNames.push_back(L"vxzty");
     PlayerBotNames.push_back(L"Milxnor");

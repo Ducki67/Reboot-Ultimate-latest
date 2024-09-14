@@ -1808,6 +1808,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				catch (...) {}
 			}
 
+			FRotator SpawnRotation = Pawn->GetActorRotation(); 
+
 			bool SpawnBots = ActorName == "bot" || ActorName == "bots";
 
 			int Max = SpawnBots ? 99 : 100;
@@ -1908,11 +1910,12 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 					auto Loc = Pawn->GetActorLocation();
 					Loc.Z += 250;
 
-					FTransform BotSpawnTransform;
-					BotSpawnTransform.Translation = Loc;
-					BotSpawnTransform.Scale3D = FVector(1, 1, 1);
+					FTransform SpawnTransform;
+					SpawnTransform.Translation = Loc;
+					SpawnTransform.Rotation = SpawnRotation.Quaternion();
+					SpawnTransform.Scale3D = FVector(1, 1, 1);
 
-					auto NewActor = SpawnBots ? Bots::SpawnBot(BotSpawnTransform, Pawn) : GetWorld()->SpawnActor<AActor>(ClassObj, Loc, FQuat(), FVector(1, 1, 1));
+					auto NewActor = SpawnBots ? Bots::SpawnBot(SpawnTransform, Pawn) : GetWorld()->SpawnActor<AActor>(ClassObj, SpawnTransform);
 
 					if (!NewActor)
 					{
@@ -2030,6 +2033,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
 
+			FRotator SpawnRotation = Pawn->GetActorRotation();
+
 			bool bShouldSpawnAtZoneCenter = false;
 
 			if (NumArgs >= 3 && Arguments[2] == "center")
@@ -2068,6 +2073,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 				FTransform Transform;
 				Transform.Translation = Loc;
+				Transform.Rotation = SpawnRotation.Quaternion();
 				Transform.Scale3D = FVector(1 * SizeMultiplier, 1 * SizeMultiplier, 1 * SizeMultiplier);
 
 				auto NewActor = Bots::SpawnBot(Transform, Pawn);
@@ -2083,9 +2089,9 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			}
 
 			if (!bShouldSpawnAtZoneCenter)
-				SendMessageToConsole(PlayerController, L"Summoned!");
+				SendMessageToConsole(PlayerController, L"Spawned bot!");
 			else
-				SendMessageToConsole(PlayerController, L"Summoned at zone center!");
+				SendMessageToConsole(PlayerController, L"Spawned bot at zone center!");
 		}
 		else if (Command == "marktoteleport" || Command == "marktotp" || Command == "markertp" || Command == "marktp")
 		{
