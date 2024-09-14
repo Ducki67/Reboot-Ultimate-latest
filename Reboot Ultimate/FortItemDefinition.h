@@ -4,6 +4,10 @@
 #include "Object.h"
 #include "Class.h"
 
+#include "SoftObjectPath.h"
+#include "SoftObjectPtr.h"
+#include "Texture2D.h"
+
 #include "reboot.h"
 #include "GameplayTagContainer.h"
 
@@ -175,6 +179,18 @@ public:
 	FGameplayTagContainer GetGameplayTags()
 	{
 		return Get<FGameplayTagContainer>("GameplayTags");
+	}
+
+	FSoftObjectPath& GetDisplayAssetPath()
+	{
+		static auto DisplayAssetPathOffset = GetOffset("DisplayAssetPath");
+		return Get<FSoftObjectPath>(DisplayAssetPathOffset);
+	}
+
+	TSoftObjectPtr<UTexture2D>& GetLargePreviewImage()
+	{
+		static auto LargePreviewImageOffset = GetOffset("LargePreviewImage");
+		return Get<TSoftObjectPtr<UTexture2D>>(LargePreviewImageOffset);
 	}
 
 	static UClass* StaticClass()

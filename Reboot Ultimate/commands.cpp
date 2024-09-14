@@ -2012,6 +2012,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			float height = 2000;
 
 			Pawn->ProcessEvent(Pawn->FindFunction("TeleportToSkyDive"), &height);
+			SendMessageToConsole(PlayerController, L"Teleported player to max height!");
 		}
 		else if (Command == "spawnbot" || Command == "bot")
 		{
@@ -2925,6 +2926,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				float height = 2000;
 
 				Pawn->ProcessEvent(Pawn->FindFunction("TeleportToSkyDive"), &height);
+				SendMessageToConsole(PlayerController, L"Teleported all players to max height!");
 			}
 		}
 		else if (Command == "oldgodall" || Command == "canbedamagedall")
