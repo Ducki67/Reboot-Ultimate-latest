@@ -8,6 +8,7 @@
 #include "FortAthenaAISpawnerData.h"
 #include "KismetTextLibrary.h"
 #include "KismetMathLibrary.h"
+#include "FortBotNameSettings.h"
 #include "AIStimulus.h"
 
 #include "botnames.h"
@@ -26,7 +27,7 @@ public:
 
 	static bool ShouldUseAIBotController()
 	{
-		return Fortnite_Version >= 11 && Engine_Version < 500 && Globals::bBotSwags == true;
+		return Fortnite_Version >= 11 && Engine_Version < 500 && Globals::bBotPC == true;
 	}
 
 	void PickRandomLoadout()
@@ -219,13 +220,9 @@ public:
 			Pawn = BotManager->GetCachedBotMutator()->SpawnBot(PawnClass, SpawnActor, SpawnTransform.Translation, SpawnTransform.Rotation.Rotator(), false);
 
 			if (Fortnite_Version < 17)
-			{
 				AIBotController = Cast<AFortAthenaAIBotController>(Pawn->GetController());
-			}
 			else
-			{
-				AIBotController = GetWorld()->SpawnActor<AFortAthenaAIBotController>(Pawn->GetAIControllerClass()); // blep 1
-			}
+				AIBotController = GetWorld()->SpawnActor<AFortAthenaAIBotController>(Pawn->GetAIControllerClass());
 
 			PlayerState = Cast<AFortPlayerStateAthena>(AIBotController->GetPlayerState());
 		}
@@ -243,12 +240,12 @@ public:
 
 		GameState->AddPlayerStateToGameMemberInfo(PlayerState);
 
+		PlayerState->SetIsBot(true);
+
 		FString BotNewName = GetRandomName();
 
 		LOG_INFO(LogBots, "BotNewName: {}", BotNewName.ToString());
 		SetName(BotNewName);
-
-		PlayerState->SetIsBot(true);
 
 		Pawn->SetHealth(21);
 		Pawn->SetMaxHealth(21);
@@ -275,6 +272,8 @@ public:
 			if (auto FortPlayerControllerAthena = Cast<AFortPlayerControllerAthena>(Controller))
 				GameMode->GetAlivePlayers().Add(FortPlayerControllerAthena);
 		}
+
+		LOG_INFO(LogDev, "Finished spawning bot!")
 	}
 
 public:
@@ -447,6 +446,52 @@ public:
 							KillerPawn->SetShield(Shield + AmountToGive);
 							AmountGiven += AmountToGive;
 						}
+					}
+				}
+			}
+		}
+
+		if (Globals::AmountOfHealthSiphon > 0)
+		{
+			auto KillerAbilityComp = KillerPlayerState->GetAbilitySystemComponent();
+
+			if (KillerAbilityComp)
+			{
+				auto ActivatableAbilities = KillerAbilityComp->GetActivatableAbilities();
+				auto& Items = ActivatableAbilities->GetItems();
+				for (size_t i = 0; i < Items.Num(); ++i)
+				{
+					auto& Item = Items.At(i, FGameplayAbilitySpec::GetStructSize());
+					auto Ability = Item.GetAbility();
+					if (Ability && Ability->ClassPrivate && Ability->ClassPrivate->GetName().contains("Siphon"))
+					{
+						FGameplayTag Tag{};
+						Tag.TagName = UKismetStringLibrary::Conv_StringToName(TEXT("GameplayCue.Shield.PotionConsumed"));
+
+						auto NetMulticast_InvokeGameplayCueAdded = FindObject<UFunction>(L"/Script/GameplayAbilities.AbilitySystemComponent.NetMulticast_InvokeGameplayCueAdded");
+						auto NetMulticast_InvokeGameplayCueExecuted = FindObject<UFunction>(L"/Script/GameplayAbilities.AbilitySystemComponent.NetMulticast_InvokeGameplayCueExecuted");
+
+						if (!NetMulticast_InvokeGameplayCueAdded || !NetMulticast_InvokeGameplayCueExecuted)
+							break;
+
+						static auto GameplayCueTagOffsetAdded = NetMulticast_InvokeGameplayCueAdded->GetOffsetFunc("GameplayCueTag");
+						static auto GameplayCueTagOffsetExecuted = NetMulticast_InvokeGameplayCueExecuted->GetOffsetFunc("GameplayCueTag");
+						static auto PredictionKeyOffsetAdded = NetMulticast_InvokeGameplayCueAdded->GetOffsetFunc("PredictionKey");
+
+						auto AddedParams = Alloc<void>(NetMulticast_InvokeGameplayCueAdded->GetPropertiesSize());
+						auto ExecutedParams = Alloc<void>(NetMulticast_InvokeGameplayCueExecuted->GetPropertiesSize());
+
+						if (!AddedParams || !ExecutedParams)
+							break;
+
+						*(FGameplayTag*)(int64(AddedParams) + GameplayCueTagOffsetAdded) = Tag;
+						*(FGameplayTag*)(int64(ExecutedParams) + GameplayCueTagOffsetExecuted) = Tag;
+						//(FPredictionKey*)(int64(AddedParams) + PredictionKeyOffsetAdded) = Tag;
+
+						KillerAbilityComp->ProcessEvent(NetMulticast_InvokeGameplayCueAdded, AddedParams);
+						KillerAbilityComp->ProcessEvent(NetMulticast_InvokeGameplayCueExecuted, ExecutedParams);
+
+						break;
 					}
 				}
 			}

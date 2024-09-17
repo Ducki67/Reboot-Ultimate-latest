@@ -604,7 +604,7 @@ static inline void StaticUI()
 
 	if (Fortnite_Version >= 11 && Engine_Version < 500 && !Globals::bStartedListening)
 	{
-		if (ImGui::Checkbox("Toggle Bot PC", &Globals::bBotSwags));
+		if (ImGui::Checkbox("Toggle Bot PC", &Globals::bBotPC));
 	}
 }
 
@@ -1104,9 +1104,7 @@ static inline void MainUI()
 
 				if (!Globals::bStartedListening) // hm
 				{
-					auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
-					GET_PLAYLIST(GameState);
-					ImGui::SliderInt("Players Required to Start the Match", &WarmupRequiredPlayerCount, 1, CurrentPlaylist->GetMaxPlayers());
+					ImGui::SliderInt("Players Required To Start", &WarmupRequiredPlayerCount, 1, 100);
 				}
 
 				static std::string ConsoleCommand;
