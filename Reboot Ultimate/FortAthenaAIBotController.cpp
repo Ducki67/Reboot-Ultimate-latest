@@ -94,7 +94,7 @@ void AFortAthenaAIBotController::OnPerceptionSensedHook(AFortAthenaAIBotControll
 {
 	/*if (SourceActor->IsA(AFortPlayerPawnAthena::StaticClass()) && Cast<AFortPlayerPawnAthena>(SourceActor)->GetController() && !Cast<AFortPlayerPawnAthena>(SourceActor)->GetController()->IsA(AFortAthenaAIBotController::StaticClass()))
 	{
-		for (auto& Boss : AllBossesToTick) // crash
+		for (auto& Boss : AllBossesToTick)
 		{
 			if (Boss.Controller == PlayerController)
 			{

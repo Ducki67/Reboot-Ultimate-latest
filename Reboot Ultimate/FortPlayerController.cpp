@@ -353,9 +353,15 @@ void AFortPlayerController::ServerExecuteInventoryItemHook(AFortPlayerController
 		{
 			LOG_INFO(LogDev, "Should unequip trap!");
 
+			LOG_INFO(LogDev, "Pawn->GetCurrentWeapon()->GetItemEntryGuid(): {}", Pawn->GetCurrentWeapon()->GetItemEntryGuid().ToString());
+			LOG_INFO(LogDev, "ItemGuid: {}", ItemGuid.ToString());
+			LOG_INFO(LogDev, "ItemDefinition: {}", ItemDefinition->GetFullName());
+			LOG_INFO(LogDev, "ItemInstance->GetItemEntry()->GetItemGuid(): {}", ItemInstance->GetItemEntry()->GetItemGuid().ToString());
+
 			Pawn->GetCurrentWeapon()->GetItemEntryGuid() = ItemGuid;
 			Pawn->EquipWeaponDefinition((UFortWeaponItemDefinition*)ItemDefinition, ItemInstance->GetItemEntry()->GetItemGuid());
 
+			LOG_INFO(LogDev, "Pawn->GetCurrentWeapon()->GetItemEntryGuid(): {}", Pawn->GetCurrentWeapon()->GetItemEntryGuid().ToString());
 			LOG_INFO(LogDev, "Pawn->GetCurrentWeapon()->GetFullName(): {}", Pawn->GetCurrentWeapon()->GetFullName());
 		}
 	}
@@ -1616,7 +1622,7 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 		{
 			KillerPawn->SiphonMats();
 
-			if (Globals::AmountOfHealthSiphon > 0)
+			if (Globals::AmountOfHealthSiphon != 0)
 			{
 				float Health = KillerPawn->GetHealth();
 				float Shield = KillerPawn->GetShield();

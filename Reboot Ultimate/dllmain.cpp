@@ -1202,8 +1202,8 @@ DWORD WINAPI Main(LPVOID)
 
     static auto ServerReturnToMainMenuFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerController.ServerReturnToMainMenu");
     static auto ServerReturnToMainMenuIdx = GetFunctionIdxOrPtr(ServerReturnToMainMenuFn) / 8;
-    auto ServerReturnToMainMenu = FortPlayerControllerDefault->VFTable[ServerReturnToMainMenuIdx];
-    VirtualSwap(FortPlayerControllerAthenaDefault->VFTable, ServerReturnToMainMenuIdx, ServerReturnToMainMenu);
+    auto FortServerRestartPlayer = FortPlayerControllerDefault->VFTable[ServerReturnToMainMenuIdx];
+    VirtualSwap(FortPlayerControllerAthenaDefault->VFTable, ServerReturnToMainMenuIdx, FortServerRestartPlayer);
 
     Hooking::MinHook::Hook(FortPlayerControllerAthenaDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerController.ServerSuicide"),
         AFortPlayerController::ServerSuicideHook, nullptr, false);
