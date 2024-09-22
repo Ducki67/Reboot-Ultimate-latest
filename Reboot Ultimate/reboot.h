@@ -190,6 +190,33 @@ inline bool ReadBitfield(void* Addr, uint8_t FieldMask)
 	return false;
 }
 
+inline bool& ReadConstBitfield(void* Addr, uint8_t FieldMask)
+{
+	auto Bitfield = (PlaceholderBitfield*)Addr;
+	bool NonConstReturnValue = false;
+	bool& ReturnValue = NonConstReturnValue;
+	// niceeeee
+	if (FieldMask == 0x1)
+		ReturnValue = Bitfield->First;
+	else if (FieldMask == 0x2)
+		ReturnValue = Bitfield->Second;
+	else if (FieldMask == 0x4)
+		ReturnValue = Bitfield->Third;
+	else if (FieldMask == 0x8)
+		ReturnValue = Bitfield->Fourth;
+	else if (FieldMask == 0x10)
+		ReturnValue = Bitfield->Fifth;
+	else if (FieldMask == 0x20)
+		ReturnValue = Bitfield->Sixth;
+	else if (FieldMask == 0x40)
+		ReturnValue = Bitfield->Seventh;
+	else if (FieldMask == 0x80)
+		ReturnValue = Bitfield->Eighth;
+	else if (FieldMask == 0xFF)
+		return *(bool*)Bitfield;
+	return ReturnValue;
+}
+
 inline void SetBitfield(void* Addr, uint8_t FieldMask, bool NewVal)
 {
 	auto Bitfield = (PlaceholderBitfield*)Addr;

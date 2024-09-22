@@ -13,8 +13,8 @@ float UDataTableFunctionLibrary::EvaluateCurveTableRow(UCurveTable* CurveTable, 
 	struct { UCurveTable* CurveTable; FName RowName; float InXY; EEvaluateCurveTableResult OutResult; float OutXY; FString ContextString; }
 	UDataTableFunctionLibrary_EvaluateCurveTableRow_Params{CurveTable, RowName, InXY, wtf1, wtf, ContextString};
 
-	static auto DefaultClass = StaticClass();
-	DefaultClass->ProcessEvent(fn, &UDataTableFunctionLibrary_EvaluateCurveTableRow_Params);
+	static auto DefaultObject = StaticClass()->GetDefaultObject();
+	DefaultObject->ProcessEvent(fn, &UDataTableFunctionLibrary_EvaluateCurveTableRow_Params);
 
 	if (OutResult)
 		*OutResult = UDataTableFunctionLibrary_EvaluateCurveTableRow_Params.OutResult;

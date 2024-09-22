@@ -339,6 +339,12 @@
     </ClCompile>
     <ClCompile Include="AIController.cpp">
       <Filter>FortniteGame\Source\FortniteGame\Private\AI</Filter>
+    <ClCompile Include="KismetRenderingLibrary.cpp">
+      <Filter>Engine\Source\Runtime\Engine\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture2D.cpp">
+      <Filter>Engine\Source\Runtime\Engine\Private</Filter>
+    </ClCompile>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1066,6 +1072,12 @@
     </ClInclude>
     <ClInclude Include="Character.h">
       <Filter>Engine\Source\Runtime\Engine\Classes\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture2D.h">
+      <Filter>Engine\Source\Runtime\Engine\Classes\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="KismetRenderingLibrary.h">
+      <Filter>Engine\Source\Runtime\Engine\Classes\Kismet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
