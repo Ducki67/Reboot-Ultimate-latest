@@ -6,8 +6,6 @@
 #include "MemoryOps.h"
 #include "ContainerAllocationPolicies.h"
 
-#define INDEX_NONE -1
-
 #define UE_LIFETIMEBOUND [[clang::lifetimebound]]
 
 struct FMemory
@@ -32,7 +30,7 @@ public:
 	using SizeType = int32;
 
 	ElementAllocatorType Data = nullptr; // AllocatorInstance;
-	mutable SizeType     ArrayNum;
+	SizeType             ArrayNum;
 	SizeType             ArrayMax;
 
 public:
@@ -69,11 +67,6 @@ public:
 	int CalculateSlackReserve(SizeType NumElements, SIZE_T NumBytesPerElement) const
 	{
 		return DefaultCalculateSlackReserve(NumElements, NumBytesPerElement, false);
-	}
-
-	FORCEINLINE SizeType GetSlack() const
-	{
-		return ArrayMax - ArrayNum;
 	}
 
 	void ResizeArray(SizeType NewNum, SIZE_T NumBytesPerElement)
@@ -185,16 +178,16 @@ public:
 	inline int Num() const { return ArrayNum; }
 	inline int size() const { return ArrayNum; }
 
-	FORCENOINLINE void ResizeTo(int32 NewMax)
+	/* FORCENOINLINE void ResizeTo(int32 NewMax)
 	{
 		if (NewMax)
 		{
-			NewMax = CalculateSlackReserve(NewMax, sizeof(InElementType));
+			NewMax = AllocatorInstance.CalculateSlackReserve(NewMax, sizeof(ElementType));
 		}
 		if (NewMax != ArrayMax)
 		{
 			ArrayMax = NewMax;
-			// AllocatorInstance.ResizeAllocation(ArrayNum, ArrayMax, sizeof(ElementType));
+			AllocatorInstance.ResizeAllocation(ArrayNum, ArrayMax, sizeof(ElementType));
 		}
 	}
 
@@ -216,16 +209,16 @@ public:
 		// If we have space to hold the excepted size, then don't reallocate
 		if (NewSize <= ArrayMax)
 		{
-			DestructItems(GetData(), ArrayNum);
+			// DestructItems(GetData(), ArrayNum);
 			ArrayNum = 0;
 		}
 		else
 		{
 			Empty(NewSize);
 		}
-	}
+	} */
 
-	void RemoveAtImpl(int32 Index, int32 Count, bool bAllowShrinking) const
+	void RemoveAtImpl(int32 Index, int32 Count, bool bAllowShrinking)
 	{
 		if (Count)
 		{
@@ -262,7 +255,7 @@ public:
 	}
 
 	template <typename CountType>
-	FORCEINLINE void RemoveAt(int32 Index, CountType Count, bool bAllowShrinking = true) const
+	FORCEINLINE void RemoveAt(int32 Index, CountType Count, bool bAllowShrinking = true)
 	{
 		// static_assert(!TAreTypesEqual<CountType, bool>::Value, "TArray::RemoveAt: unexpected bool passed as the Count argument");
 		RemoveAtImpl(Index, Count, bAllowShrinking);
@@ -439,8 +432,6 @@ public:
 	{
 		return Data[Index];
 	}
-
-	public:
 
 	template <typename T>
 	struct TReversePointerIterator

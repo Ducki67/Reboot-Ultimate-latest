@@ -535,19 +535,6 @@ void Offsets::FindAll()
 
 	Offsets::IsNetRelevantFor = FindIsNetRelevantForOffset();
 	Offsets::Script = Offsets::Children + 8 + 4 + 4;
-
-	if (Engine_Version >= 416 && Engine_Version <= 420)
-		Offsets::DefaultObject = 0xF8;
-	else if (Engine_Version == 421 || Engine_Version == 422)
-		Offsets::DefaultObject = 0x100;
-	else if (Engine_Version == 423 || Engine_Version == 424)
-		Offsets::DefaultObject = 0xF8;
-	else if (Engine_Version == 425)
-		Offsets::DefaultObject = 0x130;
-	else if (Engine_Version >= 426 && Engine_Version <= 500)
-		Offsets::DefaultObject = 0x118;
-	else if (Engine_Version >= 501)
-		Offsets::DefaultObject = 0x110;
 }
 
 void Offsets::Print()

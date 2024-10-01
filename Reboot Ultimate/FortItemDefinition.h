@@ -7,10 +7,6 @@
 #include "reboot.h"
 #include "GameplayTagContainer.h"
 
-#include "SoftObjectPath.h"
-#include "SoftObjectPtr.h"
-#include "Texture2D.h"
-
 enum class EFortItemType : uint8
 {
 	WorldItem = 0,
@@ -168,17 +164,6 @@ public:
 		static auto bAllowMultipleStacksOffset = GetOffset("bAllowMultipleStacks");
 		static auto bAllowMultipleStacksFieldMask = GetFieldMask(GetProperty("bAllowMultipleStacks"));
 		return ReadBitfieldValue(bAllowMultipleStacksOffset, bAllowMultipleStacksFieldMask);
-	}
-
-	FSoftObjectPath& GetDisplayAssetPath()
-	{
-		static auto DisplayAssetPathOffset = GetOffset("DisplayAssetPath");
-		return Get<FSoftObjectPath>(DisplayAssetPathOffset);
-	}
-	TSoftObjectPtr<UTexture2D>& GetLargePreviewImage()
-	{
-		static auto LargePreviewImageOffset = GetOffset("LargePreviewImage");
-		return Get<TSoftObjectPtr<UTexture2D>>(LargePreviewImageOffset);
 	}
 
 	EFortInventoryFilter GetFilterOverride()
