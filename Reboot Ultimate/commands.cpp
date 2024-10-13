@@ -1145,51 +1145,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				return;
 			}
 
-			if (Globals::bLateGame.load() || Fortnite_Version >= 11)
-			{
-				bStartedBus = true;
-
-				auto GameMode = (AFortGameModeAthena*)GetWorld()->GetGameMode();
-				auto GameState = Cast<AFortGameStateAthena>(GameMode->GetGameState());
-
-				AmountOfPlayersWhenBusStart = GameState->GetPlayersLeft();
-				AutoBusStartSecondsThatChanges = 0;
-
-				if (Globals::bLateGame.load())
-				{
-					CreateThread(0, 0, LateGameThread, 0, 0, 0);
-				}
-				else
-				{
-					GameMode->StartAircraftPhase();
-				}
-			}
-			else
-			{
-				bStartedBus = true;
-
-				auto GameMode = (AFortGameMode*)GetWorld()->GetGameMode();
-				auto GameState = Cast<AFortGameStateAthena>(GameMode->GetGameState());
-
-				AmountOfPlayersWhenBusStart = GameState->GetPlayersLeft(); // scuffed!!!!
-
-				static auto WarmupCountdownEndTimeOffset = GameState->GetOffset("WarmupCountdownEndTime");
-				// GameState->Get<float>(WarmupCountdownEndTimeOffset) = UGameplayStatics::GetTimeSeconds(GetWorld()) + 10;
-
-				float TimeSeconds = GameState->GetServerWorldTimeSeconds(); // UGameplayStatics::GetTimeSeconds(GetWorld());
-				float Duration = 10;
-				float EarlyDuration = Duration;
-
-				static auto WarmupCountdownStartTimeOffset = GameState->GetOffset("WarmupCountdownStartTime");
-				static auto WarmupCountdownDurationOffset = GameMode->GetOffset("WarmupCountdownDuration");
-				static auto WarmupEarlyCountdownDurationOffset = GameMode->GetOffset("WarmupEarlyCountdownDuration");
-
-				GameState->Get<float>(WarmupCountdownEndTimeOffset) = TimeSeconds + Duration;
-				GameMode->Get<float>(WarmupCountdownDurationOffset) = Duration;
-
-				// GameState->Get<float>(WarmupCountdownStartTimeOffset) = TimeSeconds;
-				GameMode->Get<float>(WarmupEarlyCountdownDurationOffset) = EarlyDuration;
-			}
+			UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"startaircraft", ReceivingController);
 
 			SendMessageToConsole(ReceivingController, L"Started bus.");
 		}
@@ -1244,6 +1200,10 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			try
 			{
+				if (argCount == 1)
+				{
+					Z = 0.0f;
+				}
 				if (argCount == 2)
 				{
 					Z = std::stof(Arguments[1]);
@@ -2025,6 +1985,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			if (bShouldSpawnAtZoneCenter && GameMode->GetGameStateAthena()->GetGamePhaseStep() <= EAthenaGamePhaseStep::BusFlying)
 				bShouldSpawnAtZoneCenter = false;
 
+			FRotator SpawnRotation = Pawn->GetActorRotation();
+
 			int SizeMultiplier = 1;
 
 			if (Arguments.size() >= 4)
@@ -2056,6 +2018,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				FTransform Transform;
 				Transform.Translation = Loc;
 				Transform.Scale3D = FVector(1 * SizeMultiplier, 1 * SizeMultiplier, 1 * SizeMultiplier);
+				Transform.Rotation = SpawnRotation.Quaternion();
 
 				auto NewActor = Bots::SpawnBot(Transform, Pawn);
 
@@ -2074,7 +2037,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else
 				SendMessageToConsole(PlayerController, L"Summoned at zone center!");
 		}
-		else if (Command == "marktoteleport" || Command == "marktotp" || Command == "markertp" || Command == "marktp")
+		else if (Command == "marktoteleport" || Command == "marktotp" || Command == "markertp" || Command == "marktp" || Command == "mark")
 		{
 			auto Pawn = ReceivingController->GetMyFortPawn();
 
@@ -2571,8 +2534,20 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			}
 
 			Pawn->TeleportTo(FVector(X, Y, Z), Pawn->GetActorRotation());
-			SendMessageToConsole(PlayerController, L"Teleported!");
-		}
+			SendMessageToConsole(PlayerController, L"Teleported to Coordinates!");
+
+			static auto LaunchCharacterFn = FindObject<UFunction>(L"/Script/Engine.Character.LaunchCharacter");
+
+			struct
+			{
+				FVector LaunchVelocity;
+				bool bXYOverride;
+				bool bZOverride;
+				bool bIgnoreFallDamage;
+			} ACharacter_LaunchCharacter_Params{ FVector(0.0f, 0.0f, -10000000.0f), false, false, true };
+
+			Pawn->ProcessEvent(LaunchCharacterFn, &ACharacter_LaunchCharacter_Params);
+}
 		else if (Command == "healthall")
 		{
 			for (int i = 0; i < ClientConnections.Num(); i++)

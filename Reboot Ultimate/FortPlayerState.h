@@ -37,6 +37,8 @@ public:
 	void ApplySiphonEffect();
 	void ApplyHealthEffect();
 	void DisableFallDamage();
+	// void CheckAndTeleportPlayer();
+	// void Tick(float DeltaTime);
 
 	static bool AreUniqueIDsIdentical(FUniqueNetIdRepl* A, FUniqueNetIdRepl* B);
 

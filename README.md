@@ -7,21 +7,21 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 # What does this reboot have?
 
 - [x] Proper Siphon (Animation, Health, and Materials)
-- [x] Fixed vehicle "interact" popup crash
 - [x] Proper Bots (cheat bot)
-- [x] Vehicle Weapons & Fixed Some Weapon Bugs
 - [x] Fixed S18+ Win Screen
 - [x] More Commands
+- [x] Fixed Several Bugs
 - [x] Fixed S13 Foundations
+- [x] Toggleable Victory Crown for S19
 - [x] Fixed Editing
 
 # To Do List:
 
 - Fix Whirlpools not launching the player/Witch Brooms & Silver Surfers Board cancelling and not enabling glider
-- Fix Siphon Animation on bots (on chapter 2)
+- Fix Ultimate Bots Siphon Animation
 
 ## Installation
 
 1. Click the green "<> Code 🔽" button, and click "Download ZIP". Extract using [WinRAR](https://www.rarlab.com/rar/winrar-x64-701.exe)
 2. Build the project using your preferred build tools. (Recommended: Visual Studio Community 2022, C++)
-3. Run the server using the Reboot Launcher.
+3. Run the server using the Reboot Launcher/another launcher of choice.

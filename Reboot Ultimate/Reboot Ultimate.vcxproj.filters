@@ -342,8 +342,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="log.h" />
-    <ClInclude Include="finder.h" />
     <ClInclude Include="Array.h">
       <Filter>Engine\Source\Runtime\Core\Public\Containers</Filter>
     </ClInclude>
@@ -413,7 +411,6 @@
     <ClInclude Include="EngineTypes.h">
       <Filter>Engine\Source\Runtime\Engine\Classes\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="hooking.h" />
     <ClInclude Include="GameModeBase.h">
       <Filter>Engine\Source\Runtime\Engine\Classes\GameFramework</Filter>
     </ClInclude>
@@ -1058,14 +1055,29 @@
     <ClInclude Include="AIStimulus.h">
       <Filter>Engine\Plugins\Runtime\AIModule\Source\AIModule\Public</Filter>
     </ClInclude>
-    <ClInclude Include="FortAthenaAIBotSpawnerData.h" />
-    <ClInclude Include="FortAthenaAISpawnerDataComponent_CosmeticLoadout.h" />
-    <ClInclude Include="FortAthenaAISpawnerDataComponent_SpawnParams.h" />
     <ClInclude Include="PathFollowingTypes.h">
       <Filter>FortniteGame\Source\FortniteGame\Public\AI</Filter>
     </ClInclude>
     <ClInclude Include="Character.h">
       <Filter>Engine\Source\Runtime\Engine\Classes\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="FortAthenaAIBotSpawnerData.h">
+      <Filter>FortniteGame\Source\FortniteGame\Public\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="FortAthenaAISpawnerDataComponent_CosmeticLoadout.h">
+      <Filter>FortniteGame\Source\FortniteGame\Public\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="FortAthenaAISpawnerDataComponent_SpawnParams.h">
+      <Filter>FortniteGame\Source\FortniteGame\Public\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="finder.h">
+      <Filter>Reboot\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="hooking.h">
+      <Filter>Reboot\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="log.h">
+      <Filter>Reboot\Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -121,6 +121,30 @@ static inline void CleanupDeviceD3D();
 static inline void ResetDevice();
 static inline LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+inline FString* GetRequestURL(UObject* Connection)
+{
+	if (Engine_Version <= 420)
+		return (FString*)(__int64(Connection) + 432);
+	if (std::floor(Fortnite_Version) >= 5 && Engine_Version < 424)
+		return (FString*)(__int64(Connection) + 424);
+	else if (Engine_Version >= 424)
+		return (FString*)(__int64(Connection) + 440);
+
+	return nullptr;
+}
+
+struct ActorSpawnStruct
+{
+	UObject* ClassOfClass;
+	std::string ClassToSpawn;
+	FVector SpawnLocation;
+	FRotator SpawnRotation;
+	// std::function<void(UObject*)> OnSpawned;
+};
+
+inline std::vector<std::pair<AFortPlayerControllerAthena*, UNetConnection*>> AllControllers;
+inline std::vector<ActorSpawnStruct> ActorsToSpawn;
+
 static inline void SetIsLategame(bool Value)
 {
 	Globals::bLateGame.store(Value);
@@ -286,10 +310,7 @@ static std::vector Primaries = {
 
 static std::vector Consumables1 = {
 	"Athena_ShockGrenade",
-	"WID_Hook_Gun_VR_Ore_T03",
 	"WID_Badger_Grape_VR",
-	"WID_Boss_GrapplingHoot",
-	"WID_Boss_Adventure_GH",
 	"WID_Launcher_Shockwave_Athena_UR_Ore_T03",
 	"WID_Athena_BadgerBangsNew",
 	"WID_Athena_HappyGhost",
@@ -644,7 +665,6 @@ static inline void MainTabs()
 		}
 
 		// if (serverStatus == EServerStatus::Up)
-		/*
 		{
 			if (ImGui::BeginTabItem("Players"))
 			{
@@ -652,7 +672,6 @@ static inline void MainTabs()
 				ImGui::EndTabItem();
 			}
 		}
-		*/
 
 		if (false && ImGui::BeginTabItem("Gamemode"))
 		{
@@ -1192,6 +1211,100 @@ static inline void MainUI()
 			}
 		}
 
+				else if (Tab == PLAYERS_TAB)
+				{
+					if (bLoaded)
+					{
+						auto World = GetWorld();
+
+						if (World)
+						{
+							static auto NetDriverOffset = World->GetOffset("NetDriver");
+							auto NetDriver = *(UObject**)(__int64(World) + NetDriverOffset);
+
+							if (NetDriver)
+							{
+								static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
+								auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
+								auto& ClientConnections = WorldNetDriver->GetClientConnections();
+
+								// if (ClientConnections)
+								{
+									for (int i = 0; i < ClientConnections.Num(); i++) {
+										auto Connection = ClientConnections.At(i);
+
+										if (!Connection)
+											continue;
+
+										auto CurrentController = Cast<AFortPlayerControllerAthena>(ClientConnections.at(i)->GetPlayerController());
+
+										if (CurrentController) {
+											auto it = std::find_if(AllControllers.begin(), AllControllers.end(), [CurrentController, Connection](const auto& pair)
+												{
+													return pair.first == CurrentController && pair.second == Connection;
+												});
+
+											if (it == AllControllers.end()) {
+												AllControllers.push_back({ CurrentController, Connection });
+											}
+										}
+									}
+
+									ImGui::Text(("Players Connected: " + std::to_string(AllControllers.size())).c_str());
+
+									for (int i = 0; i < AllControllers.size(); i++)
+									{
+										auto& CurrentPair = AllControllers.at(i);
+										auto CurrentPlayerState = CurrentPair.first->GetPlayerState();
+
+										if (!CurrentPlayerState)
+										{
+											std::cout << "tf!\n";
+											continue;
+										}
+
+										FString NameFStr;
+
+										/* static auto GetPlayerName = FindObject<UFunction>(L"/Script/Engine.PlayerState.GetPlayerName");
+										// static auto GetPlayerName = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerStateZone.GetPlayerNameForStreaming");
+										CurrentPlayerState->ProcessEvent(GetPlayerName, &NameFStr);
+
+										const wchar_t* NameWCStr = NameFStr.Data.Data;
+										std::wstring NameWStr = std::wstring(NameWCStr);
+										std::string Name = NameFStr.ToString(); // std::string(NameWStr.begin(), NameWStr.end());
+
+										auto NameCStr = Name.c_str(); */
+
+										auto Connection = CurrentPair.second;
+										auto RequestURL = *GetRequestURL(Connection);
+
+										if (RequestURL.Data.Data && RequestURL.Data.ArrayNum)
+										{
+											auto RequestURLStr = RequestURL.ToString();
+
+											std::size_t pos = RequestURLStr.find("Name=");
+
+											if (pos != std::string::npos) {
+												std::size_t end_pos = RequestURLStr.find('?', pos);
+
+												if (end_pos != std::string::npos)
+													RequestURLStr = RequestURLStr.substr(pos + 5, end_pos - pos - 5);
+											}
+
+											auto RequestURLCStr = RequestURLStr.c_str();
+
+											if (ImGui::Button(RequestURLCStr))
+											{
+												PlayerTab = i;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+		}
+
 		else if (Tab == EVENT_TAB)
 		{
 			if (ImGui::Button(std::format("Start {}", GetEventName()).c_str()))
@@ -1551,7 +1664,7 @@ static inline void MainUI()
 			ImGui::InputText("Item to Give", &ItemToGrantEveryone);
 			ImGui::InputInt("Amount to Give", &AmountToGrantEveryone);
 
-			if (ImGui::Button("Destroy all player builds"))
+			if (ImGui::Button("Destroy All Player Builds"))
 			{
 				bShouldDestroyAllPlayerBuilds = true;
 			}
@@ -1905,6 +2018,239 @@ static inline void MainUI()
 					CustomLootpoolMap.clear();
 				}
 			}
+		}
+	}
+	else if (PlayerTab != 2435892 && bLoaded)
+	{
+		auto World = GetWorld();
+		{
+			auto NetDriver = World->GetNetDriver();
+			if (NetDriver)
+			{
+				static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
+				auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
+				auto& ClientConnections = WorldNetDriver->GetClientConnections();
+				// if (ClientConnections)
+				{
+					for (int i = 0; i < ClientConnections.Num(); i++) {
+						auto Connection = ClientConnections.At(i);
+						if (!Connection)
+							continue;
+						auto CurrentController = Cast<AFortPlayerControllerAthena>(ClientConnections.at(i)->GetPlayerController());
+						if (CurrentController) {
+							auto it = std::find_if(AllControllers.begin(), AllControllers.end(), [CurrentController, Connection](const auto& pair)
+								{
+									return pair.first == CurrentController && pair.second == Connection;
+								});
+							if (it == AllControllers.end()) {
+								AllControllers.push_back({ CurrentController, Connection });
+							}
+						}
+					}
+				}
+			}
+		}
+		if (PlayerTab < AllControllers.size())
+		{
+			PlayerTabs();
+			auto& CurrentPair = AllControllers.at(PlayerTab);
+			auto CurrentController = CurrentPair.first;
+			auto CurrentPawn = CurrentController->GetMyFortPawn();
+			auto CurrentPlayerState = CurrentController->GetPlayerState();
+			if (CurrentPlayerState)
+			{
+				FString NameFStr;
+				auto Connection = CurrentPair.second;
+				auto RequestURL = *GetRequestURL(Connection); // If it works don't fix it
+				if (RequestURL.Data.Data)
+				{
+					auto RequestURLStr = RequestURL.ToString();
+					std::size_t pos = RequestURLStr.find("Name=");
+					if (pos != std::string::npos)
+					{
+						std::size_t end_pos = RequestURLStr.find('?', pos);
+						if (end_pos != std::string::npos)
+							RequestURLStr = RequestURLStr.substr(pos + 5, end_pos - pos - 5);
+					}
+					auto RequestURLCStr = RequestURLStr.c_str();
+					ImGui::Text(("Viewing " + RequestURLStr).c_str());
+					if (playerTabTab == MAIN_PLAYERTAB)
+					{
+						static std::string WID;
+						static int stud = 0;
+						static std::string KickReason = "You have been kicked!";
+						ImGui::InputText("Kick Reason", &KickReason);
+						if (ImGui::Button("Kick"))
+						{
+							std::wstring wstr = std::wstring(KickReason.begin(), KickReason.end());
+							FString Reason;
+							Reason.Set(wstr.c_str());
+							static auto ClientReturnToMainMenu = FindObject<UFunction>(L"/Script/Engine.PlayerController.ClientReturnToMainMenu");
+							CurrentController->ProcessEvent(ClientReturnToMainMenu, &Reason);
+						}
+						static std::string BanReason = "You have been banned!";
+						ImGui::InputText("Ban Reason", &BanReason);
+						if (ImGui::Button("Ban"))
+						{
+							std::wstring wstr = std::wstring(BanReason.begin(), BanReason.end());
+							FString Reason;
+							Reason.Set(wstr.c_str());
+							static auto ClientReturnToMainMenu = FindObject<UFunction>(L"/Script/Engine.PlayerController.ClientReturnToMainMenu");
+							if (CurrentController)
+							{
+								CurrentController->ProcessEvent(ClientReturnToMainMenu, &Reason);
+							}
+							auto Ban = [](APlayerController* ReceivingController)
+								{
+									if (ReceivingController)
+									{
+										FString BannedPlayerName = ReceivingController->GetPlayerState()->GetPlayerName();
+									}
+								};
+							Ban(CurrentController);
+						}
+						ImGui::NewLine();
+						ImGui::InputText("WID To Give", &WID);
+						if (ImGui::Button("Give Item"))
+						{
+							if (!WID.empty())
+							{
+								std::string cpywid = WID;
+								if (cpywid.find(".") == std::string::npos)
+									cpywid = std::format("{}.{}", cpywid, cpywid);
+								if (cpywid.find(" ") != std::string::npos)
+									cpywid = cpywid.substr(cpywid.find(" ") + 1);
+								auto wid = FindObject<UFortItem>(cpywid);
+								auto wid2 = Cast<UFortWeaponItemDefinition>(wid);
+								auto Inventory = CurrentController->GetWorldInventory();
+								if (wid)
+									Inventory->AddItem(wid->GetItemEntry(), nullptr, wid2->GetClipSize());
+								else
+									LOG_WARN(LogGame, "Unable to find WID!");
+							}
+						}
+
+						ImGui::NewLine();
+
+						if (ImGui::Button("Spawn Llama"))
+						{
+							if (CurrentPawn)
+							{
+								static auto LlamaClass = FindObject<UClass>(L"/Game/Athena/SupplyDrops/Llama/AthenaSupplyDrop_Llama.AthenaSupplyDrop_Llama_C");
+
+								if (LlamaClass)
+								{
+									FTransform Transform;
+									Transform.Translation = CurrentPawn->GetActorLocation();
+									Transform.Scale3D = FVector{ 1, 1, 1 };
+									Transform.Rotation = FQuat();
+
+									auto Llama = GetWorld()->SpawnActor<AActor>(LlamaClass, Transform);
+								}
+							}
+						}
+						if (ImGui::Button("Spawn Supply Drop"))
+						{
+							if (CurrentPawn)
+							{
+								static auto SupplyClass = FindObject<UClass>(L"/Game/Athena/SupplyDrops/AthenaSupplyDrop.AthenaSupplyDrop_C");
+								if (SupplyClass)
+								{
+									FTransform Transform;
+									Transform.Translation = CurrentPawn->GetActorLocation();
+									Transform.Scale3D = FVector{ 1, 1, 1 };
+									Transform.Rotation = FQuat();
+									auto Supply = GetWorld()->SpawnActor<AActor>(SupplyClass, Transform);
+								}
+							}
+						}
+						/*if (ImGui::Button("Rift Player"))
+						{
+							if (CurrentPawn)
+							{
+								auto Loc = CurrentPawn->GetActorLocation();
+								Loc.Z += 0;
+
+								static auto BGAClass = FindObject<UClass>(L"/Script/Engine.BlueprintGeneratedClass");
+								auto RiftClass = LoadObject<UClass>(L"/Game/Athena/Items/ForagedItems/Rift/BGA_RiftPortal_Athena_Spawner.BGA_RiftPortal_Athena_Spawner_C", BGAClass);
+
+								if (!RiftClass)
+									return;
+
+								FTransform RiftSpawnTransform;
+								RiftSpawnTransform.Translation = Loc;
+								RiftSpawnTransform.Scale3D = FVector(1, 1, 1);
+
+								auto NewRift = GetWorld()->SpawnActor<AActor>(RiftClass, RiftSpawnTransform);
+
+								if (!NewRift)
+								{
+									LOG_WARN(LogGame, "Failed to spawn rift!");
+								}
+								else
+								{
+									NewRift->ForceNetUpdate();
+								}
+							}
+						}*/
+
+						ImGui::NewLine();
+
+						if (ImGui::Button("Copy Player's Location"))
+						{
+							auto PawnLocation = CurrentPawn->GetActorLocation();
+							FString Loc = PawnLocation.ToString();
+							CurrentPawn->CopyToClipboard(Loc);
+						}
+					}
+					else if (playerTabTab == FUN_PLAYERTAB)
+					{
+						static auto LaunchCharacterJump = FindObject<UFunction>(L"/Script/FortniteGame.FortPawn.LaunchCharacterJump");
+						if (LaunchCharacterJump)
+						{
+							static FVector velocity;
+							InputVector("Velocity", &velocity);
+							bool bIgnoreFallDamage = true;
+							if (ImGui::Button("Launch"))
+							{
+								struct { FVector LaunchVelocity; bool bXYOverride; bool bZOverride; bool bIgnoreFallDamage; bool bPlayFeedbackEvent; } AFortPawn_LaunchCharacterJump_Params{
+									velocity, true, true, bIgnoreFallDamage, false
+								};
+								CurrentPawn->ProcessEvent(LaunchCharacterJump, &AFortPawn_LaunchCharacterJump_Params);
+							}
+							ImGui::NewLine();
+							static std::string ClassOfActorClass = "/Script/Engine.BlueprintGeneratedClass";
+							ImGui::InputText("Class of the ActorClass", &ClassOfActorClass);
+							static std::string ActorClassToSpawn;
+							ImGui::InputText("Actor to spawn at player", &ActorClassToSpawn);
+							if (ImGui::Button("Spawn BlueprintClass"))
+							{
+								if (CurrentPawn)
+								{
+									auto ClassOfActorClassObj = FindObject<UClass>(ClassOfActorClass);
+									if (ClassOfActorClassObj)
+									{
+										ActorSpawnStruct newSpawn;
+										newSpawn.ClassOfClass = ClassOfActorClassObj;
+										newSpawn.ClassToSpawn = ActorClassToSpawn;
+										newSpawn.SpawnLocation = CurrentPawn->GetActorLocation();
+										ActorsToSpawn.push_back(newSpawn);
+									}
+									else
+									{
+										LOG_WARN(LogGame, "Unable to find class of actor class!");
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		ImGui::NewLine();
+		if (ImGui::Button("Back"))
+		{
+			PlayerTab = -1;
 		}
 	}
 }

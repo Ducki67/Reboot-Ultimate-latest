@@ -248,6 +248,10 @@ public:
 
 		GameState->AddPlayerStateToGameMemberInfo(PlayerState);
 
+		FString BotNewName = GetRandomName();
+		LOG_INFO(LogBots, "BotNewName: {}", BotNewName.ToString());
+		SetName(BotNewName);
+
 		PlayerState->SetIsBot(true);
 
 		Pawn->SetHealth(21);

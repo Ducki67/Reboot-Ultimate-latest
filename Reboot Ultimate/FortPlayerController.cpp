@@ -238,6 +238,9 @@ void AFortPlayerController::ServerLoadingScreenDroppedHook(UObject* Context, FFr
 
 	auto PlayerController = (AFortPlayerController*)Context;
 
+	if (!PlayerController)
+		return ServerLoadingScreenDroppedOriginal(Context, Stack, Ret);
+
 	PlayerController->ApplyCosmeticLoadout();
 
 	if (Fortnite_Version >= 11)
@@ -247,15 +250,15 @@ void AFortPlayerController::ServerLoadingScreenDroppedHook(UObject* Context, FFr
 		auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
 		auto WorldInventory = PlayerController->GetWorldInventory();
 
-		PlayerController->GetXPComponent()->IsRegisteredWithQuestManager() = true;
-		PlayerController->GetXPComponent()->OnRep_bRegisteredWithQuestManager();
-
 		auto XPComponent = PlayerController->GetXPComponent();
 
-		XPComponent->IsRegisteredWithQuestManager() = true;
-		XPComponent->OnRep_bRegisteredWithQuestManager();
-		PlayerState->GetSeasonLevelUIDisplay() = PlayerController->GetXPComponent()->GetCurrentLevel();
-		PlayerState->OnRep_SeasonLevelUIDisplay();
+		if (XPComponent)
+		{
+			XPComponent->IsRegisteredWithQuestManager() = true;
+			XPComponent->OnRep_bRegisteredWithQuestManager();
+			PlayerState->GetSeasonLevelUIDisplay() = XPComponent->GetCurrentLevel();
+			PlayerState->OnRep_SeasonLevelUIDisplay();
+		}
 	}
 
 	return ServerLoadingScreenDroppedOriginal(Context, Stack, Ret);
@@ -1417,9 +1420,14 @@ void VictoryCrownSlowmo()
 		static auto Crown = FindObject<UFortItemDefinition>(
 			L"/VictoryCrownsGameplay/Items/AGID_VictoryCrown.AGID_VictoryCrown");
 
-		WorldInventory->AddItem(Crown, nullptr, 1);
+		auto CrownInstance = WorldInventory->FindItemInstance(Crown);
+		auto CrownCount = CrownInstance ? CrownInstance->GetItemEntry()->GetCount() : 0;
 
-		WorldInventory->Update();
+		if (CrownCount < 1)
+		{
+			WorldInventory->AddItem(Crown, nullptr, 1);
+			WorldInventory->Update();
+		}
 	}
 }
 
@@ -1622,7 +1630,7 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 		{
 			KillerPawn->SiphonMats();
 
-			if (Globals::AmountOfHealthSiphon != 0)
+			if (Globals::AmountOfHealthSiphon > 0)
 			{
 				float Health = KillerPawn->GetHealth();
 				float Shield = KillerPawn->GetShield();
@@ -1641,7 +1649,10 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 
 				if ((MaxShield - Shield) >= 0 && AmountGiven < Globals::AmountOfHealthSiphon)
 				{
-					KillerPlayerState->ApplySiphonEffect();
+					if (Fortnite_Version >= 7)
+					{
+						KillerPlayerState->ApplySiphonEffect();
+					}
 
 					if (MaxShield - Shield > 0)
 					{
