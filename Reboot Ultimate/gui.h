@@ -1124,7 +1124,7 @@ static inline void MainUI()
 				{
 					auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
 					GET_PLAYLIST(GameState);
-					ImGui::SliderInt("Players Required to Start the Match", &WarmupRequiredPlayerCount, 1, CurrentPlaylist->GetMaxPlayers());
+					ImGui::SliderInt("Players Required to Start", &WarmupRequiredPlayerCount, 1, CurrentPlaylist->GetMaxPlayers());
 				}
 
 				static std::string ConsoleCommand;

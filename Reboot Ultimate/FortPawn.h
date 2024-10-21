@@ -37,6 +37,18 @@ public:
 		return Get(HealthSetOffset);
 	}
 
+	UObject* GetShieldSet()
+	{
+		static auto ShieldSetOffset = GetOffset("ShieldSet");
+		return Get(ShieldSetOffset);
+	}
+
+	FGameplayTagContainer GetGameplayTags()
+	{
+		static auto GameplayTagsOffset = GetOffset("GameplayTags");
+		return Get<FGameplayTagContainer>(GameplayTagsOffset);
+	}
+
 	bool IsDBNO()
 	{
 		static auto bIsDBNOFieldMask = GetFieldMask(GetProperty("bIsDBNO"));

@@ -2544,10 +2544,49 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				bool bXYOverride;
 				bool bZOverride;
 				bool bIgnoreFallDamage;
-			} ACharacter_LaunchCharacter_Params{ FVector(0.0f, 0.0f, -10000000.0f), false, false, true };
+			} ACharacter_LaunchCharacter_Params{ FVector(0.0f, 0.0f, -10000000.0f), false, false, true }; // sort of works to stop momentum
 
 			Pawn->ProcessEvent(LaunchCharacterFn, &ACharacter_LaunchCharacter_Params);
-}
+		}
+		/*else if (Command == "tpto")
+		{
+			if (Arguments.size() < 2)
+			{
+				SendMessageToConsole(PlayerController, L"Please specify a player's name using \\PlayerName\\.");
+				return;
+			}
+
+			FString TargetPlayerName = FString(Arguments[1]); // E0289
+
+			APlayerController* TargetController = FindPlayerControllerByName(TargetPlayerName); // E0020
+
+			if (!TargetController)
+			{
+				SendMessageToConsole(PlayerController, L"Player not found!");
+				return;
+			}
+
+			auto TargetPawn = TargetController->GetPawn(); // E0135
+
+			if (!TargetPawn)
+			{
+				SendMessageToConsole(PlayerController, L"Target player does not have a valid pawn.");
+				return;
+			}
+
+			FVector TargetLocation = TargetPawn->GetActorLocation();
+
+			auto ExecutingPawn = Cast<APawn>(ReceivingController->GetPawn());
+
+			if (!ExecutingPawn)
+			{
+				SendMessageToConsole(PlayerController, L"You do not have a valid pawn to teleport.");
+				return;
+			}
+
+			ExecutingPawn->TeleportTo(TargetLocation, ExecutingPawn->GetActorRotation());
+			SendMessageToConsole(PlayerController, L"Teleported to Player!");
+		}*/
 		else if (Command == "healthall")
 		{
 			for (int i = 0; i < ClientConnections.Num(); i++)

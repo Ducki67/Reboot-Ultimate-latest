@@ -1,6 +1,10 @@
 #include "FortAthenaAIBotController.h"
 
+#include "gui.h"
+#include "FortAthenaMutator_InventoryOverride.h"
+#include "FortAthenaMutator_ItemDropOnDeath.h"
 #include "bots.h"
+#include <algorithm>
 #include "FortInventory.h"
 
 void AFortAthenaAIBotController::SwitchTeam(uint8 TeamIndex)
@@ -63,6 +67,94 @@ void AFortAthenaAIBotController::GiveItem(UFortItemDefinition* ItemDefinition, i
 void AFortAthenaAIBotController::OnPossesedPawnDiedHook(AFortAthenaAIBotController* PlayerController, AActor* DamagedActor, float Damage, AController* InstigatedBy, AActor* DamageCauser, FVector HitLocation, UObject* FHitComponent, FName BoneName, FVector Momentum)
 {
 	LOG_INFO(LogDev, "OnPossesedPawnDiedHook!");
+
+	auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
+	auto GameState = Cast<AFortGameStateAthena>(((AFortGameMode*)GetWorld()->GetGameMode())->GetGameState());
+
+	auto DeadPawn = Cast<AFortPlayerPawn>(PlayerController->GetPawn());
+	auto DeadPlayerState = Cast<AFortPlayerStateAthena>(PlayerController->GetPlayerState());
+
+	AFortPlayerPawn* KillerPawn = nullptr;
+	AFortPlayerStateAthena* KillerPlayerState = nullptr;
+	AFortPlayerControllerAthena* KillerController = nullptr;
+
+	if (Globals::AmountOfHealthSiphon != 0)
+	{
+		if (KillerPawn && KillerPawn != DeadPawn && KillerPlayerState && KillerPlayerState != DeadPlayerState)
+		{
+			auto WorldInventory = KillerController->GetWorldInventory();
+
+			if (!WorldInventory)
+				return;
+
+			static auto WoodItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/WoodItemData.WoodItemData");
+			static auto StoneItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/StoneItemData.StoneItemData");
+			static auto MetalItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/MetalItemData.MetalItemData");
+
+			int MaxWood = WoodItemData->GetMaxStackSize();
+			int MaxStone = StoneItemData->GetMaxStackSize();
+			int MaxMetal = MetalItemData->GetMaxStackSize();
+
+			auto WoodInstance = WorldInventory->FindItemInstance(WoodItemData);
+			auto WoodCount = WoodInstance ? WoodInstance->GetItemEntry()->GetCount() : 0;
+
+			auto StoneInstance = WorldInventory->FindItemInstance(StoneItemData);
+			auto StoneCount = StoneInstance ? StoneInstance->GetItemEntry()->GetCount() : 0;
+
+			auto MetalInstance = WorldInventory->FindItemInstance(MetalItemData);
+			auto MetalCount = MetalInstance ? MetalInstance->GetItemEntry()->GetCount() : 0;
+
+			if (WoodCount < MaxWood)
+			{
+				int WoodToAdd = FMath::Min(50, MaxWood - WoodCount);
+				WorldInventory->AddItem(WoodItemData, nullptr, WoodToAdd);
+			}
+			if (StoneCount < MaxStone)
+			{
+				int StoneToAdd = FMath::Min(50, MaxStone - StoneCount);
+				WorldInventory->AddItem(StoneItemData, nullptr, StoneToAdd);
+			}
+			if (MetalCount < MaxMetal)
+			{
+				int MetalToAdd = FMath::Min(50, MaxMetal - MetalCount);
+				WorldInventory->AddItem(MetalItemData, nullptr, MetalToAdd);
+			}
+
+			WorldInventory->Update();
+
+			float Health = KillerPawn->GetHealth();
+			float Shield = KillerPawn->GetShield();
+
+			float MaxHealth = KillerPawn->GetMaxHealth();
+			float MaxShield = KillerPawn->GetMaxShield();
+
+			float AmountGiven = 0;
+
+			if ((MaxHealth - Health) > 0)
+			{
+				float AmountToGive = MaxHealth - Health >= Globals::AmountOfHealthSiphon ? Globals::AmountOfHealthSiphon : MaxHealth - Health;
+				KillerPawn->SetHealth(Health + AmountToGive);
+				AmountGiven += AmountToGive;
+			}
+
+			if ((MaxShield - Shield) >= 0 && AmountGiven < Globals::AmountOfHealthSiphon)
+			{
+				KillerPlayerState->ApplySiphonEffect(); // why doesnt this work on chapter 2 adiubawuybdawbdab
+
+				if (MaxShield - Shield > 0)
+				{
+					float AmountToGive = MaxShield - Shield >= Globals::AmountOfHealthSiphon ? Globals::AmountOfHealthSiphon : MaxShield - Shield;
+					AmountToGive -= AmountGiven;
+
+					if (AmountToGive > 0)
+					{
+						KillerPawn->SetShield(Shield + AmountToGive);
+						AmountGiven += AmountToGive;
+					}
+				}
+			}
+		}
+	}
 
 	// if (!InstigatedBy)
 		// return OnPossesedPawnDiedOriginal(PlayerController, DamagedActor, Damage, InstigatedBy, DamageCauser, HitLocation, FHitComponent, BoneName, Momentum);
