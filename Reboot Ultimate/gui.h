@@ -6,7 +6,7 @@
 
 #include <Windows.h>
 #include <dxgi.h>
-#include <d3d11.h>
+// #include <d3d11.h>
 #include <d3d9.h>
 
 #include <ImGui/imgui.h>
@@ -45,6 +45,7 @@
 #include "die.h"
 #include "calendar.h"
 #include "botnames.h"
+#include "KismetRenderingLibrary.h"
 
 #define PREGAME_GAME_TAB 1
 #define PREGAME_PLAYLIST_TAB 2
@@ -71,6 +72,7 @@
 #define FUN_PLAYERTAB 5
 
 using json = nlohmann::json;
+using namespace std::chrono;
 
 static inline float DefaultCannonMultiplier = 1.f;
 
@@ -1467,17 +1469,44 @@ static inline void MainUI()
 
 		else if (Tab == ZONE_TAB)
 		{
-			if (ImGui::Button("Start Safe Zone"))
+			static std::string PauseStatusMessage = "";
+			static std::string SkipStatusMessage = "";
+
+			static high_resolution_clock::time_point AddMessageTime;
+			static high_resolution_clock::time_point RemoveMessageTime;
+
+			static bool bZonePaused = false;
+
+			/*if (ImGui::Button("Start Safe Zone"))
 			{
 				UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"startsafezone", nullptr);
-			}
+			}*/
 
 			if (ImGui::Button("Pause Safe Zone"))
 			{
-				UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"pausesafezone", nullptr);
+				bZonePaused = !bZonePaused;
+
+				if (Fortnite_Version == 13)
+				{
+					UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"pausesafezone", nullptr);
+
+					PauseStatusMessage = bZonePaused
+						? "Next zone will be paused. It is advised to skip zone."
+						: "Zone unpaused!";
+				}
+				else
+				{
+					UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"pausesafezone", nullptr);
+
+					PauseStatusMessage = bZonePaused
+						? "Successfully paused zone!"
+						: "Zone unpaused!";
+				}
+
+				AddMessageTime = high_resolution_clock::now();
 			}
 
-			if (ImGui::Button("Skip Zone"))
+			/*if (ImGui::Button("Skip Zone"))
 			{
 				UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"skipsafezone", nullptr);
 			}
@@ -1485,9 +1514,9 @@ static inline void MainUI()
 			if (ImGui::Button("Start Shrink Safe Zone"))
 			{
 				UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"startshrinksafezone", nullptr);
-			}
+			}*/
 
-			if (ImGui::Button("Skip Shrink Safe Zone"))
+			if (ImGui::Button("Skip Safe Zone"))
 			{
 				auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
 				auto SafeZoneIndicator = GameMode->GetSafeZoneIndicator();
@@ -1495,20 +1524,50 @@ static inline void MainUI()
 				if (SafeZoneIndicator)
 				{
 					SafeZoneIndicator->SkipShrinkSafeZone();
+
+					SkipStatusMessage = "Successfully skipped zone!";
 				}
+				else
+				{
+					SkipStatusMessage = "Failed to skip zone.";
+				}
+
+				AddMessageTime = high_resolution_clock::now();
 			}
 
-			ImGui::NewLine;
+			ImGui::Checkbox("Enable Reverse Zone (EXPERIMENTAL)", &bEnableReverseZone);
 
 			if (bEnableReverseZone)
 				ImGui::Text(std::format("Currently {}eversing zone", bZoneReversing ? "R" : "Not R").c_str());
-
-			ImGui::Checkbox("Enable Reverse Zone (EXPERIMENTAL)", &bEnableReverseZone);
 
 			if (bEnableReverseZone)
 			{
 				ImGui::InputInt("Start Reversing Phase", &StartReverseZonePhase);
 				ImGui::InputInt("End Reversing Phase", &EndReverseZonePhase);
+			}
+
+			// ImGui::NewLine();
+
+			// ImGui::Text("Zone is currently: %s", bZonePaused ? "Paused" : "Running");
+
+			ImGui::NewLine();
+
+			if (!PauseStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
+			{
+				ImGui::Text("%s", PauseStatusMessage.c_str());
+			}
+			else
+			{
+				PauseStatusMessage.clear();
+			}
+
+			if (!SkipStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
+			{
+				ImGui::Text("%s", SkipStatusMessage.c_str());
+			}
+			else
+			{
+				SkipStatusMessage.clear();
 			}
 		}
 
@@ -2536,6 +2595,13 @@ static inline DWORD WINAPI GuiThread(LPVOID)
 	::RegisterClassEx(&wc);
 	HWND hwnd = ::CreateWindowExW(0L, wc.lpszClassName, L"Reboot Ultimate", (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX), 100, 100, Width, Height, NULL, NULL, wc.hInstance, NULL);
 
+	if (hwnd == NULL)
+	{
+		MessageBoxA(0, ("Failed to create GUI window " + std::to_string(GetLastError()) + "!").c_str(), "Reboot Ultimate", MB_ICONERROR);
+		::UnregisterClass(wc.lpszClassName, wc.hInstance);
+		return 1;
+	}
+
 	if (false) // idk why this dont work
 	{
 		auto hIcon = LoadIconFromMemory((const char*)reboot_icon_data, strlen((const char*)reboot_icon_data), L"RebootIco");
@@ -2548,6 +2614,8 @@ static inline DWORD WINAPI GuiThread(LPVOID)
 	// Initialize Direct3D
 	if (!CreateDeviceD3D(hwnd))
 	{
+		// MessageBoxA(0, "Failed to create D3D Device!", "Reboot Ultimate", MB_ICONERROR); // Error Boxes are within the helper function.
+		LOG_ERROR(LogDev, "Failed to create D3D Device!");
 		CleanupDeviceD3D();
 		::UnregisterClass(wc.lpszClassName, wc.hInstance);
 		return 1;
@@ -2669,8 +2737,12 @@ static inline DWORD WINAPI GuiThread(LPVOID)
 
 static inline bool CreateDeviceD3D(HWND hWnd)
 {
-	if ((g_pD3D = Direct3DCreate9(D3D_SDK_VERSION)) == NULL)
+	g_pD3D = Direct3DCreate9(D3D_SDK_VERSION);
+	if (g_pD3D == NULL)
+	{
+		MessageBoxA(0, "Failed call to Direct3DCreate9!", "Reboot Ultimate", MB_ICONERROR);
 		return false;
+	}
 
 	// Create the D3DDevice
 	ZeroMemory(&g_d3dpp, sizeof(g_d3dpp));
@@ -2681,8 +2753,19 @@ static inline bool CreateDeviceD3D(HWND hWnd)
 	g_d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
 	g_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;           // Present with vsync
 	//g_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;   // Present without vsync, maximum unthrottled framerate
-	if (g_pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING, &g_d3dpp, &g_pd3dDevice) < 0)
+	auto CreateDeviceResult = g_pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING, &g_d3dpp, &g_pd3dDevice);
+	if (CreateDeviceResult == -2005530520)
+	{
+		UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"r.setres 1280x720w", nullptr);
+		Sleep(50); // for good measure
+		return CreateDeviceD3D(hWnd);
+	}
+	else if (CreateDeviceResult < D3D_OK)
+	{
+		MessageBoxA(0, ("Failed call to CreateDevice " + std::to_string(CreateDeviceResult) + "!").c_str(), "Reboot Ultimate", MB_ICONERROR);
+
 		return false;
+	}
 
 	return true;
 }

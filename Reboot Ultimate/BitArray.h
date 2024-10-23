@@ -82,13 +82,13 @@ public:
         const TBitArray& IteratedArray;
 
     public:
-        FORCEINLINE const FBitIterator(const TBitArray& ToIterate, const int32 StartIndex) // Begin
+        FORCEINLINE FBitIterator(const TBitArray& ToIterate, const int32 StartIndex) // Begin
             : IteratedArray(ToIterate)
             , Index(StartIndex)
             , FRelativeBitReference(StartIndex)
         {
         }
-        FORCEINLINE const FBitIterator(const TBitArray& ToIterate) // End
+        FORCEINLINE FBitIterator(const TBitArray& ToIterate) // End
             : IteratedArray(ToIterate)
             , Index(ToIterate.NumBits)
             , FRelativeBitReference(ToIterate.NumBits)

@@ -82,14 +82,16 @@ static inline ItemRow* GetRandomItemForCustomLootpool(std::string LootTier, EFor
 
 bool ABuildingContainer::SpawnLoot(AFortPawn* Pawn)
 {
+	/*
+	* 
 	if (!Pawn)
 		return false;
+
+	*/
 
 	this->ForceNetUpdate();
 
 	auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
-	// idk
-   /* this->GetActorForwardVector() * this->GetLootSpawnLocation_Athena().X + this->GetActorRightVector() * this->GetLootSpawnLocation_Athena().Y + this->GetActorUpVector() * this->GetLootSpawnLocation_Athena().Z*/
 
 	// FVector LocationToSpawnLoot = this->GetActorLocation() + this->GetActorRightVector() * 70.f + this->GetActorUpVector() * 50.f;
 

@@ -10,6 +10,7 @@
 #include "FortResourceItemDefinition.h"
 #include "FortKismetLibrary.h"
 #include "DataTableFunctionLibrary.h"
+#include "BuildingContainer.h"
 
 void ABuildingActor::OnDamageServerHook(ABuildingActor* BuildingActor, float Damage, FGameplayTagContainer DamageTags,
 	FVector Momentum, /* FHitResult */ __int64 HitInfo, APlayerController* InstigatedBy, AActor* DamageCauser,
@@ -19,6 +20,30 @@ void ABuildingActor::OnDamageServerHook(ABuildingActor* BuildingActor, float Dam
 		LOG_INFO(LogDev, "ABuildingActor::OnDamageServerHook!");
 
 	auto BuildingSMActor = Cast<ABuildingSMActor>(BuildingActor);
+	if (auto Container = Cast<ABuildingContainer>(BuildingActor))
+	{
+		if ((BuildingSMActor->GetHealth() <= 0 || BuildingActor->GetHealth() <= 0) && !Container->IsAlreadySearched())
+		{
+			Container->SpawnLoot();
+		}
+	}
+	auto AttachedBuildingActors = BuildingSMActor->GetAttachedBuildingActors();
+	for (int i = 0; i < AttachedBuildingActors.Num(); ++i)
+	{
+
+		auto CurrentBuildingActor = AttachedBuildingActors.at(i);
+		auto CurrentActor = Cast<ABuildingActor>(CurrentBuildingActor);
+		if (BuildingSMActor->GetHealth() <= 0 || BuildingActor->GetHealth() <= 0)
+		{
+			if (auto Container = Cast<ABuildingContainer>(CurrentActor))
+			{
+				if (!Container->IsAlreadySearched())
+				{
+					Container->SpawnLoot();
+				}
+			}
+		}
+	}
 	auto PlayerController = Cast<AFortPlayerControllerAthena>(InstigatedBy);
 	// auto Pawn = PlayerController ? PlayerController->GetMyFortPawn() : nullptr;
 	auto Weapon = Cast<AFortWeapon>(DamageCauser);
@@ -72,8 +97,8 @@ void ABuildingActor::OnDamageServerHook(ABuildingActor* BuildingActor, float Dam
 	if (BuildingResourceAmountOverride.RowName.IsValid())
 	{
 		// auto AssetManager = Cast<UFortAssetManager>(GEngine->AssetManager);
-		// auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameStateAthena);
-		UCurveTable* CurveTable = nullptr; // GameState->CurrentPlaylistInfo.BasePlaylist ? GameState->CurrentPlaylistInfo.BasePlaylist->ResourceRates.Get() : nullptr;
+		// auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
+		UCurveTable* CurveTable = nullptr; //GameState->GetCurrentPlaylist().BasePlaylist ? GameState->GetCurrentPlaylist().BasePlaylist->ResourceRates.Get() : nullptr;
 
 		// LOG_INFO(LogDev, "Before1");
 
