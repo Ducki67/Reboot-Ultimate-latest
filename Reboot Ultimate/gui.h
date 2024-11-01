@@ -167,6 +167,11 @@ static inline void Restart() // todo move?
 {
 	InitBotNames();
 
+	Globals::UPTime = 0;
+	Globals::tickTime = 0;
+
+	AmountOfRestarts++;
+
 	FString LevelA = Engine_Version < 424
 		? L"open Athena_Terrain" : Engine_Version >= 500 ? Engine_Version >= 501
 		? L"open Asteria_Terrain"
@@ -189,7 +194,6 @@ static inline void Restart() // todo move?
 	Globals::bStartedListening = false;
 	Globals::bHitReadyToStartMatch = false;
 	bStartedBus = false;
-	AmountOfRestarts++;
 
 	LOG_INFO(LogDev, "Switching!");
 

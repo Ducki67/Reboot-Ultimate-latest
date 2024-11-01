@@ -10,7 +10,38 @@
 #include "FortResourceItemDefinition.h"
 #include "FortKismetLibrary.h"
 #include "DataTableFunctionLibrary.h"
+#include "FortGameStateAthena.h"
+#include "GameplayStatics.h"
 #include "BuildingContainer.h"
+#include "FortPlayerController.h"
+
+#include "Rotator.h"
+#include "BuildingSMActor.h"
+#include "FortGameModeAthena.h"
+
+#include "FortPlayerState.h"
+#include "BuildingWeapons.h"
+
+#include "ActorComponent.h"
+#include "FortPlayerStateAthena.h"
+#include "globals.h"
+#include "FortPlayerControllerAthena.h"
+#include "FortLootPackage.h"
+#include "FortPickup.h"
+#include "FortPlayerPawn.h"
+#include <memcury.h>
+#include "KismetStringLibrary.h"
+#include "FortGadgetItemDefinition.h"
+#include "FortAbilitySet.h"
+#include "vendingmachine.h"
+#include "KismetSystemLibrary.h"
+#include "gui.h"
+#include "FortAthenaMutator_InventoryOverride.h"
+#include "FortAthenaMutator_TDM.h"
+#include <unordered_set>
+#include "FortAthenaAIBotController.h"
+#include "FortAthenaMutator_ItemDropOnDeath.h"
+#include "FortAthenaMutator_GG.h"
 
 void ABuildingActor::OnDamageServerHook(ABuildingActor* BuildingActor, float Damage, FGameplayTagContainer DamageTags,
 	FVector Momentum, /* FHitResult */ __int64 HitInfo, APlayerController* InstigatedBy, AActor* DamageCauser,

@@ -12,6 +12,10 @@
 
 #include <iomanip>
 #include <sstream>
+#include <map>
+#include <string>
+
+std::map<std::string, FVector> Waypoints;
 
 enum class EMovementMode : uint8_t
 {
@@ -86,7 +90,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		}
 		else
 		{
-			// SendMessageToConsole(PlayerController, L"Warning: You have a backslash but no ending backslash, was this by mistake? Executing on you.");
+			SendMessageToConsole(PlayerController, L"Warning: You have a backslash but no ending backslash, was this by mistake? Executing on you.");
 		}
 	}
 
@@ -725,6 +729,15 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			}
 
 			int count = WID->GetMaxStackSize();
+
+			if (weaponName == "bouncer" || weaponName == "bouncers" || weaponName == "TID_Context_BouncePad_Athena")
+			{
+				count = 6;
+			}
+			else if (weaponName == "launchpad" || weaponName == "launch" || weaponName == "pad" || weaponName == "launches" || weaponName == "TID_Floor_Player_Launch_Pad_Athena")
+			{
+				count = 3;
+			}
 
 			try
 			{
@@ -1877,10 +1890,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				SendMessageToConsole(PlayerController, L"Not a valid class!");
 			}
 		}
-		else if (Command == "togglemarktoteleport" || Command == "togglemarktotp")
-		{
-			bMarkToTeleport = !bMarkToTeleport;
-		}
 		else if (Command == "rift")
 		{
 			auto Pawn = ReceivingController->GetPawn();
@@ -2037,7 +2046,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else
 				SendMessageToConsole(PlayerController, L"Summoned at zone center!");
 		}
-		else if (Command == "marktoteleport" || Command == "marktotp" || Command == "markertp" || Command == "marktp" || Command == "mark")
+		else if (Command == "marktoteleport" || Command == "marktotp" || Command == "markertp" || Command == "marktp" || Command == "mark" || Command == "marker")
 		{
 			auto Pawn = ReceivingController->GetMyFortPawn();
 
@@ -2169,6 +2178,69 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			CheatManager->Teleport();
 			CheatManager = nullptr;
 			SendMessageToConsole(PlayerController, L"Teleported!");
+		}
+		else if (Command == "savewaypoint" || Command == "s")
+		{
+			if (NumArgs < 1) 
+			{
+				SendMessageToConsole(PlayerController, L"Please provide a phrase to save the waypoint.");
+				return;
+			}
+
+			auto Pawn = ReceivingController->GetMyFortPawn();
+
+			if (!Pawn) 
+			{
+				SendMessageToConsole(PlayerController, L"No pawn to get location from!");
+				return;
+			}
+
+			auto PawnLocation = Pawn->GetActorLocation();
+			Waypoints[Arguments[1]] = PawnLocation;
+
+			SendMessageToConsole(PlayerController, L"Waypoint saved! Use « cheat waypoint (phrase) » to teleport to that location!");
+		}
+		else if (Command == "waypoint" || Command == "w")
+		{
+			if (NumArgs < 1) 
+			{
+				SendMessageToConsole(PlayerController, L"Please provide a waypoint phrase to teleport to.");
+				return;
+			}
+
+			std::string phrase = Arguments[1];
+
+			if (Waypoints.find(phrase) == Waypoints.end()) 
+			{
+				SendMessageToConsole(PlayerController, L"A saved waypoint with this phrase was not found!");
+				return;
+			}
+
+			FVector Destination = Waypoints[phrase];
+
+			auto Pawn = ReceivingController->GetMyFortPawn();
+
+			if (Pawn) 
+			{
+				Pawn->TeleportTo(Destination, Pawn->GetActorRotation());
+				SendMessageToConsole(PlayerController, L"Teleported to waypoint!");
+
+				static auto LaunchCharacterFn = FindObject<UFunction>(L"/Script/Engine.Character.LaunchCharacter");
+
+				struct
+				{
+					FVector LaunchVelocity;
+					bool bXYOverride;
+					bool bZOverride;
+					bool bIgnoreFallDamage;
+				} ACharacter_LaunchCharacter_Params{ FVector(0.0f, 0.0f, -10000000.0f), false, false, true }; // sort of works to stop momentum
+
+				Pawn->ProcessEvent(LaunchCharacterFn, &ACharacter_LaunchCharacter_Params);
+			}
+			else 
+			{
+				SendMessageToConsole(PlayerController, L"No pawn to teleport!");
+			}
 		}
 		else if (Command == "fly")
 		{
@@ -3121,7 +3193,10 @@ cheat givenames - Sends a message to the console of all of the names that work w
 cheat summon (full path of object) (#) - Summons the specified blueprint class at the executing player's location. Note: There is a limit on the count.
 cheat spawn (name of object, use cheat spawnnames) (#) - Spawns a blueprint actor on player using a shorter name.
 cheat spawnnames - Sends a message to the console of all of the names that work with the "cheat spawn" command.
+cheat savewaypoint (phrase/number) - Gets the location of where you are standing and saves it as a waypoint. **NEW!**
+cheat waypoint (saved phrase/number) - Teleports the player to the selected existing waypoint. **NEW!**
 cheat bugitgo (X Y Z) - Teleport to a location.
+cheat getlocation - Gives you the current XYZ cords of where you are standing and copies them to your clipboard (useful for bugitgo)
 cheat infammo - Toggles Infinite Ammo.
 cheat buildfree - Toggles Infinite Materials.
 cheat launch/fling (X Y Z) - Launches a player.
@@ -3155,7 +3230,6 @@ cheat regenall - Heals all players health and shield.
 cheat godall - Gods all players.
 cheat giveall - Gives all players Ammo, Materials, and Traps maxed out.
 cheat tpalltomax - Teleports everyone to max height, in the middle of the map.
-cheat getlocation - Gives you the current XYZ cords of where you are standing and copies them to your clipboard (useful for bugitgo)
 cheat togglesnowmap - Toggles the map to have snow or not. (7.10, 7.30, 11.31, 15.10, 19.01, & 19.10 ONLY)
 cheat destroy - Destroys the actor that the player is looking at.
 cheat destroyall (ClassPathName) - Destroys every actor of a given class. Useful for removing all floorloot for example.

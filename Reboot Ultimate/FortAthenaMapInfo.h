@@ -159,6 +159,6 @@ public:
 		return Get<AActor*>(AircraftDropVolumeOffset);
 	}
 
-	FVector PickSupplyDropLocation(FVector Center, float Radius);
+	FVector PickSupplyDropLocation(FVector Center, float Radius); // ?
 	void SpawnLlamas();
 };

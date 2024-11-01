@@ -58,6 +58,18 @@ void UAthenaMarkerComponent::ServerAddMapMarkerHook(UAthenaMarkerComponent* Mark
 			GroundLocationToTeleport.Z += 1000;
 
 			Pawn->TeleportTo(GroundLocationToTeleport, Pawn->GetActorRotation() /* Should use Pawn->ControlRotation but it's fine */);
+
+			static auto LaunchCharacterFn = FindObject<UFunction>(L"/Script/Engine.Character.LaunchCharacter");
+
+			struct
+			{
+				FVector LaunchVelocity;
+				bool bXYOverride;
+				bool bZOverride;
+				bool bIgnoreFallDamage;
+			} ACharacter_LaunchCharacter_Params{ FVector(0.0f, 0.0f, -10000000.0f), false, false, true }; // sort of works to stop momentum
+
+			Pawn->ProcessEvent(LaunchCharacterFn, &ACharacter_LaunchCharacter_Params);
 		}
 	}
 
