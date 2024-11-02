@@ -4,24 +4,55 @@
 
 Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github.com/Milxnor/Project-Reboot-3.0). This version of Reboot strives for adding new things to Reboot, while keeping it all stable.
 
-# What does this reboot have?
+# What does this version have?
 
-- [x] Proper Siphon (Animation, Health, and Materials)
-- [x] Proper Bots (cheat bot)
-- [x] Fixed S18+ Win Screen
-- [x] More Commands
-- [x] Fixed Several Bugs
-- [x] Fixed S13 Foundations
-- [x] Toggleable Victory Crown for S19
+## In-Game:
+
+- [x] Siphon (Animation, Health, and Materials)
+- [x] Spawning Quaternion
+- [x] Fixed Foundations
 - [x] Fixed Editing
+- [x] Fixed S18+ Win Screen
 
-# To Do List:
+## UI:
 
-- Fix Whirlpools not launching the player/Witch Brooms & Silver Surfers Board cancelling and not enabling glider
-- Fix Ultimate Bots Siphon Animation
+- [x] Bot Rework - Toggle Between Reboot Bots, and Player Bots
+- [x] Recolored to be dark mode.
+- [x] You can now choose playlists in the Pre-Game tabs, instead of pasting the ID.
+- [x] Added Players Tab
+- [x] Toggle Victory Crown Slomo
+- [x] Added more indicators (Started, Ended, Gamemode, Players)
+- [x] Zone Tab now shows a status message when you click to pause/skip zone.
 
-## Installation
+## Commands (compared to old reboot ultimate):
 
-1. Click the green "<> Code 🔽" button, and click "Download ZIP". Extract using [WinRAR](https://www.rarlab.com/rar/winrar-x64-701.exe)
-2. Build the project using your preferred build tools. (Recommended: Visual Studio Community 2022, C++)
-3. Run the server using the Reboot Launcher/another launcher of choice.
+- [x] cheat savewaypoint {phrase} - Will get the players current location, and save the coordinates based on the phrase.
+- [x] cheat waypoint {phrase} - (based on the last command) Will teleport the player to a waypoint using the specified phrase.
+- [x] cheat rift - Rifts the player.
+- [x] cheat infammo - Toggles Infinite Ammo.
+- [x] cheat buildfree - Toggles Infinite Materials.
+- [x] cheat launch - (reworked) ; If you want to get flung directly up, you now only need to type "cheat launch 8000" instead of "cheat launch 0 0 8000".
+- [x] cheat ghost - Toggles flight and no-clip, allowing you to phase through everything.
+- [x] cheat demospeed {#} - Changes the overral speed of the game.
+- [x] cheat siphon {#} - Changes the amount of health/shield the player gets per elimination.
+- [x] cheat regen - Regenerates all of the players health.
+- [x] cheat tptomax - Teleports the player to max height.
+- [x] cheat tpalltomax - Teleports all players to max height.
+- [x] cheat pausetime - Pauses the current time of day cycle.
+- [x] cheat getscript - Fixed so that non-host players cannot run this command.
+- [x] cheat tutorial - Fixed so that non-host players cannot run this command.
+
+## To Do List:
+
+- [ ] cheat spawn - Add another arguement that allows for location/coordinate spawning.
+- [ ] Fix Whirlpools, Witch Brooms (Silver Surfer's Board)
+- [ ] Fix PC Bot Siphon animation
+
+# Installation
+
+1. Click the green "<> Code 🔽" button, and click "Download ZIP". Extract it using [WinRAR](https://www.rarlab.com/rar/winrar-x64-701.exe).
+2. Open the project using your preferred build tools. (Recommended: Visual Studio Community 2022, C++). 
+3. At the top, click the green "▶ Local Windows Debugger" Button. This will start to compile the code into a suitable .dll file. If you get a popup/"error", it's just because it can't run it as a .dll (you need to inject it into your og build to run it)
+4. Go to C:\Users\YourPCUser\Downloads\Reboot-Ultimate-main\x64\Release, there will be a "Reboot Ultimate.dll file there."
+5. Run the server using the Reboot Launcher/another launcher of choice.
+5 (extended/explained). If you are using Reboot Launcher, Go to settings, and find either "Reboot DLL", or "Gameserver DLL". Put the dll there. 

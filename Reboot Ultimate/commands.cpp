@@ -232,11 +232,11 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "WID_Shotgun_Standard_Athena_UC_Ore_T03";
 			}
-			else if (weaponName == "pump_vr" || weaponName == "spazz_vr")
+			else if (weaponName == "pump_vr" || weaponName == "spaz_vr")
 			{
 				weaponName = "WID_Shotgun_Standard_Athena_VR_Ore_T03";
 			}
-			else if (weaponName == "pump_sr" || weaponName == "spazz_sr" || weaponName == "spazz")
+			else if (weaponName == "pump_sr" || weaponName == "spaz_sr" || weaponName == "spaz")
 			{
 				weaponName = "WID_Shotgun_Standard_Athena_SR_Ore_T03";
 			}
@@ -480,10 +480,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "WID_Athena_Bucket_Nice";
 			}
-			else if (weaponName == "coal")
-			{
-				weaponName = "WID_Athena_Bucket_Coal";
-			}
 			else if (weaponName == "stink" || weaponName == "stinkbomb" || weaponName == "stinks")
 			{
 				weaponName = "Athena_GasGrenade";
@@ -495,6 +491,14 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else if (weaponName == "zaptrap")
 			{
 				weaponName = "Athena_ZippyTrout";
+			}
+			else if (weaponName == "batman")
+			{
+				weaponName = "WID_Badger_Grape_VR";
+			}
+			else if (weaponName == "spiderman")
+			{
+				weaponName = "WID_WestSausage_Parallel";
 			}
 			else if (weaponName == "shockwave" || weaponName == "shock" || weaponName == "shockwavegrenade" || weaponName == "shocks" || weaponName == "shockwaves")
 			{
@@ -1625,7 +1629,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				LOG_INFO(LogDev, "Destroyed Fishing Hole {}", FishingHole->GetFullName());
 			}
 		}
-		else if (Command == "getscript")
+		else if (Command == "getscript" || Command == "script")
 		{
 			auto& IP = PlayerState->GetSavedNetworkAddress();
 			auto IPStr = IP.ToString();
@@ -2099,6 +2103,27 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			ss << std::fixed << std::setprecision(0) << NewTimeOfDay;
 
 			std::wstring Message = L"Time of day set to " + ss.str() + L"!\n";
+			SendMessageToConsole(PlayerController, Message.c_str());
+		}
+		else if (Command == "pausetimeofday" || Command == "pausetime" || Command == "pausehour")
+		{
+			static auto SetTimeOfDaySpeedFn = FindObject<UFunction>(L"/Script/FortniteGame.FortKismetLibrary.SetTimeOfDaySpeed");
+
+			static bool isPaused = false;
+
+			float newSpeed = isPaused ? 1.0f : 0.0f;
+
+			struct
+			{
+				UObject* WorldContextObject;
+				float Speed;
+			} params{ GetWorld(), newSpeed };
+
+			UFortKismetLibrary::StaticClass()->ProcessEvent(SetTimeOfDaySpeedFn, &params);
+
+			isPaused = !isPaused;
+
+			std::wstring Message = isPaused ? L"Time of day paused!\n" : L"Time of day resumed!\n";
 			SendMessageToConsole(PlayerController, Message.c_str());
 		}
 		else if (Command == "sethealth" || Command == "health")
@@ -3039,8 +3064,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			SendMessageToConsole(PlayerController, L"minigun_ur/brutus || Mythic Brutus' Minigun");
 			SendMessageToConsole(PlayerController, L"pump_uc || Uncommon Pump Shotgun");
 			SendMessageToConsole(PlayerController, L"pump_r || Rare Pump Shotgun");
-			SendMessageToConsole(PlayerController, L"pump_vr/spazz_vr || Epic Pump Shotgun");
-			SendMessageToConsole(PlayerController, L"pump_sr/spazz_sr/spazz/pump || Legendary Pump Shotgun");
+			SendMessageToConsole(PlayerController, L"pump_vr/spaz_vr || Epic Pump Shotgun");
+			SendMessageToConsole(PlayerController, L"pump_sr/spaz_sr/spaz/pump || Legendary Pump Shotgun");
 			SendMessageToConsole(PlayerController, L"tac_uc || Uncommon Tactical Shotgun");
 			SendMessageToConsole(PlayerController, L"tac_r || Rare Tactical Shotgun");
 			SendMessageToConsole(PlayerController, L"tac_vr || Epic Tactical Shotgun");
@@ -3101,7 +3126,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			SendMessageToConsole(PlayerController, L"chillers/chiller/chillergrenade || Common Chiller Grenades");
 			SendMessageToConsole(PlayerController, L"can/rustycan/cans || Common Rusty Cans");
 			SendMessageToConsole(PlayerController, L"mythicgoldfish/mythicfish/goldfish || Mythic Goldfish");
-			SendMessageToConsole(PlayerController, L"coal || Common Coal");
+			SendMessageToConsole(PlayerController, L"batman || Batman's Grapnel Gun");
+			SendMessageToConsole(PlayerController, L"spiderman || (infinite) Spider-Man's Webshooters");
 			SendMessageToConsole(PlayerController, L"stink/stinkbomb/stinks || Rare Stink Bombs");
 			SendMessageToConsole(PlayerController, L"shieldbubble || Rare Shield Bubbles");
 			SendMessageToConsole(PlayerController, L"zaptrap || Epic Zaptraps");
@@ -3187,19 +3213,19 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 	if (bSendHelpMessage)
 	{
 		FString HelpMessage = LR"(
-cheat giveitem (WID) (#) - Gives a weapon to the executing player, if inventory is full drops a pickup on the player.
-cheat give (NAMEOFITEM_RARITY || Use cheat givenames) (#) - Gives a weapon using a shortcut name, without ID.
+cheat giveitem {ID} - Gives a weapon to the executing player, if inventory is full drops a pickup on the player.
+cheat give {NAMEOFITEM_RARITY || Use cheat givenames} - Gives a weapon using a shortcut name, without ID.
 cheat givenames - Sends a message to the console of all of the names that work with the "cheat give" command.
-cheat summon (full path of object) (#) - Summons the specified blueprint class at the executing player's location. Note: There is a limit on the count.
-cheat spawn (name of object, use cheat spawnnames) (#) - Spawns a blueprint actor on player using a shorter name.
+cheat summon {full path of object} - Summons the specified blueprint class at the executing player's location. Note: There is a limit on the count.
+cheat spawn {name of object, use cheat spawnnames} - Spawns a blueprint actor on player using a shorter name.
 cheat spawnnames - Sends a message to the console of all of the names that work with the "cheat spawn" command.
-cheat savewaypoint (phrase/number) - Gets the location of where you are standing and saves it as a waypoint. **NEW!**
-cheat waypoint (saved phrase/number) - Teleports the player to the selected existing waypoint. **NEW!**
-cheat bugitgo (X Y Z) - Teleport to a location.
+cheat savewaypoint {phrase/number} - Gets the location of where you are standing and saves it as a waypoint. **NEW!**
+cheat waypoint {saved phrase/number} - Teleports the player to the selected existing waypoint. **NEW!**
+cheat bugitgo {X Y Z} - Teleport to a location.
 cheat getlocation - Gives you the current XYZ cords of where you are standing and copies them to your clipboard (useful for bugitgo)
 cheat infammo - Toggles Infinite Ammo.
 cheat buildfree - Toggles Infinite Materials.
-cheat launch/fling (X Y Z) - Launches a player.
+cheat launch/fling {X Y Z} - Launches a player.
 cheat fly - Toggles flight.
 cheat ghost - Toggles flight and disables collision.
 cheat rift - Rifts the player into the air.
@@ -3210,18 +3236,18 @@ cheat ban - Permanently bans the player from the game. (IP Ban)
 cheat pausesafezone - Pauses the zone.
 cheat demospeed - Speeds up/slows down the speed of the game.
 cheat tptomax - Teleports player to max height, in the middle of the map.
-cheat health (#) - Sets executing player's health.
-cheat shield (#) - Sets executing player's shield.
-cheat maxhealth (#) - Sets the maximum health of the player.
-cheat maxshield (#) - Sets the maximum shield of the player.
+cheat health {#} - Sets executing player's health.
+cheat shield {#} - Sets executing player's shield.
+cheat maxhealth {#} - Sets the maximum health of the player.
+cheat maxshield {#} - Sets the maximum shield of the player.
 cheat regen - Regenerates the players health and shield to their max.
-cheat siphon (#) - Changes the amount of health and shield a player gets for killing someone.
-cheat skin (CID) - Sets a player's character.
-cheat spawnpickup (WID) (#) - Spawns a pickup at specified player.
+cheat siphon {#} - Changes the amount of health and shield a player gets for killing someone.
+cheat skin {CID} - Sets a player's character.
+cheat spawnpickup {WID} {#} - Spawns a pickup at specified player.
 cheat tp - Teleports to what the player is looking at.
-cheat bot (#) - Spawns a bot at the player (experimental).
-cheat pickaxe (Pickaxe ID) - Set player's pickaxe. Can be either the PID or WID
-cheat wipe/clear (Primary = Guns || Secondary = Ammo & Mats) - Removes the specified quickbar.
+cheat bot {#} - Spawns a bot at the player (experimental).
+cheat pickaxe {Pickaxe (W)ID} - Set player's pickaxe. Can be either the PID or WID
+cheat wipe/clear {Primary = Guns || Secondary = Ammo & Mats} - Removes the specified quickbar.
 cheat wipeall/clearall - Removes the player's entire inventory.
 cheat suicide - Insta-kills player.
 cheat healthall - Heals all players health.
@@ -3232,15 +3258,16 @@ cheat giveall - Gives all players Ammo, Materials, and Traps maxed out.
 cheat tpalltomax - Teleports everyone to max height, in the middle of the map.
 cheat togglesnowmap - Toggles the map to have snow or not. (7.10, 7.30, 11.31, 15.10, 19.01, & 19.10 ONLY)
 cheat destroy - Destroys the actor that the player is looking at.
-cheat destroyall (ClassPathName) - Destroys every actor of a given class. Useful for removing all floorloot for example.
-cheat damagetarget (#) - Damages the Actor in front of you by the specified amount.
+cheat destroyall {ClassPathName} - Destroys every actor of a given class. Useful for removing all floorloot for example.
+cheat damagetarget {#} - Damages the Actor in front of you by the specified amount.
 cheat getscript - Opens the Project Reboot V3 Script on your preferred browser (host only).
 cheat tutorial - Opens the Project Reboot V3 Tutorial (host only).
 cheat killserver - Ends the running task of the hosting window (host only).
 cheat startaircraft - Starts the bus.
-cheat settimeofday (1-23) - Changes the time of day in game to a 24H time period.
+cheat settimeofday {1-23} - Changes the time of day in game to a 24H time period.
+cheat pausetimeofday - Pauses the current time of day cycle. **NEW!**
 
-If you want to execute a command on a certain player, surround their name (case sensitive) with \, and put the param with their name anywhere. Example: cheat sethealth \Ralzify\ 100
+If you want to execute a command on a certain player, surround their name (case sensitive) with \, and put the param with their name anywhere. Example: cheat health \Ralzify\ 100
 )";
 
 		SendMessageToConsole(PlayerController, HelpMessage);

@@ -300,8 +300,6 @@ static std::vector Primaries = {
 	"WID_Assault_AutoHigh_Athena_SR_Ore_T03",
 	"WID_Assault_SemiAuto_Athena_VR_Ore_T03",
 	"WID_Assault_SemiAuto_Athena_SR_Ore_T03",
-	"WID_Assault_Suppressed_Athena_VR_Ore_T03",
-	"WID_Assault_Suppressed_Athena_SR_Ore_T03",
 	"WID_Assault_PistolCaliber_AR_Athena_R_Ore_T03",
 	"WID_Assault_PistolCaliber_AR_Athena_VR_Ore_T03",
 	"WID_Assault_PistolCaliber_AR_Athena_SR_Ore_T03",
@@ -324,9 +322,6 @@ static std::vector Consumables1 = {
 	"Athena_Rift_Item",
 	"Athena_GasGrenade",
 	"Athena_SilverBlazer_V2",
-	"Athena_Balloons_Consumable",
-	"Athena_Balloons",
-	"Athena_TowerGrenade",
 	"WID_Athena_AppleSun",
 	"WID_Athena_AppleSun",
 	"Athena_IceGrenade",
@@ -337,21 +332,14 @@ static std::vector Consumables1 = {
 	"Athena_Rift_Item",
 	"Athena_GasGrenade",
 	"Athena_SilverBlazer_V2",
-	"Athena_Balloons_Consumable",
-	"Athena_Balloons",
-	"Athena_TowerGrenade",
 	"WID_Athena_AppleSun",
 	"WID_Athena_AppleSun",
-	"Athena_IceGrenade",
 	"WID_Athena_Bucket_Old",
 	"ID_ValetMod_Tires_OffRoad_Thrown",
 	"WID_Pistol_Flintlock_Athena_C",
 	"WID_Pistol_Flintlock_Athena_UC",
 	"WID_Pistol_Flintlock_Athena_C",
 	"WID_Pistol_Flintlock_Athena_UC",
-	"WID_Launcher_Rocket_Athena_R_Ore_T03",
-	"WID_Launcher_Rocket_Athena_VR_Ore_T03",
-	"WID_Launcher_Rocket_Athena_SR_Ore_T03",
 	"WID_Launcher_Rocket_Athena_VR_Ore_T03",
 	"WID_Launcher_Rocket_Athena_SR_Ore_T03",
 	"WID_Launcher_Grenade_Athena_R_Ore_T03",
@@ -395,11 +383,7 @@ static std::vector Traps = {
 	"TID_Floor_Player_Launch_Pad_Athena",
 	"TID_Context_Reinforced_Athena",
 	"TID_Context_Reinforced_Athena",
-	"TID_Context_Freeze_Athena",
 	"TID_Floor_Player_Campfire_Athena",
-	"TID_Floor_Player_Campfire_Athena",
-	"TID_Floor_MountedTurret_Athena",
-	"TID_ContextTrap_Athena",
 	"TID_ContextTrap_Athena"
 };
 
@@ -1577,7 +1561,7 @@ static inline void MainUI()
 
 		else if (Tab == DUMP_TAB)
 		{
-			ImGui::Text("These will all be in your Win64 folder!");
+			ImGui::Text("Located in your versions FortniteGame/Binaries/Win64 folder!");
 
 			static std::string FortniteVersionStr = std::format("Fortnite Version {}\n\n", std::to_string(Fortnite_Version));
 
@@ -1600,7 +1584,7 @@ static inline void MainUI()
 				}
 			}
 
-			if (ImGui::Button("Dump Skins (Skins.txt)"))
+			if (ImGui::Button("Dump Skins"))
 			{
 				std::ofstream SkinsFile("Skins.txt");
 
@@ -1646,7 +1630,7 @@ static inline void MainUI()
 				}
 			}
 
-			if (ImGui::Button("Dump Playlists (Playlists.txt)"))
+			if (ImGui::Button("Dump Playlists"))
 			{
 				std::ofstream PlaylistsFile("Playlists.txt");
 
@@ -1677,7 +1661,7 @@ static inline void MainUI()
 					std::cout << "Failed to open playlist file!\n";
 			}
 
-			if (ImGui::Button("Dump Weapons (Weapons.txt)"))
+			if (ImGui::Button("Dump Weapons"))
 			{
 				std::ofstream WeaponsFile("Weapons.txt");
 
@@ -1775,13 +1759,13 @@ static inline void MainUI()
 				static auto DefaultGliderRedeployCanRedeployOffset = FindOffsetStruct("/Script/FortniteGame.FortGameStateAthena", "DefaultGliderRedeployCanRedeploy", false);
 				static auto DefaultParachuteDeployTraceForGroundDistanceOffset = GameState->GetOffset("DefaultParachuteDeployTraceForGroundDistance", false);
 
-				if (Globals::bStartedListening) // it resets accordingly to ProHenis b4 this
+				/*if (Globals::bStartedListening) // it resets accordingly to ProHenis b4 this
 				{
 					if (DefaultParachuteDeployTraceForGroundDistanceOffset != -1)
 					{
 						ImGui::InputFloat("Automatic Parachute Pullout Distance", GameState->GetPtr<float>(DefaultParachuteDeployTraceForGroundDistanceOffset));
 					}
-				}
+				}*/
 
 				if (DefaultGliderRedeployCanRedeployOffset != -1)
 				{
