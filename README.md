@@ -41,10 +41,9 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 - [x] cheat pausetime - Pauses the current time of day cycle.
 - [x] cheat getscript - Fixed so that non-host players cannot run this command.
 - [x] cheat tutorial - Fixed so that non-host players cannot run this command.
+- [x] cheat spawn - Allows for spawning at a location (ex: cheat spawn quad -120397.375000, 4183.438477, 7969.918457)
 
 ## To Do List:
-
-- [ ] cheat spawn - Add another arguement that allows for location/coordinate spawning.
 - [ ] Fix Whirlpools, Witch Brooms (Silver Surfer's Board)
 - [ ] Fix PC Bot Siphon animation
 

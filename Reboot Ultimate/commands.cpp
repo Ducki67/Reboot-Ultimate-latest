@@ -1760,12 +1760,39 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				return;
 			}
 
+			FVector Loc = Pawn->GetActorLocation();
 			int Count = 1;
 
-			if (Arguments.size() >= 3)
+			try
 			{
-				try { Count = std::stod(Arguments[2]); }
-				catch (...) {}
+				if (Arguments.size() >= 5)
+				{
+					Loc.X = std::stof(Arguments[2]);
+					Loc.Y = std::stof(Arguments[3]);
+					Loc.Z = std::stof(Arguments[4]) - 75;
+
+					if (Arguments.size() >= 6)
+						Count = std::stoi(Arguments[5]);
+				}
+				else
+				{
+					Loc.Z += 250;
+				}
+
+				if (Arguments.size() == 3)
+				{
+					Count = std::stoi(Arguments[2]);
+				}
+			}
+			catch (const std::invalid_argument&)
+			{
+				SendMessageToConsole(PlayerController, L"Invalid input for coordinates or count!");
+				return;
+			}
+			catch (const std::out_of_range&)
+			{
+				SendMessageToConsole(PlayerController, L"Input value out of range!");
+				return;
 			}
 
 			FRotator SpawnRotation = Pawn->GetActorRotation();
@@ -1867,9 +1894,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 				for (int i = 0; i < Count; i++)
 				{
-					auto Loc = Pawn->GetActorLocation();
-					Loc.Z += 250;
-
 					FTransform SpawnTransform;
 					SpawnTransform.Translation = Loc;
 					SpawnTransform.Rotation = SpawnRotation.Quaternion();
@@ -1879,7 +1903,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 					if (!NewActor)
 					{
-						SendMessageToConsole(PlayerController, (L"Failed to spawn actor!"));
+						SendMessageToConsole(PlayerController, (L"Failed to spawn actor(s)!"));
 					}
 					else
 					{
@@ -3216,8 +3240,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 cheat giveitem {ID} - Gives a weapon to the executing player, if inventory is full drops a pickup on the player.
 cheat give {NAMEOFITEM_RARITY || Use cheat givenames} - Gives a weapon using a shortcut name, without ID.
 cheat givenames - Sends a message to the console of all of the names that work with the "cheat give" command.
-cheat summon {full path of object} - Summons the specified blueprint class at the executing player's location. Note: There is a limit on the count.
-cheat spawn {name of object, use cheat spawnnames} - Spawns a blueprint actor on player using a shorter name.
+cheat summon {full path of object} {optional: X, Y, Z} - Summons the specified blueprint class at the executing player's location. Note: There is a limit on the count.
+cheat spawn {name of object, use cheat spawnnames} {optional: X, Y, Z} - Spawns a blueprint actor on player using a shorter name.
 cheat spawnnames - Sends a message to the console of all of the names that work with the "cheat spawn" command.
 cheat savewaypoint {phrase/number} - Gets the location of where you are standing and saves it as a waypoint. **NEW!**
 cheat waypoint {saved phrase/number} - Teleports the player to the selected existing waypoint. **NEW!**

@@ -349,6 +349,8 @@ static std::vector Consumables1 = {
 	"WID_Athena_AppleSun",
 	"WID_Athena_AppleSun",
 	"WID_Athena_Bucket_Old",
+	"WID_FringePlank_Athena_Prototype",
+	"WID_FringePlank_Athena_Prototype",
 	"ID_ValetMod_Tires_OffRoad_Thrown",
 	"WID_Pistol_Flintlock_Athena_C",
 	"WID_Pistol_Flintlock_Athena_UC",
@@ -1217,6 +1219,11 @@ static inline void MainUI()
 
 				else if (Tab == PLAYERS_TAB)
 				{
+					if (Globals::bStartedListening == false)
+					{
+						ImGui::Text("The game hasn't started yet!");
+					}
+
 					if (bLoaded)
 					{
 						auto World = GetWorld();
