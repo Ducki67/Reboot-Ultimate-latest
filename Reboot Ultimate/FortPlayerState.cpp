@@ -74,31 +74,6 @@ void AFortPlayerState::ApplyHealthEffect()
 	GetAbilitySystemComponent()->NetMulticast_InvokeGameplayCueExecuted(GameplayCueTag);
 }
 
-/*void AFortPlayerState::CheckAndTeleportPlayer()
-{
-	if (!GetAbilitySystemComponent() || !Pawn)
-		return;
-
-	static auto BGAClass = FindObject<UClass>(L"/Script/Engine.BlueprintGeneratedClass");
-	UClass* RiftGEClass = LoadObject<UClass>(L"/Game/Athena/Items/ForagedItems/Rift/GE_Rift_Athena_Teleport.GE_Rift_Athena_Teleport_C", BGAClass);
-
-	if (GetAbilitySystemComponent()->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(UKismetStringLibrary::Conv_StringToName(L"GameplayCue.RiftTeleport"))))
-	{
-		FVector CurrentLocation = Pawn->GetActorLocation();
-
-		FVector NewLocation = FVector(CurrentLocation.X, CurrentLocation.Y, 20000.0f);
-
-		Pawn->TeleportTo(NewLocation, Pawn->GetActorRotation());
-	}
-}
-
-void AFortPlayerState::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	CheckAndTeleportPlayer();
-}*/
-
 bool AFortPlayerState::AreUniqueIDsIdentical(FUniqueNetIdRepl* A, FUniqueNetIdRepl* B)
 {
 	return A->IsIdentical(B);

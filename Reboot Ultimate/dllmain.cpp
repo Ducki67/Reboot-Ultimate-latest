@@ -612,7 +612,7 @@ UObject* GetAIDirectorHook()
 static inline void (*Athena_MedConsumable_TriggeredOriginal)(UObject* Context, FFrame& Stack, void* Ret);
 static void Athena_MedConsumable_TriggeredHook(UObject* Context, FFrame& Stack, void* Ret)
 {
-    LOG_INFO(LogDev, __FUNCTION__);
+    // LOG_INFO(LogDev, __FUNCTION__);
 
     UObject* Athena_MedConsumable = Context;
 
@@ -1402,6 +1402,10 @@ DWORD WINAPI Main(LPVOID)
         UFortKismetLibrary::K2_RemoveItemFromPlayerByGuidHook, (PVOID*)&UFortKismetLibrary::K2_RemoveItemFromPlayerByGuidOriginal, false, true);
     Hooking::MinHook::Hook(FortKismetLibraryDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortKismetLibrary.K2_RemoveItemFromPlayer"),
         UFortKismetLibrary::K2_RemoveItemFromPlayerHook, (PVOID*)&UFortKismetLibrary::K2_RemoveItemFromPlayerOriginal, false, true);
+
+    Hooking::MinHook::Hook(FindObject(L"/Game/Athena/Items/Consumables/Parents/GA_Athena_MedConsumable_Parent.Default__GA_Athena_MedConsumable_Parent_C"),
+        FindObject<UFunction>(L"/Game/Athena/Items/Consumables/Parents/GA_Athena_MedConsumable_Parent.GA_Athena_MedConsumable_Parent_C.Triggered_4C02BFB04B18D9E79F84848FFE6D2C32"),
+        Athena_MedConsumable_TriggeredHook, (PVOID*)&Athena_MedConsumable_TriggeredOriginal, false, true);
 
     Hooking::MinHook::Hook(FortPlayerPawnAthenaDefault, NetMulticast_Athena_BatchedDamageCuesFn,
         AFortPawn::NetMulticast_Athena_BatchedDamageCuesHook, (PVOID*)&AFortPawn::NetMulticast_Athena_BatchedDamageCuesOriginal, false, true);
