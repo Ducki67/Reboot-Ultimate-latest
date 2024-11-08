@@ -1275,21 +1275,28 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				return;
 			}
 
-			float Shield = 0.f;
-
-			if (NumArgs >= 1)
+			if (Arguments.size() < 2)
 			{
-				try { Shield = std::stof(Arguments[1]); }
-				catch (...) {}
+				SendMessageToConsole(PlayerController, L"Please choose a number to set your shield to!");
 			}
+			else
+			{
+				float Shield = 0.f;
 
-			Pawn->SetShield(Shield);
+				if (NumArgs >= 1)
+				{
+					try { Shield = std::stof(Arguments[1]); }
+					catch (...) {}
+				}
 
-			std::wstringstream ss;
-			ss << std::fixed << std::setprecision(0) << Shield;
+				Pawn->SetShield(Shield);
 
-			std::wstring Message = L"Shield set to " + ss.str() + L"!\n";
-			SendMessageToConsole(PlayerController, Message.c_str());
+				std::wstringstream ss;
+				ss << std::fixed << std::setprecision(0) << Shield;
+
+				std::wstring Message = L"Shield set to " + ss.str() + L"!\n";
+				SendMessageToConsole(PlayerController, Message.c_str());
+			}
 		}
 		else if (Command == "setmaxshield" || Command == "maxshield")
 		{
@@ -1301,21 +1308,28 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				return;
 			}
 
-			float MaxShield = 0.f;
-
-			if (NumArgs >= 1)
+			if (Arguments.size() < 2)
 			{
-				try { MaxShield = std::stof(Arguments[1]); }
-				catch (...) {}
+				SendMessageToConsole(PlayerController, L"Please choose a number to set your max shield to!");
 			}
+			else
+			{
+				float MaxShield = 0.f;
 
-			Pawn->SetMaxShield(MaxShield);
+				if (NumArgs >= 1)
+				{
+					try { MaxShield = std::stof(Arguments[1]); }
+					catch (...) {}
+				}
 
-			std::wstringstream ss;
-			ss << std::fixed << std::setprecision(0) << MaxShield;
+				Pawn->SetMaxShield(MaxShield);
 
-			std::wstring Message = L"Max shield set to " + ss.str() + L"!\n";
-			SendMessageToConsole(PlayerController, Message.c_str());
+				std::wstringstream ss;
+				ss << std::fixed << std::setprecision(0) << MaxShield;
+
+				std::wstring Message = L"Max shield set to " + ss.str() + L"!\n";
+				SendMessageToConsole(PlayerController, Message.c_str());
+			}
 		}
 		/*else if (Command == "setbotmaxshield" || Command == "botmaxshield")
 		{
@@ -2160,18 +2174,25 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				return;
 			}
 
-			float Health = 100.f;
+			if (Arguments.size() < 2)
+			{
+				SendMessageToConsole(PlayerController, L"Please choose a number to set your health to!");
+			}
+			else
+			{
+				float Health = 100.f;
 
-			try { Health = std::stof(Arguments[1]); }
-			catch (...) {}
+				try { Health = std::stof(Arguments[1]); }
+				catch (...) {}
 
-			Pawn->SetHealth(Health);
+				Pawn->SetHealth(Health);
 
-			std::wstringstream ss;
-			ss << std::fixed << std::setprecision(0) << Health;
+				std::wstringstream ss;
+				ss << std::fixed << std::setprecision(0) << Health;
 
-			std::wstring Message = L"Health set to " + ss.str() + L"!\n";
-			SendMessageToConsole(PlayerController, Message.c_str());
+				std::wstring Message = L"Health set to " + ss.str() + L"!\n";
+				SendMessageToConsole(PlayerController, Message.c_str());
+			}
 		}
 		else if (Command == "setmaxhealth" || Command == "maxhealth")
 		{
@@ -2183,18 +2204,25 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				return;
 			}
 
-			float MaxHealth = 100.f;
+			if (Arguments.size() < 2)
+			{
+				SendMessageToConsole(PlayerController, L"Please choose a number to set your max health to!");
+			}
+			else
+			{
+				float MaxHealth = 100.f;
 
-			try { MaxHealth = std::stof(Arguments[1]); }
-			catch (...) {}
+				try { MaxHealth = std::stof(Arguments[1]); }
+				catch (...) {}
 
-			Pawn->SetMaxHealth(MaxHealth);
+				Pawn->SetMaxHealth(MaxHealth);
 
-			std::wstringstream ss;
-			ss << std::fixed << std::setprecision(0) << MaxHealth;
+				std::wstringstream ss;
+				ss << std::fixed << std::setprecision(0) << MaxHealth;
 
-			std::wstring Message = L"Max health set to " + ss.str() + L"!\n";
-			SendMessageToConsole(PlayerController, Message.c_str());
+				std::wstring Message = L"Max health set to " + ss.str() + L"!\n";
+				SendMessageToConsole(PlayerController, Message.c_str());
+			}
 		}
 		else if (Command == "pausesafezone" || Command == "pausezone")
 		{
