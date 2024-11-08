@@ -61,16 +61,18 @@ void ABuildingActor::OnDamageServerHook(ABuildingActor* BuildingActor, float Dam
 	auto AttachedBuildingActors = BuildingSMActor->GetAttachedBuildingActors();
 	for (int i = 0; i < AttachedBuildingActors.Num(); ++i)
 	{
-
-		auto CurrentBuildingActor = AttachedBuildingActors.at(i);
-		auto CurrentActor = Cast<ABuildingActor>(CurrentBuildingActor);
-		if (BuildingSMActor->GetHealth() <= 0 || BuildingActor->GetHealth() <= 0)
+		if (Fortnite_Version >= 7)
 		{
-			if (auto Container = Cast<ABuildingContainer>(CurrentActor))
+			auto CurrentBuildingActor = AttachedBuildingActors.at(i);
+			auto CurrentActor = Cast<ABuildingActor>(CurrentBuildingActor);
+			if (BuildingSMActor->GetHealth() <= 0 || BuildingActor->GetHealth() <= 0)
 			{
-				if (!Container->IsAlreadySearched())
+				if (auto Container = Cast<ABuildingContainer>(CurrentActor))
 				{
-					Container->SpawnLoot();
+					if (!Container->IsAlreadySearched())
+					{
+						Container->SpawnLoot();
+					}
 				}
 			}
 		}

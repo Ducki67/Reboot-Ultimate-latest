@@ -3,6 +3,7 @@
 # What is Reboot Ultimate?
 
 Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github.com/Milxnor/Project-Reboot-3.0). This version of Reboot strives for adding new things to Reboot, while keeping it all stable.
+Alot of these updates wouldn't be possible without [Max's](https://github.com/max8447) help. I will not take all of the credit for this.
 
 # What does this version have?
 
@@ -10,7 +11,7 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 
 - [x] Siphon (Animation, Health, and Materials)
 - [x] Spawning Quaternion
-- [x] Fixed Foundations
+- [x] Fixed Foundations (minus maybe some stuff on s17)
 - [x] Fixed Editing
 - [x] Fixed S18+ Win Screen
 
@@ -45,7 +46,7 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 
 ## To Do List:
 - [ ] Fix Whirlpools, Witch Brooms (Silver Surfer's Board)
-- [ ] Fix PC Bot Siphon animation
+- [ ] Fix PC Bot Siphon Animation
 
 # Installation
 
