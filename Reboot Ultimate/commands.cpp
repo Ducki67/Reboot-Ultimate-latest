@@ -966,6 +966,108 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			}
 
 			auto& pickaxeName = Arguments[1];
+
+			if (pickaxeName == "reaper" || pickaxeName == "scythe") // if this git ever gets released feel free to pull request open more of these i cba
+			{
+				pickaxeName = "WID_Harvest_HalloweenScythe_Athena_C_T01";
+			}
+			else if (pickaxeName == "raiders" || pickaxeName == "revenge")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_Lockjaw_Athena_C_T01";
+			}
+			else if (pickaxeName == "icebreaker" || pickaxeName == "shovel")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_WinterCamo_Athena";
+			}
+			else if (pickaxeName == "default")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_Athena_C_T01";
+			}
+			else if (pickaxeName == "candy")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_HolidayCandyCane_Athena";
+			}
+			else if (pickaxeName == "galaxy")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_Celestial";
+			}
+			else if (pickaxeName == "spectral" || pickaxeName == "prismatic")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_Prismatic";
+			}
+			else if (pickaxeName == "tat")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_Heart_Athena";
+			}
+			else if (pickaxeName == "acdc")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_Teslacoil_Athena";
+			}
+			else if (pickaxeName == "lucky")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_Smiley_Athena_C_T01";
+			}
+			else if (pickaxeName == "studded")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_SharpDresser";
+			}
+			else if (pickaxeName == "driver" || pickaxeName == "golf" || pickaxeName == "club")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_GolfClub";
+			}
+			else if (pickaxeName == "guiding" || pickaxeName == "glow" || pickaxeName == "redriding")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_RedRiding";
+			}
+			else if (pickaxeName == "coldsnap" || pickaxeName == "gnome")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_Gnome";
+			}
+			else if (pickaxeName == "vision")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_StreetGoth";
+			}
+			else if (pickaxeName == "bootstrap" || pickaxeName == "fish")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_TeriyakiFish";
+			}
+			else if (pickaxeName == "widows" || pickaxeName == "widowsbite")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_AshtonBoardwalk";
+			}
+			else if (pickaxeName == "riperippers" || pickaxeName == "bunker" || pickaxeName == "1h")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_BunkerMan_1H";
+			}
+			else if (pickaxeName == "starwand" || pickaxeName == "star" || pickaxeName == "wand")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_StarWand";
+			}
+			else if (pickaxeName == "rey" || pickaxeName == "quarterstaff")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_GalileoRocket";
+			}
+			else if (pickaxeName == "harly" || pickaxeName == "bat")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_LollipopTricksterFemale";
+			}
+			else if (pickaxeName == "fncs")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_FNCS";
+			}
+			else if (pickaxeName == "butterfly" || pickaxeName == "knives")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_SpyMale1H";
+			}
+			else if (pickaxeName == "mjolnir")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_HightowerTapas1H";
+			}
+			else if (pickaxeName == "leviathan")
+			{
+				pickaxeName = "WID_Harvest_Pickaxe_HistorianMale";
+			}
+
 			static auto AthenaPickaxeItemDefinitionClass = FindObject<UClass>(L"/Script/FortniteGame.AthenaPickaxeItemDefinition");
 
 			auto Pickaxe1 = FindObject(pickaxeName + "." + pickaxeName, nullptr, ANY_PACKAGE);
@@ -1264,6 +1366,13 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			Pawn->ProcessEvent(LaunchCharacterFn, &ACharacter_LaunchCharacter_Params);
 
 			SendMessageToConsole(PlayerController, L"Launched character!");
+		}
+		else if (Command == "falldmg" || Command == "falldamage")
+		{
+			if (auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn()))
+				PlayerState->DisableFallDamage();
+
+			SendMessageToConsole(PlayerController, L"You have **PERMANENTLY** turned off fall damage for this game.");
 		}
 		else if (Command == "setshield" || Command == "shield")
 		{
@@ -1704,6 +1813,120 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn());
 
 			std::string CIDStr = Arguments[1];
+
+			if (CIDStr == "rene" || CIDStr == "renegaderaider") // if this git ever gets released feel free to pull request open more of these i cba
+			{
+				CIDStr = "CID_028_Athena_Commando_F";
+			}
+			else if (CIDStr == "ghoul" || CIDStr == "ghoultrooper")
+			{
+				CIDStr = "CID_029_Athena_Commando_F_Halloween";
+			}
+			else if (CIDStr == "skull" || CIDStr == "skulltrooper")
+			{
+				CIDStr = "CID_030_Athena_Commando_M_Halloween";
+			}
+			else if (CIDStr == "aerial" || CIDStr == "aerialassault")
+			{
+				CIDStr = "CID_017_Athena_Commando_M";
+			}
+			else if (CIDStr == "recon" || CIDStr == "reconexpert")
+			{
+				CIDStr = "CID_022_Athena_Commando_F";
+			}
+			else if (CIDStr == "desperado")
+			{
+				CIDStr = "CID_026_Athena_Commando_M";
+			}
+			else if (CIDStr == "blackknight" || CIDStr == "bk")
+			{
+				CIDStr = "CID_035_Athena_Commando_M_Medieval";
+			}
+			else if (CIDStr == "sparkle" || CIDStr == "sparklespecialist")
+			{
+				CIDStr = "CID_039_Athena_Commando_F_Disco";
+			}
+			else if (CIDStr == "rednosed" || CIDStr == "rnr" || CIDStr == "reindeer")
+			{
+				CIDStr = "CID_047_Athena_Commando_F_HolidayReindeer";
+			}
+			else if (CIDStr == "ginger")
+			{
+				CIDStr = "CID_048_Athena_Commando_F_HolidayGingerbread";
+			}
+			else if (CIDStr == "mogul")
+			{
+				CIDStr = "CID_061_Athena_Commando_F_SkiGirl";
+			}
+			else if (CIDStr == "usa")
+			{
+				CIDStr = "CID_062_Athena_Commando_F_SkiGirl_USA";
+			}
+			else if (CIDStr == "can")
+			{
+				CIDStr = "CID_063_Athena_Commando_F_SkiGirl_CAN";
+			}
+			else if (CIDStr == "gbr")
+			{
+				CIDStr = "CID_064_Athena_Commando_F_SkiGirl_GBR";
+			}
+			else if (CIDStr == "fra")
+			{
+				CIDStr = "CID_065_Athena_Commando_F_SkiGirl_FRA";
+			}
+			else if (CIDStr == "ger")
+			{
+				CIDStr = "CID_066_Athena_Commando_F_SkiGirl_GER";
+			}
+			else if (CIDStr == "chn")
+			{
+				CIDStr = "CID_067_Athena_Commando_F_SkiGirl_CHN";
+			}
+			else if (CIDStr == "kor")
+			{
+				CIDStr = "CID_068_Athena_Commando_F_SkiGirl_KOR";
+			}
+			else if (CIDStr == "rapscallion")
+			{
+				CIDStr = "CID_135_Athena_Commando_F_Jailbird";
+			}
+			else if (CIDStr == "galaxy")
+			{
+				CIDStr = "CID_175_Athena_Commando_M_Celestial";
+			}
+			else if (CIDStr == "heidi")
+			{
+				CIDStr = "CID_226_Athena_Commando_F_Octoberfest";
+			}
+			else if (CIDStr == "ikonik")
+			{
+				CIDStr = "CID_313_Athena_Commando_M_KpopFashion";
+			}
+			else if (CIDStr == "kuno")
+			{
+				CIDStr = "CID_362_Athena_Commando_F_BandageNinja";
+			}
+			else if (CIDStr == "aura")
+			{
+				CIDStr = "CID_397_Athena_Commando_F_TreasureHunterFashion";
+			}
+			else if (CIDStr == "wonder")
+			{
+				CIDStr = "CID_434_Athena_Commando_F_StealthHonor";
+			}
+			else if (CIDStr == "worldcup" || CIDStr == "wc")
+			{
+				CIDStr = "CID_478_Athena_Commando_F_WorldCup";
+			}
+			else if (CIDStr == "crystal")
+			{
+				CIDStr = "CID_493_Athena_Commando_F_JurassicArchaeology";
+			}
+			else if (CIDStr == "fennix")
+			{
+				CIDStr = "CID_504_Athena_Commando_M_Lopex";
+			}
+
 			auto CIDDef = FindObject(CIDStr, nullptr, ANY_PACKAGE);
 
 			if (!CIDDef)
@@ -1834,7 +2057,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else if (ActorName == "golfcart" || ActorName == "golf")
 				ActorName = "/Game/Athena/DrivableVehicles/Golf_Cart/Golf_Cart_Base/Blueprints/GolfCartVehicleSK.GolfCartVehicleSK_C";
 			else if (ActorName == "ufo")
-				ActorName = "/Nevada/Blueprints/Vehicle/Nevada_Vehicle_V2.Nevada_Vehicle_V2_C";
+				SendMessageToConsole(PlayerController, L"for some fuckass reason this doesn't work, go to the V3 script (cheat script if your hosting) and grab the spawn from there");
 			else if (ActorName == "cannon")
 				ActorName = "/Game/Athena/DrivableVehicles/PushCannon.PushCannon_C";
 			else if (ActorName == "shoppingcart" || ActorName == "shopping")
@@ -1923,13 +2146,20 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 					{
 						NewActor->ForceNetUpdate();
 						AmountSpawned++;
-						SendMessageToConsole(PlayerController, L"Summoned!");
+
+						if (ActorName != "ufo")
+						{
+							SendMessageToConsole(PlayerController, L"Summoned!");
+						}
 					}
 				}
 			}
 			else
 			{
-				SendMessageToConsole(PlayerController, L"Not a valid class!");
+				if (ActorName != "ufo")
+				{
+					SendMessageToConsole(PlayerController, L"Not a valid class!");
+				}
 			}
 		}
 		else if (Command == "rift")
@@ -3294,6 +3524,7 @@ cheat maxhealth {#} - Sets the maximum health of the player.
 cheat maxshield {#} - Sets the maximum shield of the player.
 cheat regen - Regenerates the players health and shield to their max.
 cheat siphon {#} - Changes the amount of health and shield a player gets for killing someone.
+cheat falldamage - Permanently turn off fall damage. **NEW!**
 cheat skin {CID} - Sets a player's character.
 cheat spawnpickup {WID} {#} - Spawns a pickup at specified player.
 cheat tp - Teleports to what the player is looking at.

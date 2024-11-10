@@ -310,7 +310,7 @@ public:
 
 		uint8_t DeathCause = 0;
 
-		static auto FallDamageEnumValue = 1;
+		static auto FallDamageEnumValue = 0;
 
 		auto DeathInfo = PlayerState->GetDeathInfo(); // Alloc<void>(DeathInfoStructSize);
 		PlayerState->ClearDeathInfo();
