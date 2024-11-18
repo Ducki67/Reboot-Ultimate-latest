@@ -142,20 +142,22 @@ public:
 
 	FString GetRandomName()
 	{
+		int RandomNumber = 264 + (std::rand() % 101);
+
 		static int CurrentBotNum = 1;
 		std::wstring BotNumWStr;
 		FString NewName;
 
 		if (Fortnite_Version < 9)
 		{
-			BotNumWStr = std::to_wstring(CurrentBotNum++ + 262);
+			std::wstring BotNumWStr = std::to_wstring(RandomNumber);
 			NewName = (std::format(L"Anonymous[{}]", BotNumWStr)).c_str();
 		}
 		else
 		{
 			if (Fortnite_Version < 11)
 			{
-				BotNumWStr = std::to_wstring(CurrentBotNum++ + 262);
+				std::wstring BotNumWStr = std::to_wstring(RandomNumber);
 				NewName = (std::format(L"Anonymous[{}]", BotNumWStr)).c_str();
 			}
 			else

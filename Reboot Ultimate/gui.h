@@ -1017,10 +1017,13 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 
 		static UFortItemDefinition* Trap = nullptr;
 
-		do
+		if (Fortnite_Version < 19)
 		{
-			Trap = FindObject<UFortItemDefinition>(GetRandomItem(Traps, z), nullptr, ANY_PACKAGE);
-		} while (!Trap);
+			do
+			{
+				Trap = FindObject<UFortItemDefinition>(GetRandomItem(Traps, z), nullptr, ANY_PACKAGE);
+			} while (!Trap);
+		}
 
 		static auto HeavyAmmo = FindObject<UFortItemDefinition>(
 			L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsHeavy.AthenaAmmoDataBulletsHeavy");
@@ -1217,103 +1220,103 @@ static inline void MainUI()
 			}
 		}
 
-				else if (Tab == PLAYERS_TAB)
+		else if (Tab == PLAYERS_TAB)
+		{
+			if (Globals::bStartedListening == false)
+			{
+				ImGui::Text("The game hasn't started yet!");
+			}
+
+			if (bLoaded)
+			{
+				auto World = GetWorld();
+
+				if (World)
 				{
-					if (Globals::bStartedListening == false)
-					{
-						ImGui::Text("The game hasn't started yet!");
-					}
+					static auto NetDriverOffset = World->GetOffset("NetDriver");
+					auto NetDriver = *(UObject**)(__int64(World) + NetDriverOffset);
 
-					if (bLoaded)
+					if (NetDriver)
 					{
-						auto World = GetWorld();
+						static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
+						auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
+						auto& ClientConnections = WorldNetDriver->GetClientConnections();
 
-						if (World)
+						// if (ClientConnections)
 						{
-							static auto NetDriverOffset = World->GetOffset("NetDriver");
-							auto NetDriver = *(UObject**)(__int64(World) + NetDriverOffset);
+							for (int i = 0; i < ClientConnections.Num(); i++) {
+								auto Connection = ClientConnections.At(i);
 
-							if (NetDriver)
+								if (!Connection)
+									continue;
+
+								auto CurrentController = Cast<AFortPlayerControllerAthena>(ClientConnections.at(i)->GetPlayerController());
+
+								if (CurrentController) {
+									auto it = std::find_if(AllControllers.begin(), AllControllers.end(), [CurrentController, Connection](const auto& pair)
+										{
+											return pair.first == CurrentController && pair.second == Connection;
+										});
+
+									if (it == AllControllers.end()) {
+										AllControllers.push_back({ CurrentController, Connection });
+									}
+								}
+							}
+
+							ImGui::Text(("Players Connected: " + std::to_string(AllControllers.size())).c_str());
+
+							for (int i = 0; i < AllControllers.size(); i++)
 							{
-								static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
-								auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
-								auto& ClientConnections = WorldNetDriver->GetClientConnections();
+								auto& CurrentPair = AllControllers.at(i);
+								auto CurrentPlayerState = CurrentPair.first->GetPlayerState();
 
-								// if (ClientConnections)
+								if (!CurrentPlayerState)
 								{
-									for (int i = 0; i < ClientConnections.Num(); i++) {
-										auto Connection = ClientConnections.At(i);
+									std::cout << "tf!\n";
+									continue;
+								}
 
-										if (!Connection)
-											continue;
+								FString NameFStr;
 
-										auto CurrentController = Cast<AFortPlayerControllerAthena>(ClientConnections.at(i)->GetPlayerController());
+								/* static auto GetPlayerName = FindObject<UFunction>(L"/Script/Engine.PlayerState.GetPlayerName");
+								// static auto GetPlayerName = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerStateZone.GetPlayerNameForStreaming");
+								CurrentPlayerState->ProcessEvent(GetPlayerName, &NameFStr);
 
-										if (CurrentController) {
-											auto it = std::find_if(AllControllers.begin(), AllControllers.end(), [CurrentController, Connection](const auto& pair)
-												{
-													return pair.first == CurrentController && pair.second == Connection;
-												});
+								const wchar_t* NameWCStr = NameFStr.Data.Data;
+								std::wstring NameWStr = std::wstring(NameWCStr);
+								std::string Name = NameFStr.ToString(); // std::string(NameWStr.begin(), NameWStr.end());
 
-											if (it == AllControllers.end()) {
-												AllControllers.push_back({ CurrentController, Connection });
-											}
-										}
+								auto NameCStr = Name.c_str(); */
+
+								auto Connection = CurrentPair.second;
+								auto RequestURL = *GetRequestURL(Connection);
+
+								if (RequestURL.Data.Data && RequestURL.Data.ArrayNum)
+								{
+									auto RequestURLStr = RequestURL.ToString();
+
+									std::size_t pos = RequestURLStr.find("Name=");
+
+									if (pos != std::string::npos) {
+										std::size_t end_pos = RequestURLStr.find('?', pos);
+
+										if (end_pos != std::string::npos)
+											RequestURLStr = RequestURLStr.substr(pos + 5, end_pos - pos - 5);
 									}
 
-									ImGui::Text(("Players Connected: " + std::to_string(AllControllers.size())).c_str());
+									auto RequestURLCStr = RequestURLStr.c_str();
 
-									for (int i = 0; i < AllControllers.size(); i++)
+									if (ImGui::Button(RequestURLCStr))
 									{
-										auto& CurrentPair = AllControllers.at(i);
-										auto CurrentPlayerState = CurrentPair.first->GetPlayerState();
-
-										if (!CurrentPlayerState)
-										{
-											std::cout << "tf!\n";
-											continue;
-										}
-
-										FString NameFStr;
-
-										/* static auto GetPlayerName = FindObject<UFunction>(L"/Script/Engine.PlayerState.GetPlayerName");
-										// static auto GetPlayerName = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerStateZone.GetPlayerNameForStreaming");
-										CurrentPlayerState->ProcessEvent(GetPlayerName, &NameFStr);
-
-										const wchar_t* NameWCStr = NameFStr.Data.Data;
-										std::wstring NameWStr = std::wstring(NameWCStr);
-										std::string Name = NameFStr.ToString(); // std::string(NameWStr.begin(), NameWStr.end());
-
-										auto NameCStr = Name.c_str(); */
-
-										auto Connection = CurrentPair.second;
-										auto RequestURL = *GetRequestURL(Connection);
-
-										if (RequestURL.Data.Data && RequestURL.Data.ArrayNum)
-										{
-											auto RequestURLStr = RequestURL.ToString();
-
-											std::size_t pos = RequestURLStr.find("Name=");
-
-											if (pos != std::string::npos) {
-												std::size_t end_pos = RequestURLStr.find('?', pos);
-
-												if (end_pos != std::string::npos)
-													RequestURLStr = RequestURLStr.substr(pos + 5, end_pos - pos - 5);
-											}
-
-											auto RequestURLCStr = RequestURLStr.c_str();
-
-											if (ImGui::Button(RequestURLCStr))
-											{
-												PlayerTab = i;
-											}
-										}
+										PlayerTab = i;
 									}
 								}
 							}
 						}
 					}
+				}
+			}
 		}
 
 		else if (Tab == EVENT_TAB)

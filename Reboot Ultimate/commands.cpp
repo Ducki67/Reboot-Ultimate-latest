@@ -47,8 +47,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 	auto ReceivingController = PlayerController; // for now
 	auto ReceivingPlayerState = PlayerState; // for now
 
-	auto firstBackslash = OldMsg.find_first_of("\\");
-	auto lastBackslash = OldMsg.find_last_of("\\");
+	auto firstBackslash = OldMsg.find_first_of("\\" || "/" || "\"");
+	auto lastBackslash = OldMsg.find_last_of("\\" || "/" || "\"");
 
 	static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
 	auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
@@ -90,7 +90,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		}
 		else
 		{
-			SendMessageToConsole(PlayerController, L"Warning: You have a backslash but no ending backslash, was this by mistake? Executing on you.");
+			// SendMessageToConsole(PlayerController, L"Warning: You have a backslash but no ending backslash, was this by mistake? Executing on you.");
 		}
 	}
 
@@ -103,17 +103,17 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 	{
 		auto Message = Msg.ToString();
 
-		size_t start = Message.find('\\');
+		size_t start = Message.find('\\' || '/' || '\"');
 
 		while (start != std::string::npos) // remove the playername
 		{
-			size_t end = Message.find('\\', start + 1);
+			size_t end = Message.find('\\' || '/' || '\"', start + 1);
 
 			if (end == std::string::npos)
 				break;
 
 			Message.replace(start, end - start + 2, "");
-			start = Message.find('\\');
+			start = Message.find('\\' || '/' || '\"');
 		}
 
 		int zz = 0;
@@ -3495,63 +3495,62 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 	if (bSendHelpMessage)
 	{
 		FString HelpMessage = LR"(
-cheat giveitem {ID} - Gives a weapon to the executing player, if inventory is full drops a pickup on the player.
-cheat give {NAMEOFITEM_RARITY || Use cheat givenames} - Gives a weapon using a shortcut name, without ID.
-cheat givenames - Sends a message to the console of all of the names that work with the "cheat give" command.
-cheat summon {full path of object} {optional: X, Y, Z} - Summons the specified blueprint class at the executing player's location. Note: There is a limit on the count.
-cheat spawn {name of object, use cheat spawnnames} {optional: X, Y, Z} - Spawns a blueprint actor on player using a shorter name.
-cheat spawnnames - Sends a message to the console of all of the names that work with the "cheat spawn" command.
-cheat savewaypoint {phrase/number} - Gets the location of where you are standing and saves it as a waypoint. **NEW!**
-cheat waypoint {saved phrase/number} - Teleports the player to the selected existing waypoint. **NEW!**
-cheat bugitgo {X Y Z} - Teleport to a location.
-cheat getlocation - Gives you the current XYZ cords of where you are standing and copies them to your clipboard (useful for bugitgo)
-cheat infammo - Toggles Infinite Ammo.
-cheat buildfree - Toggles Infinite Materials.
-cheat launch/fling {X Y Z} - Launches a player.
-cheat fly - Toggles flight.
-cheat ghost - Toggles flight and disables collision.
-cheat rift - Rifts the player into the air.
-cheat speed - Changes player's movement speed (buggy running but works with cheat fly)
-cheat listplayers - Gives you all players names.
-cheat kick - Kicks the player from the game.
-cheat ban - Permanently bans the player from the game. (IP Ban)
-cheat pausesafezone - Pauses the zone.
-cheat demospeed - Speeds up/slows down the speed of the game.
-cheat tptomax - Teleports player to max height, in the middle of the map.
-cheat health {#} - Sets executing player's health.
-cheat shield {#} - Sets executing player's shield.
-cheat maxhealth {#} - Sets the maximum health of the player.
-cheat maxshield {#} - Sets the maximum shield of the player.
-cheat regen - Regenerates the players health and shield to their max.
-cheat siphon {#} - Changes the amount of health and shield a player gets for killing someone.
-cheat falldamage - Permanently turn off fall damage. **NEW!**
-cheat skin {CID} - Sets a player's character.
-cheat spawnpickup {WID} {#} - Spawns a pickup at specified player.
-cheat tp - Teleports to what the player is looking at.
-cheat bot {#} - Spawns a bot at the player (experimental).
-cheat pickaxe {Pickaxe (W)ID} - Set player's pickaxe. Can be either the PID or WID
-cheat wipe/clear {Primary = Guns || Secondary = Ammo & Mats} - Removes the specified quickbar.
-cheat wipeall/clearall - Removes the player's entire inventory.
-cheat suicide - Insta-kills player.
-cheat healthall - Heals all players health.
-cheat shieldall - Heals all players shield.
-cheat regenall - Heals all players health and shield.
-cheat godall - Gods all players.
-cheat giveall - Gives all players Ammo, Materials, and Traps maxed out.
-cheat tpalltomax - Teleports everyone to max height, in the middle of the map.
-cheat togglesnowmap - Toggles the map to have snow or not. (7.10, 7.30, 11.31, 15.10, 19.01, & 19.10 ONLY)
-cheat destroy - Destroys the actor that the player is looking at.
-cheat destroyall {ClassPathName} - Destroys every actor of a given class. Useful for removing all floorloot for example.
-cheat damagetarget {#} - Damages the Actor in front of you by the specified amount.
-cheat getscript - Opens the Project Reboot V3 Script on your preferred browser (host only).
-cheat tutorial - Opens the Project Reboot V3 Tutorial (host only).
-cheat killserver - Ends the running task of the hosting window (host only).
-cheat startaircraft - Starts the bus.
-cheat settimeofday {1-23} - Changes the time of day in game to a 24H time period.
-cheat pausetimeofday - Pauses the current time of day cycle. **NEW!**
+- cheat giveitem {ID} - Gives a weapon to the executing player, if inventory is full drops a pickup on the player.
+- cheat give {NAMEOFITEM_RARITY || Use cheat givenames} - Gives a weapon using a shortcut name, without ID.
+- cheat givenames - Sends a message to the console of all of the names that work with the "cheat give" command.
+- cheat summon {full path of object} {optional: X, Y, Z} - Summons the specified blueprint class at the executing player's location. Note: There is a limit on the count.
+- cheat spawn {name of object, use cheat spawnnames} {optional: X, Y, Z} - Spawns a blueprint actor on player using a shorter name.
+- cheat spawnnames - Sends a message to the console of all of the names that work with the "cheat spawn" command.
+- cheat savewaypoint {phrase/number} - Gets the location of where you are standing and saves it as a waypoint. **NEW!**
+- cheat waypoint {saved phrase/number} - Teleports the player to the selected existing waypoint. **NEW!**
+- cheat bugitgo {X Y Z} - Teleport to a location.
+- cheat getlocation - Gives you the current XYZ cords of where you are standing and copies them to your clipboard (useful for bugitgo)
+- cheat infammo - Toggles Infinite Ammo.
+- cheat buildfree - Toggles Infinite Materials.
+- cheat launch/fling {X Y Z} - Launches a player.
+- cheat fly - Toggles flight.
+- cheat ghost - Toggles flight and disables collision.
+- cheat rift - Rifts the player into the air.
+- cheat speed - Changes player's movement speed (buggy running but works with cheat fly)
+- cheat listplayers - Gives you all players names.
+- cheat kick - Kicks the player from the game.
+- cheat ban - Permanently bans the player from the game. (IP Ban)
+- cheat pausesafezone - Pauses the zone.
+- cheat demospeed - Speeds up/slows down the speed of the game.
+- cheat tptomax - Teleports player to max height, in the middle of the map.
+- cheat health {#} - Sets executing player's health.
+- cheat shield {#} - Sets executing player's shield.
+- cheat maxhealth {#} - Sets the maximum health of the player.
+- cheat maxshield {#} - Sets the maximum shield of the player.
+- cheat regen - Regenerates the players health and shield to their max.
+- cheat siphon {#} - Changes the amount of health and shield a player gets for killing someone.
+- cheat falldamage - Permanently turn off fall damage. **NEW!**
+- cheat skin {CID} - Sets a player's character.
+- cheat spawnpickup {WID} {#} - Spawns a pickup at specified player.
+- cheat tp - Teleports to what the player is looking at.
+- cheat bot {#} - Spawns a bot at the player (experimental).
+- cheat pickaxe {Pickaxe (W)ID} - Set player's pickaxe. Can be either the PID or WID
+- cheat wipe/clear {Primary = Guns || Secondary = Ammo & Mats} - Removes the specified quickbar.
+- cheat wipeall/clearall - Removes the player's entire inventory.
+- cheat suicide - Insta-kills player.
+- cheat healthall - Heals all players health.
+- cheat shieldall - Heals all players shield.
+- cheat regenall - Heals all players health and shield.
+- cheat godall - Gods all players.
+- cheat giveall - Gives all players Ammo, Materials, and Traps maxed out.
+- cheat tpalltomax - Teleports everyone to max height, in the middle of the map.
+- cheat togglesnowmap - Toggles the map to have snow or not. (7.10, 7.30, 11.31, 15.10, 19.01, & 19.10 ONLY)
+- cheat destroy - Destroys the actor that the player is looking at.
+- cheat destroyall {ClassPathName} - Destroys every actor of a given class. Useful for removing all floorloot for example.
+- cheat damagetarget {#} - Damages the Actor in front of you by the specified amount.
+- cheat getscript - Opens the Project Reboot V3 Script on your preferred browser (host only).
+- cheat tutorial - Opens the Project Reboot V3 Tutorial (host only).
+- cheat killserver - Ends the running task of the hosting window (host only).
+- cheat startaircraft - Starts the bus.
+- cheat settimeofday {1-23} - Changes the time of day in game to a 24H time period.
+- cheat pausetimeofday - Pauses the current time of day cycle. **NEW!**
 
-If you want to execute a command on a certain player, surround their name (case sensitive) with \, and put the param with their name anywhere. Example: cheat health \Ralzify\ 100
-)";
+- NOTE: If you want to execute a command on a player, quote their name after the command. Example: cheat op "Ralzify")";
 
 		SendMessageToConsole(PlayerController, HelpMessage);
 	}
