@@ -229,6 +229,8 @@ enum class Playlist : int
 	OneShotSolos,
 	OneShotDuos,
 	OneShotSquads,
+	SiphonDuos,
+	SiphonSquads,
 	SlideSolos,
 	SlideDuos,
 	Custom
@@ -1098,11 +1100,13 @@ static inline void MainUI()
 			auto GameMode = (AFortGameModeAthena*)GetWorld()->GetGameMode();
 			auto GameState = Cast<AFortGameStateAthena>(GameMode->GetGameState());
 
+			bool isLateGame = Globals::bLateGame;
+
 			if (bLoaded)
 			{
 				StaticUI();
 
-				if (!bStartedBus)
+				if (!Globals::bStartedListening)
 				{
 					bool bWillBeLategame = Globals::bLateGame.load();
 					ImGui::Checkbox("Lategame", &bWillBeLategame);
@@ -1126,7 +1130,7 @@ static inline void MainUI()
 				ImGui::Text(std::format("Joinable: {}", Globals::bStartedListening).c_str());
 				ImGui::Text(std::format("Started: {}", bStartedBus).c_str());
 				ImGui::Text(std::format("Ended: {}", GameState->GetGamePhase() > EAthenaGamePhase::Warmup && !GameMode->IsMatchInProgress()).c_str());
-				ImGui::Text(std::format("Gamemode: {}", PlaylistShortName).c_str());
+				ImGui::Text(std::format("Gamemode: {} {}", (isLateGame ? "Lategame " : "Full Map "), PlaylistShortName).c_str());
 				ImGui::Text(std::format("Players: {}", GameState->GetPlayersLeft()).c_str());
 
 				if (!Globals::bStartedListening) // hm
@@ -2367,6 +2371,8 @@ static inline void PregameUI()
 		ImGui::RadioButton("One Shot Solos", &SelectedPlaylist, (int)Playlist::OneShotSolos);
 		ImGui::RadioButton("One Shot Duos", &SelectedPlaylist, (int)Playlist::OneShotDuos);
 		ImGui::RadioButton("One Shot Squads", &SelectedPlaylist, (int)Playlist::OneShotSquads);
+		ImGui::RadioButton("Siphon Duos", &SelectedPlaylist, (int)Playlist::SiphonDuos);
+		ImGui::RadioButton("Siphon Squads", &SelectedPlaylist, (int)Playlist::SiphonSquads);
 		ImGui::RadioButton("Slide Solos", &SelectedPlaylist, (int)Playlist::SlideSolos);
 		ImGui::RadioButton("Slide Duos", &SelectedPlaylist, (int)Playlist::SlideDuos);
 		ImGui::RadioButton("Team Rumble", &SelectedPlaylist, (int)Playlist::TeamRumble);
@@ -2407,6 +2413,16 @@ static inline void PregameUI()
 		case (int)Playlist::OneShotSquads:
 		{
 			PlaylistName = "/Game/Athena/Playlists/Low/Playlist_Low_Squad.Playlist_Low_Squad";
+			break;
+		}
+		case (int)Playlist::SiphonDuos:
+		{
+			PlaylistName = "/Game/Athena/Playlists/Vamp/Playlist_Vamp_Duos.Playlist_Vamp_Duos";
+			break;
+		}
+		case (int)Playlist::SiphonSquads:
+		{
+			PlaylistName = "/Game/Athena/Playlists/Vamp/Playlist_Vamp_Squad.Playlist_Vamp_Squad";
 			break;
 		}
 		case (int)Playlist::SlideSolos:

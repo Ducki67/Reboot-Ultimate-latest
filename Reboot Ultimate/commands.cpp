@@ -47,8 +47,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 	auto ReceivingController = PlayerController; // for now
 	auto ReceivingPlayerState = PlayerState; // for now
 
-	auto firstBackslash = OldMsg.find_first_of("\\" || "/" || "\"");
-	auto lastBackslash = OldMsg.find_last_of("\\" || "/" || "\"");
+	auto firstBackslash = OldMsg.find_first_of("\\");
+	auto lastBackslash = OldMsg.find_last_of("\\");
 
 	static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
 	auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
@@ -103,17 +103,17 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 	{
 		auto Message = Msg.ToString();
 
-		size_t start = Message.find('\\' || '/' || '\"');
+		size_t start = Message.find('\\');
 
 		while (start != std::string::npos) // remove the playername
 		{
-			size_t end = Message.find('\\' || '/' || '\"', start + 1);
+			size_t end = Message.find('\\', start + 1);
 
 			if (end == std::string::npos)
 				break;
 
 			Message.replace(start, end - start + 2, "");
-			start = Message.find('\\' || '/' || '\"');
+			start = Message.find('\\');
 		}
 
 		int zz = 0;
@@ -1369,10 +1369,24 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		}
 		else if (Command == "falldmg" || Command == "falldamage")
 		{
-			if (auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn()))
-				PlayerState->DisableFallDamage();
+			bool FallDamage = false;
 
-			SendMessageToConsole(PlayerController, L"You have **PERMANENTLY** turned off fall damage for this game.");
+			if (auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn()))
+			{
+				if (FallDamage)
+				{
+					static auto FallDamageClass = FindObject<UClass>(L"/Game/Athena/Items/Gameplay/BackPacks/Ashton/GE_AshtonPack_FallDamageImmune.GE_AshtonPack_FallDamageImmune_C");
+					PlayerState->GetAbilitySystemComponent()->RemoveActiveGameplayEffectBySourceEffect(FallDamageClass, 1, PlayerState->GetAbilitySystemComponent());
+					SendMessageToConsole(PlayerController, L"Fall damage has been turned on.");
+				}
+				else
+				{
+					PlayerState->DisableFallDamage();
+					SendMessageToConsole(PlayerController, L"Fall damage has been turned off.");
+				}
+
+				FallDamage = !FallDamage;
+			}
 		}
 		else if (Command == "setshield" || Command == "shield")
 		{
@@ -2092,6 +2106,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				ActorName = "/Game/Building/ActorBlueprints/Prop/Prop_TirePile_04.Prop_TirePile_04_C";
 			else if (ActorName == "llama")
 				ActorName = "/Game/Athena/SupplyDrops/Llama/AthenaSupplyDrop_Llama.AthenaSupplyDrop_Llama_C";
+			else if (ActorName == "rift")
+				ActorName = "/Game/Athena/Items/ForagedItems/Rift/BGA_RiftPortal_Athena_Spawner.BGA_RiftPortal_Athena_Spawner_C";
 			else if (ActorName == "airvent")
 				ActorName = "/Game/Athena/Environments/Blueprints/DUDEBRO/BGA_HVAC.BGA_HVAC_C";
 			else if (ActorName == "geyser")
