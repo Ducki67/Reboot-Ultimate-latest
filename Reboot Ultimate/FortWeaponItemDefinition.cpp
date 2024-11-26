@@ -36,6 +36,40 @@ int UFortWeaponItemDefinition::GetClipSize()
 	return *(int*)(__int64(Row) + ClipSizeOffset);
 }
 
+float& UFortWeaponItemDefinition::GetSpread()
+{
+	static float INVALID_RET = 0.f;
+
+	static auto WeaponStatHandleOffset = GetOffset("WeaponStatHandle");
+	auto& WeaponStatHandle = Get<FDataTableRowHandle>(WeaponStatHandleOffset);
+
+	auto Table = WeaponStatHandle.DataTable;
+
+	if (!Table)
+		return INVALID_RET;
+
+	auto& RowMap = Table->GetRowMap();
+
+	void* Row = nullptr;
+
+	for (int i = 0; i < RowMap.Pairs.Elements.Data.Num(); ++i)
+	{
+		auto& Pair = RowMap.Pairs.Elements.Data.at(i).ElementData.Value;
+
+		if (Pair.Key() == WeaponStatHandle.RowName)
+		{
+			Row = Pair.Value();
+			break;
+		}
+	}
+
+	if (!Row)
+		return INVALID_RET;
+
+	static auto SpreadOffset = FindOffsetStruct("/Script/FortniteGame.FortRangedWeaponStats", "Spread");
+	return *(float*)(__int64(Row) + SpreadOffset);
+}
+
 int UFortWeaponItemDefinition::GetInitialClips()
 {
 	static auto WeaponStatHandleOffset = GetOffset("WeaponStatHandle");

@@ -1105,6 +1105,181 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, L"Successfully set pickaxe!");
 		}
+		else if (Command == "pickaxeall")
+		{
+			static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
+			auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
+			auto& ClientConnections = WorldNetDriver->GetClientConnections();
+
+			for (int z = 0; z < ClientConnections.Num(); z++)
+			{
+				auto ClientConnection = ClientConnections.at(z);
+				auto FortPC = Cast<AFortPlayerController>(ClientConnection->GetPlayerController());
+
+				if (!FortPC)
+					continue;
+
+				auto WorldInventory = FortPC->GetWorldInventory();
+
+				if (!WorldInventory)
+				{
+					SendMessageToConsole(PlayerController, L"No world inventory!");
+					return;
+				}
+
+				if (NumArgs < 1)
+				{
+					SendMessageToConsole(PlayerController, L"Please provide a pickaxe!");
+					return;
+				}
+
+				if (Fortnite_Version < 3)
+				{
+					SendMessageToConsole(PlayerController, L"Not supported on this version!");
+					return;
+				}
+
+				auto& pickaxeName = Arguments[1];
+
+				if (pickaxeName == "reaper" || pickaxeName == "scythe") // if this git ever gets released feel free to pull request open more of these i cba
+				{
+					pickaxeName = "WID_Harvest_HalloweenScythe_Athena_C_T01";
+				}
+				else if (pickaxeName == "raiders" || pickaxeName == "revenge")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_Lockjaw_Athena_C_T01";
+				}
+				else if (pickaxeName == "icebreaker" || pickaxeName == "shovel")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_WinterCamo_Athena";
+				}
+				else if (pickaxeName == "default")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_Athena_C_T01";
+				}
+				else if (pickaxeName == "candy")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_HolidayCandyCane_Athena";
+				}
+				else if (pickaxeName == "galaxy")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_Celestial";
+				}
+				else if (pickaxeName == "spectral" || pickaxeName == "prismatic")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_Prismatic";
+				}
+				else if (pickaxeName == "tat")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_Heart_Athena";
+				}
+				else if (pickaxeName == "acdc")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_Teslacoil_Athena";
+				}
+				else if (pickaxeName == "lucky")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_Smiley_Athena_C_T01";
+				}
+				else if (pickaxeName == "studded")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_SharpDresser";
+				}
+				else if (pickaxeName == "driver" || pickaxeName == "golf" || pickaxeName == "club")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_GolfClub";
+				}
+				else if (pickaxeName == "guiding" || pickaxeName == "glow" || pickaxeName == "redriding")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_RedRiding";
+				}
+				else if (pickaxeName == "coldsnap" || pickaxeName == "gnome")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_Gnome";
+				}
+				else if (pickaxeName == "vision")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_StreetGoth";
+				}
+				else if (pickaxeName == "bootstrap" || pickaxeName == "fish")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_TeriyakiFish";
+				}
+				else if (pickaxeName == "widows" || pickaxeName == "widowsbite")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_AshtonBoardwalk";
+				}
+				else if (pickaxeName == "riperippers" || pickaxeName == "bunker" || pickaxeName == "1h")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_BunkerMan_1H";
+				}
+				else if (pickaxeName == "starwand" || pickaxeName == "star" || pickaxeName == "wand")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_StarWand";
+				}
+				else if (pickaxeName == "rey" || pickaxeName == "quarterstaff")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_GalileoRocket";
+				}
+				else if (pickaxeName == "harly" || pickaxeName == "bat")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_LollipopTricksterFemale";
+				}
+				else if (pickaxeName == "fncs")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_FNCS";
+				}
+				else if (pickaxeName == "butterfly" || pickaxeName == "knives")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_SpyMale1H";
+				}
+				else if (pickaxeName == "mjolnir")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_HightowerTapas1H";
+				}
+				else if (pickaxeName == "leviathan")
+				{
+					pickaxeName = "WID_Harvest_Pickaxe_HistorianMale";
+				}
+
+				static auto AthenaPickaxeItemDefinitionClass = FindObject<UClass>(L"/Script/FortniteGame.AthenaPickaxeItemDefinition");
+
+				auto Pickaxe1 = FindObject(pickaxeName + "." + pickaxeName, nullptr, ANY_PACKAGE);
+
+				UFortWeaponMeleeItemDefinition* NewPickaxeItemDefinition = nullptr;
+
+				if (Pickaxe1)
+				{
+					if (Pickaxe1->IsA(AthenaPickaxeItemDefinitionClass))
+					{
+						static auto WeaponDefinitionOffset = Pickaxe1->GetOffset("WeaponDefinition");
+						NewPickaxeItemDefinition = Pickaxe1->Get<UFortWeaponMeleeItemDefinition*>(WeaponDefinitionOffset);
+					}
+					else
+					{
+						NewPickaxeItemDefinition = Cast<UFortWeaponMeleeItemDefinition>(Pickaxe1);
+					}
+				}
+
+				if (!NewPickaxeItemDefinition)
+				{
+					SendMessageToConsole(PlayerController, L"Invalid pickaxe item definition!");
+					return;
+				}
+
+				auto PickaxeInstance = WorldInventory->GetPickaxeInstance();
+
+				if (PickaxeInstance)
+				{
+					WorldInventory->RemoveItem(PickaxeInstance->GetItemEntry()->GetItemGuid(), nullptr, PickaxeInstance->GetItemEntry()->GetCount(), true);
+				}
+
+				WorldInventory->AddItem(NewPickaxeItemDefinition, nullptr, 1);
+				WorldInventory->Update();
+
+				SendMessageToConsole(PlayerController, L"Successfully gave pickaxe to all players!");
+			}
+		}
 		else if (Command == "load")
 		{
 			if (!Globals::bCreative)
@@ -1154,7 +1329,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, L"Loaded!");
 		}
-		else if (Command == "spawnpickup")
+		else if (Command == "spawnpickup" || Command == "pickup")
 		{
 			if (NumArgs < 1)
 			{
@@ -1171,13 +1346,478 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			}
 
 			auto& weaponName = Arguments[1];
-			int count = 1;
+
+			if (weaponName == "ar_uc")
+			{
+				weaponName = "WID_Assault_Auto_Athena_UC_Ore_T03";
+			}
+			else if (weaponName == "ar_r" || weaponName == "ar")
+			{
+				weaponName = "WID_Assault_Auto_Athena_R_Ore_T03";
+			}
+			else if (weaponName == "ar_vr" || weaponName == "scar_vr")
+			{
+				weaponName = "WID_Assault_AutoHigh_Athena_VR_Ore_T03";
+			}
+			else if (weaponName == "ar_sr" || weaponName == "scar_sr" || weaponName == "scar")
+			{
+				weaponName = "WID_Assault_AutoHigh_Athena_SR_Ore_T03";
+			}
+			else if (weaponName == "ar_ur" || weaponName == "scar_ur" || weaponName == "skyesar" || weaponName == "skyear")
+			{
+				weaponName = "WID_Boss_Adventure_AR";
+			}
+			else if (weaponName == "minigun_vr")
+			{
+				weaponName = "WID_Assault_LMG_Athena_VR_Ore_T03";
+			}
+			else if (weaponName == "minigun_sr" || weaponName == "minigun")
+			{
+				weaponName = "WID_Assault_LMG_Athena_SR_Ore_T03";
+			}
+			else if (weaponName == "minigun_ur" || weaponName == "brutus")
+			{
+				weaponName = "WID_Boss_Hos_MG";
+			}
+			else if (weaponName == "pump_uc")
+			{
+				weaponName = "WID_Shotgun_Standard_Athena_C_Ore_T03";
+			}
+			else if (weaponName == "pump_r")
+			{
+				weaponName = "WID_Shotgun_Standard_Athena_UC_Ore_T03";
+			}
+			else if (weaponName == "pump_vr" || weaponName == "spaz_vr")
+			{
+				weaponName = "WID_Shotgun_Standard_Athena_VR_Ore_T03";
+			}
+			else if (weaponName == "pump_sr" || weaponName == "spaz_sr" || weaponName == "spaz")
+			{
+				weaponName = "WID_Shotgun_Standard_Athena_SR_Ore_T03";
+			}
+			else if (weaponName == "tac_uc")
+			{
+				weaponName = "WID_Shotgun_SemiAuto_Athena_R_Ore_T03";
+			}
+			else if (weaponName == "tac_r")
+			{
+				weaponName = "WID_Shotgun_SemiAuto_Athena_VR_Ore_T03";
+			}
+			else if (weaponName == "tac_vr")
+			{
+				weaponName = "WID_Shotgun_HighSemiAuto_Athena_VR_Ore_T03";
+			}
+			else if (weaponName == "tac_sr" || weaponName == "tac")
+			{
+				weaponName = "WID_Shotgun_HighSemiAuto_Athena_SR_Ore_T03";
+			}
+			else if (weaponName == "doublebarrel_vr")
+			{
+				weaponName = "WID_Shotgun_BreakBarrel_Athena_VR_Ore_T03";
+			}
+			else if (weaponName == "doublebarrel_sr" || weaponName == "doublebarrel")
+			{
+				weaponName = "WID_Shotgun_BreakBarrel_Athena_SR_Ore_T03";
+			}
+			else if (weaponName == "flint_c")
+			{
+				weaponName = "WID_Pistol_Flintlock_Athena_C";
+			}
+			else if (weaponName == "flint_uc" || weaponName == "flint")
+			{
+				weaponName = "WID_Pistol_Flintlock_Athena_UC";
+			}
+			else if (weaponName == "deagle_vr")
+			{
+				weaponName = "WID_Pistol_HandCannon_Athena_VR_Ore_T03";
+			}
+			else if (weaponName == "deagle_sr" || weaponName == "deagle")
+			{
+				weaponName = "WID_Pistol_HandCannon_Athena_SR_Ore_T03";
+			}
+			else if (weaponName == "heavy_r")
+			{
+				weaponName = "WID_Sniper_Heavy_Athena_R_Ore_T03";
+			}
+			else if (weaponName == "heavy_vr")
+			{
+				weaponName = "WID_Sniper_Heavy_Athena_VR_Ore_T03";
+			}
+			else if (weaponName == "heavy_sr" || weaponName == "heavy")
+			{
+				weaponName = "WID_Sniper_Heavy_Athena_SR_Ore_T03";
+			}
+			else if (weaponName == "hunting_uc")
+			{
+				weaponName = "WID_Sniper_NoScope_Athena_UC_Ore_T03";
+			}
+			else if (weaponName == "hunting_r")
+			{
+				weaponName = "WID_Sniper_NoScope_Athena_R_Ore_T03";
+			}
+			else if (weaponName == "hunting_vr")
+			{
+				weaponName = "WID_Sniper_NoScope_Athena_VR_Ore_T03";
+			}
+			else if (weaponName == "hunting_sr")
+			{
+				weaponName = "WID_Sniper_NoScope_Athena_SR_Ore_T03";
+			}
+			else if (weaponName == "bolt_c")
+			{
+				weaponName = "WID_Sniper_BoltAction_Scope_Athena_C_Ore_T03";
+			}
+			else if (weaponName == "bolt_uc")
+			{
+				weaponName = "WID_Sniper_BoltAction_Scope_Athena_UC_Ore_T03";
+			}
+			else if (weaponName == "bolt_r" || weaponName == "bolt")
+			{
+				weaponName = "WID_Sniper_BoltAction_Scope_Athena_R_Ore_T03";
+			}
+			else if (weaponName == "bolt_vr")
+			{
+				weaponName = "WID_Sniper_BoltAction_Scope_Athena_VR_Ore_T03";
+			}
+			else if (weaponName == "bolt_sr")
+			{
+				weaponName = "WID_Sniper_BoltAction_Scope_Athena_SR_Ore_T03";
+			}
+			else if (weaponName == "suppressed_vr")
+			{
+				weaponName = "WID_Sniper_Suppressed_Scope_Athena_VR_Ore_T03";
+			}
+			else if (weaponName == "suppressed_sr" || weaponName == "suppressed")
+			{
+				weaponName = "WID_Sniper_Suppressed_Scope_Athena_SR_Ore_T03";
+			}
+			else if (weaponName == "semi_uc")
+			{
+				weaponName = "WID_Sniper_Standard_Scope_Athena_VR_Ore_T03";
+			}
+			else if (weaponName == "semi_r" || weaponName == "semi")
+			{
+				weaponName = "WID_Sniper_Standard_Scope_Athena_SR_Ore_T03";
+			}
+			else if (weaponName == "stormscout_vr")
+			{
+				weaponName = "WID_Sniper_Weather_Athena_VR";
+			}
+			else if (weaponName == "stormscout_sr" || weaponName == "stormscout")
+			{
+				weaponName = "WID_Sniper_Weather_Athena_SR";
+			}
+			else if (weaponName == "lever_uc")
+			{
+				weaponName = "WID_Sniper_Cowboy_Athena_UC";
+			}
+			else if (weaponName == "lever_r")
+			{
+				weaponName = "WID_Sniper_Cowboy_Athena_R";
+			}
+			else if (weaponName == "lever_vr" || weaponName == "lever")
+			{
+				weaponName = "WID_Sniper_Cowboy_Athena_VR";
+			}
+			else if (weaponName == "lever_sr")
+			{
+				weaponName = "WID_Sniper_Cowboy_Athena_SR";
+			}
+			else if (weaponName == "hunterbolt_uc")
+			{
+				weaponName = "WID_Sniper_CoreSniper_Athena_UC";
+			}
+			else if (weaponName == "hunterbolt_r")
+			{
+				weaponName = "WID_Sniper_CoreSniper_Athena_R";
+			}
+			else if (weaponName == "hunterbolt_vr")
+			{
+				weaponName = "WID_Sniper_CoreSniper_Athena_VR";
+			}
+			else if (weaponName == "hunterbolt_sr" || weaponName == "hunterbolt")
+			{
+				weaponName = "WID_Sniper_CoreSniper_Athena_SR";
+			}
+			else if (weaponName == "firesniper" || weaponName == "dragonsbreath")
+			{
+				weaponName = "WID_WaffleTruck_Sniper_DragonBreath";
+			}
+			else if (weaponName == "exstormscout" || weaponName == "exoticstormscout")
+			{
+				weaponName = "WID_WaffleTruck_Sniper_StormScout";
+			}
+			else if (weaponName == "boom" || weaponName == "boomsniper")
+			{
+				weaponName = "WID_WaffleTruck_BoomSniper";
+			}
+			else if (weaponName == "rocket_r")
+			{
+				weaponName = "WID_Launcher_Rocket_Athena_R_Ore_T03";
+			}
+			else if (weaponName == "rocket_vr")
+			{
+				weaponName = "WID_Launcher_Rocket_Athena_VR_Ore_T03";
+			}
+			else if (weaponName == "rocket_sr" || weaponName == "rocket")
+			{
+				weaponName = "WID_Launcher_Rocket_Athena_SR_Ore_T03";
+			}
+			else if (weaponName == "pumpkin_uc")
+			{
+				weaponName = "WID_Launcher_Pumpkin_Athena_UC_Ore_T03";
+			}
+			else if (weaponName == "pumpkin_r")
+			{
+				weaponName = "WID_Launcher_Pumpkin_Athena_R_Ore_T03";
+			}
+			else if (weaponName == "pumpkin_vr")
+			{
+				weaponName = "WID_Launcher_Pumpkin_Athena_VR_Ore_T03";
+			}
+			else if (weaponName == "pumpkin_sr" || weaponName == "pumpkin")
+			{
+				weaponName = "WID_Launcher_Pumpkin_Athena_SR_Ore_T03";
+			}
+			else if (weaponName == "gl_r")
+			{
+				weaponName = "WID_Launcher_Grenade_Athena_R_Ore_T03";
+			}
+			else if (weaponName == "gl_vr")
+			{
+				weaponName = "WID_Launcher_Grenade_Athena_VR_Ore_T03";
+			}
+			else if (weaponName == "gl_sr" || weaponName == "gl")
+			{
+				weaponName = "WID_Launcher_Grenade_Athena_SR_Ore_T03";
+			}
+			else if (weaponName == "quad_vr")
+			{
+				weaponName = "WID_Launcher_Military_Athena_VR_Ore_T03";
+			}
+			else if (weaponName == "quad_sr" || weaponName == "quad" || weaponName == "quadlauncher")
+			{
+				weaponName = "WID_Launcher_Military_Athena_SR_Ore_T03";
+			}
+			else if (weaponName == "guidedmissile_vr" || weaponName == "guided_vr" || weaponName == "missile_vr")
+			{
+				weaponName = "WID_RC_Rocket_Athena_VR_T03";
+			}
+			else if (weaponName == "guidedmissile_sr" || weaponName == "guided_sr" || weaponName == "missile_sr" || weaponName == "guided")
+			{
+				weaponName = "WID_RC_Rocket_Athena_SR_T03";
+			}
+			else if (weaponName == "xenonbow" || weaponName == "xenon" || weaponName == "stwbow")
+			{
+				weaponName = "WID_Sniper_Neon_Bow_SR_Crystal_T04";
+			}
+			else if (weaponName == "kits" || weaponName == "kitslauncher")
+			{
+				weaponName = "WID_Launcher_Shockwave_Athena_UR_Ore_T03";
+			}
+			else if (weaponName == "rift" || weaponName == "rifts")
+			{
+				weaponName = "Athena_Rift_Item";
+			}
+			else if (weaponName == "crashpad" || weaponName == "crashes" || weaponName == "crash" || weaponName == "crashpads")
+			{
+				weaponName = "WID_Athena_AppleSun";
+			}
+			else if (weaponName == "chillers" || weaponName == "chiller" || weaponName == "chillergrenade")
+			{
+				weaponName = "Athena_IceGrenade";
+			}
+			else if (weaponName == "can" || weaponName == "rustycan" || weaponName == "cans")
+			{
+				weaponName = "WID_Athena_Bucket_Old";
+			}
+			else if (weaponName == "mythicgoldfish" || weaponName == "mythicfish" || weaponName == "goldfish")
+			{
+				weaponName = "WID_Athena_Bucket_Nice";
+			}
+			else if (weaponName == "stink" || weaponName == "stinkbomb" || weaponName == "stinks")
+			{
+				weaponName = "Athena_GasGrenade";
+			}
+			else if (weaponName == "shieldbubble")
+			{
+				weaponName = "Athena_SilverBlazer_V2";
+			}
+			else if (weaponName == "zaptrap")
+			{
+				weaponName = "Athena_ZippyTrout";
+			}
+			else if (weaponName == "batman")
+			{
+				weaponName = "WID_Badger_Grape_VR";
+			}
+			else if (weaponName == "spiderman")
+			{
+				weaponName = "WID_WestSausage_Parallel";
+			}
+			else if (weaponName == "shockwave" || weaponName == "shock" || weaponName == "shockwavegrenade" || weaponName == "shocks" || weaponName == "shockwaves")
+			{
+				weaponName = "Athena_ShockGrenade";
+			}
+			else if (weaponName == "impulse" || weaponName == "impulsegrenade" || weaponName == "impulses")
+			{
+				weaponName = "Athena_KnockGrenade";
+			}
+			else if (weaponName == "portafortress" || weaponName == "fortress")
+			{
+				weaponName = "Athena_SuperTowerGrenade_A";
+			}
+			else if (weaponName == "hopflop" || weaponName == "hopflopper")
+			{
+				weaponName = "WID_Athena_Flopper_HopFlopper";
+			}
+			else if (weaponName == "slurpfish")
+			{
+				weaponName = "WID_Athena_Flopper_Effective";
+			}
+			else if (weaponName == "chugsplash" || weaponName == "chugs")
+			{
+				weaponName = "Athena_ChillBronco";
+			}
+			else if (weaponName == "minis")
+			{
+				weaponName = "Athena_ShieldSmall";
+			}
+			else if (weaponName == "bandage" || weaponName == "bandages")
+			{
+				weaponName = "Athena_Bandage";
+			}
+			else if (weaponName == "portafort" || weaponName == "paf")
+			{
+				weaponName = "Athena_TowerGrenade";
+			}
+			else if (weaponName == "c4")
+			{
+				weaponName = "Athena_C4";
+			}
+			else if (weaponName == "firefly" || weaponName == "fireflies")
+			{
+				weaponName = "WID_Athena_Grenade_Molotov";
+			}
+			else if (weaponName == "tire" || weaponName == "tires" || weaponName == "tyre")
+			{
+				weaponName = "ID_ValetMod_Tires_OffRoad_Thrown";
+			}
+			else if (weaponName == "doomgauntlets" || weaponName == "doom")
+			{
+				weaponName = "WID_HighTower_Date_ChainLightning_CoreBR";
+			}
+			else if (weaponName == "dub")
+			{
+				weaponName = "WID_WaffleTruck_Dub";
+			}
+			else if (weaponName == "hoprockdualies" || weaponName == "dualies")
+			{
+				weaponName = "WID_WaffleTruck_HopRockDualies";
+			}
+			else if (weaponName == "recon")
+			{
+				weaponName = "AGID_Athena_Scooter";
+			}
+			else if (weaponName == "jules" || weaponName == "julesgrappler" || weaponName == "julesgrap")
+			{
+				weaponName = "WID_Boss_GrapplingHoot";
+			}
+			else if (weaponName == "skye" || weaponName == "skyesgrappler" || weaponName == "skyegrap" || weaponName == "skyesgrap")
+			{
+				weaponName = "WID_Boss_Adventure_GH";
+			}
+			else if (weaponName == "captainamerica" || weaponName == "shield" || weaponName == "ca")
+			{
+				weaponName = "AGID_AshtonPack_Chicago";
+			}
+			else if (weaponName == "thorshammer" || weaponName == "thor" || weaponName == "thors")
+			{
+				weaponName = "AGID_AshtonPack_Turbo";
+			}
+			else if (weaponName == "batman" || weaponName == "batgrap")
+			{
+				weaponName = "WID_Badger_Grape_VR";
+			}
+			else if (weaponName == "flare" || Command == "flaregun")
+			{
+				weaponName = "WID_FringePlank_Athena_Prototype";
+			}
+			else if (weaponName == "grabitron")
+			{
+				weaponName = "WID_GravyGoblinV2_Athena";
+			}
+			else if (weaponName == "grappler" || weaponName == "grap" || weaponName == "grapple")
+			{
+				if (Fortnite_Version < 7.10)
+				{
+					weaponName = "WID_Hook_Gun_VR_Ore_T03";
+				}
+				else
+				{
+					weaponName = "WID_Hook_Gun_Slide";
+				}
+			}
+			else if (weaponName == "snowman" || weaponName == "snowmen")
+			{
+				if (Fortnite_Version < 11)
+				{
+					weaponName = "Athena_SneakySnowman";
+				}
+				else
+				{
+					weaponName = "AGID_SneakySnowmanV2";
+				}
+			}
+			else if (weaponName == "ironman" || weaponName == "iron-man")
+			{
+				if (Fortnite_Version < 14.00 || Fortnite_Version > 14.60)
+				{
+					weaponName = "AGID_AshtonPack_Indigo";
+				}
+				else
+				{
+					weaponName = "WID_HighTower_Tomato_Repulsor_CoreBR";
+				}
+			}
+			else if (weaponName == "hunting")
+			{
+				if (Fortnite_Version < 12.41)
+				{
+					weaponName = "WID_Sniper_NoScope_Athena_R_Ore_T03";
+				}
+				else
+				{
+					weaponName = "WID_Sniper_NoScope_Athena_SR_Ore_T03";
+				}
+			}
+			else if (weaponName == "pump")
+			{
+				if (Fortnite_Version < 6.31)
+				{
+					weaponName = "WID_Shotgun_Standard_Athena_UC_Ore_T03";
+				}
+				else
+				{
+					weaponName = "WID_Shotgun_Standard_Athena_SR_Ore_T03";
+				}
+			}
+			else if (weaponName == "harpoon")
+			{
+				if (Fortnite_Version < 13.40)
+				{
+					weaponName = "WID_Athena_HappyGhost";
+				}
+				else
+				{
+					weaponName = "WID_Athena_HappyGhost_Infinite";
+				}
+			}
+
 			int amount = 1;
 
 			try
 			{
-				if (NumArgs >= 2)
-					count = std::stoi(Arguments[2]);
 				if (NumArgs >= 3)
 					amount = std::stoi(Arguments[3]);
 			}
@@ -1201,6 +1841,17 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				SendMessageToConsole(PlayerController, L"Invalid WID!");
 				return;
+			}
+
+			int count = WID->GetMaxStackSize();
+
+			try
+			{
+				if (NumArgs >= 2)
+					count = std::stoi(Arguments[2]);
+			}
+			catch (...)
+			{
 			}
 
 			auto Location = Pawn->GetActorLocation();
@@ -1369,7 +2020,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		}
 		else if (Command == "falldmg" || Command == "falldamage")
 		{
-			bool FallDamage = false;
+			/*bool FallDamage = false;
 
 			if (auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn()))
 			{
@@ -1381,12 +2032,52 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				}
 				else
 				{
-					PlayerState->DisableFallDamage();
+					static auto FallDamageClass = FindObject<UClass>(L"/Game/Athena/Items/Gameplay/BackPacks/Ashton/GE_AshtonPack_FallDamageImmune.GE_AshtonPack_FallDamageImmune_C");
+					auto AbilitySystemComponent = PlayerState->GetAbilitySystemComponent();
+					AbilitySystemComponent->ApplyGameplayEffectToSelf(FallDamageClass, 1.f);
 					SendMessageToConsole(PlayerController, L"Fall damage has been turned off.");
 				}
 
 				FallDamage = !FallDamage;
+			}*/
+
+			if (auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn()))
+				PlayerState->DisableFallDamage();
+
+			SendMessageToConsole(PlayerController, L"You have **PERMANENTLY** turned off fall damage for this game.");
+		}
+		else if (Command == "changespread")
+		{
+			if (NumArgs < 1)
+			{
+				SendMessageToConsole(ReceivingController, L"Please provide a valid clip size!");
+				return;
 			}
+
+			auto WorldInventory = ReceivingController->GetWorldInventory();
+
+			if (!WorldInventory)
+			{
+				SendMessageToConsole(PlayerController, L"No world inventory!");
+				return;
+			}
+
+			static auto WeaponDef = FindObject<UFortWeaponItemDefinition>("/Game/Athena/Items/Weapons/WID_Sniper_BoltAction_Scope_Athena_SR_Ore_T03.WID_Sniper_BoltAction_Scope_Athena_SR_Ore_T03");
+
+			int NewSpread = WeaponDef->GetSpread();
+
+			try { NewSpread = std::stoi(Arguments[1]); }
+			catch (...) {}
+
+			WeaponDef->GetSpread() = NewSpread;
+
+			bool bShouldUpdate = false;
+			WorldInventory->AddItem(WeaponDef, &bShouldUpdate);
+
+			if (bShouldUpdate)
+				WorldInventory->Update();
+
+			SendMessageToConsole(PlayerController, L"Granted item!");
 		}
 		else if (Command == "setshield" || Command == "shield")
 		{
@@ -1454,6 +2145,210 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				SendMessageToConsole(PlayerController, Message.c_str());
 			}
 		}
+		/*else if (Command == "lategame" || Command == "lg")
+		{
+			if (Globals::bLateGame)
+			{
+				SendMessageToConsole(PlayerController, L"You can only run this command on Full Map!");
+			}
+			else
+			{
+				static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
+				auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
+				auto& ClientConnections = WorldNetDriver->GetClientConnections();
+
+				for (int z = 0; z < ClientConnections.Num(); z++)
+				{
+					auto ClientConnection = ClientConnections.at(z);
+					auto FortPC = Cast<AFortPlayerController>(ClientConnection->GetPlayerController());
+
+					if (!FortPC)
+						continue;
+
+					auto WorldInventory = FortPC->GetWorldInventory();
+
+					if (!WorldInventory)
+						continue;
+
+					static auto WoodItemData = FindObject<UFortItemDefinition>(
+						L"/Game/Items/ResourcePickups/WoodItemData.WoodItemData");
+					static auto StoneItemData = FindObject<UFortItemDefinition>(
+						L"/Game/Items/ResourcePickups/StoneItemData.StoneItemData");
+					static auto MetalItemData = FindObject<UFortItemDefinition>(
+						L"/Game/Items/ResourcePickups/MetalItemData.MetalItemData");
+					static auto Gold = FindObject<UFortItemDefinition>(
+						L"/Game/Items/ResourcePickups/Athena_WadsItemData.Athena_WadsItemData");
+
+					static UFortItemDefinition* Primary = nullptr;
+
+					do
+					{
+						Primary = FindObject<UFortItemDefinition>(GetRandomItem(Primaries, z), nullptr, ANY_PACKAGE);
+					} while (!Primary);
+
+					static UFortItemDefinition* Secondary = nullptr;
+
+					do
+					{
+						Secondary = FindObject<UFortItemDefinition>(GetRandomItem(Secondaries, z), nullptr, ANY_PACKAGE);
+					} while (!Secondary);
+
+					static UFortItemDefinition* Tertiary = nullptr;
+
+					do
+					{
+						Tertiary = FindObject<UFortItemDefinition>(GetRandomItem(Tertiaries, z), nullptr, ANY_PACKAGE);
+					} while (!Tertiary);
+
+					static UFortItemDefinition* Consumable1 = nullptr;
+
+					do
+					{
+						Consumable1 = FindObject<UFortItemDefinition>(GetRandomItem(Consumables1, z), nullptr, ANY_PACKAGE);
+					} while (!Consumable1);
+
+					static UFortItemDefinition* Consumable2 = nullptr;
+
+					do
+					{
+						Consumable2 = FindObject<UFortItemDefinition>(GetRandomItem(Consumables2, z), nullptr, ANY_PACKAGE);
+					} while (!Consumable2);
+
+					static UFortItemDefinition* Trap = nullptr;
+
+					do
+					{
+						Trap = FindObject<UFortItemDefinition>(GetRandomItem(Traps, z), nullptr, ANY_PACKAGE);
+					} while (!Trap);
+
+					static auto HeavyAmmo = FindObject<UFortItemDefinition>(
+						L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsHeavy.AthenaAmmoDataBulletsHeavy");
+					static auto ShellsAmmo = FindObject<UFortItemDefinition>(
+						L"/Game/Athena/Items/Ammo/AthenaAmmoDataShells.AthenaAmmoDataShells");
+					static auto MediumAmmo = FindObject<UFortItemDefinition>(
+						L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsMedium.AthenaAmmoDataBulletsMedium");
+					static auto LightAmmo = FindObject<UFortItemDefinition>(
+						L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsLight.AthenaAmmoDataBulletsLight");
+					static auto RocketAmmo = FindObject<UFortItemDefinition>(
+						L"/Game/Athena/Items/Ammo/AmmoDataRockets.AmmoDataRockets");
+					static auto ExplosiveAmmo = FindObject<UFortItemDefinition>(
+						L"/Game/Items/Ammo/AmmoDataExplosive.AmmoDataExplosive");
+					static auto EnergyCells = FindObject<UFortItemDefinition>(
+						L"/Game/Items/Ammo/AmmoDataEnergyCell.AmmoDataEnergyCell");
+					static auto Arrows = FindObject<UFortItemDefinition>(
+						L"/PrimalGameplay/Items/Ammo/AthenaAmmoDataArrows.AthenaAmmoDataArrows");
+					static auto ReconAmmo = FindObject<UFortItemDefinition>(
+						L"/MotherGameplay/Items/Scooter/Ammo_Athena_Mother_Scooter.Ammo_Athena_Mother_Scooter");
+					static auto STWHeavy = FindObject<UFortItemDefinition>(
+						L"/Game/Items/Ammo/AmmoDataBulletsHeavy.AmmoDataBulletsHeavy");
+					static auto STWMedium = FindObject<UFortItemDefinition>(
+						L"/Game/Items/Ammo/AmmoDataBulletsMedium.AmmoDataBulletsMedium");
+					static auto STWLight = FindObject<UFortItemDefinition>(
+						L"/Game/Items/Ammo/AmmoDataBulletsLight.AmmoDataBulletsLight");
+					static auto STWShells = FindObject<UFortItemDefinition>(
+						L"/Game/Items/Ammo/AmmoDataShells.AmmoDataShells");
+
+					WorldInventory->AddItem(WoodItemData, nullptr, (std::rand() % 646) + 186);
+					WorldInventory->AddItem(StoneItemData, nullptr, (std::rand() % 646) + 186);
+					WorldInventory->AddItem(MetalItemData, nullptr, (std::rand() % 646) + 186);
+
+					if (Fortnite_Version < 15)
+					{
+						WorldInventory->AddItem(Gold, nullptr, (std::rand() % 7500) + 1200);
+					}
+					else
+					{
+						WorldInventory->AddItem(Gold, nullptr, Gold->GetMaxStackSize());
+					}
+
+					WorldInventory->AddItem(Primary, nullptr, 1);
+					WorldInventory->AddItem(Secondary, nullptr, 1);
+					WorldInventory->AddItem(Tertiary, nullptr, 1);
+					WorldInventory->AddItem(Consumable1, nullptr, Consumable1->GetMaxStackSize());
+					WorldInventory->AddItem(Consumable2, nullptr, Consumable2->GetMaxStackSize());
+					WorldInventory->AddItem(ShellsAmmo, nullptr, (std::rand() % 576) + 87);
+					WorldInventory->AddItem(HeavyAmmo, nullptr, (std::rand() % 576) + 50);
+					WorldInventory->AddItem(MediumAmmo, nullptr, (std::rand() % 824) + 186);
+					WorldInventory->AddItem(LightAmmo, nullptr, (std::rand() % 824) + 124);
+					WorldInventory->AddItem(RocketAmmo, nullptr, (std::rand() % 12) + 3);
+					WorldInventory->AddItem(ExplosiveAmmo, nullptr, (std::rand() % 999) + 186);
+					WorldInventory->AddItem(EnergyCells, nullptr, (std::rand() % 999) + 186);
+					WorldInventory->AddItem(STWHeavy, nullptr, (std::rand() % 999) + 186);
+					WorldInventory->AddItem(STWMedium, nullptr, (std::rand() % 999) + 186);
+					WorldInventory->AddItem(STWLight, nullptr, (std::rand() % 999) + 186);
+					WorldInventory->AddItem(STWShells, nullptr, (std::rand() % 999) + 186);
+					WorldInventory->AddItem(Arrows, nullptr, (std::rand() % 30) + 12);
+					WorldInventory->AddItem(ReconAmmo, nullptr, 999);
+
+					WorldInventory->Update();
+				}
+
+				for (int i = 0; i < ClientConnections.Num(); i++)
+				{
+					auto Pawn = ReceivingController->GetMyFortPawn();
+
+					if (!Pawn)
+					{
+						SendMessageToConsole(PlayerController, L"No pawn!");
+						return;
+					}
+
+					float MaxHealth = Pawn->GetMaxHealth();
+
+					auto HealthSet = Pawn->GetHealthSet();
+
+					if (!HealthSet)
+					{
+						SendMessageToConsole(PlayerController, L"No HealthSet!");
+						return;
+					}
+
+					static auto HealthOffset = HealthSet->GetOffset("Health");
+					auto& Health = HealthSet->Get<FFortGameplayAttributeData>(HealthOffset);
+
+					if (Health.GetMinimum() != MaxHealth)
+					{
+						Health.GetMinimum() = MaxHealth;
+					}
+					else
+					{
+						Health.GetMinimum() = 0;
+					}
+				}
+
+				for (int i = 0; i < ClientConnections.Num(); i++)
+				{
+					auto PlayerController = Cast<AFortPlayerController>(ClientConnections.at(i)->GetPlayerController());
+					auto Pawn = PlayerController->GetMyFortPawn();
+
+					Pawn->TeleportTo(FVector{ 0,0,105000 }, FRotator{ 0,0,0 });
+
+					float height = 2000;
+
+					Pawn->ProcessEvent(Pawn->FindFunction("TeleportToSkyDive"), &height);
+				}
+
+				UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"startsafezone", nullptr);
+
+				auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
+				auto SafeZoneIndicator = GameMode->GetSafeZoneIndicator();
+
+				if (SafeZoneIndicator)
+				{
+					SafeZoneIndicator->SkipShrinkSafeZone();
+					SafeZoneIndicator->SkipShrinkSafeZone();
+					SafeZoneIndicator->SkipShrinkSafeZone();
+					SafeZoneIndicator->SkipShrinkSafeZone();
+					SafeZoneIndicator->SkipShrinkSafeZone();
+				}
+
+				UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"pausesafezone", nullptr);
+
+				// SafeZoneIndicator->GetSafeZoneCenter();
+
+				SendMessageToConsole(PlayerController, L"Skipped to Lategame Zone!");
+			}
+		}*/
 		/*else if (Command == "setbotmaxshield" || Command == "botmaxshield")
 		{
 			AFortPlayerPawnAthena* BotPawn = nullptr;
@@ -1958,6 +2853,148 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			}
 
 			SendMessageToConsole(PlayerController, L"Applied CID!");
+		}
+		else if (Command == "skinall")
+		{
+			for (int i = 0; i < ClientConnections.Num(); i++)
+			{
+				auto PlayerController = Cast<AFortPlayerController>(ClientConnections.at(i)->GetPlayerController());
+				auto Pawn = PlayerController->GetMyFortPawn();
+				auto FortPlayerPawn = Cast<AFortPlayerPawn>(Pawn);
+
+				std::string CIDStr = Arguments[1];
+
+				if (CIDStr == "rene" || CIDStr == "renegaderaider") // if this git ever gets released feel free to pull request open more of these i cba
+				{
+					CIDStr = "CID_028_Athena_Commando_F";
+				}
+				else if (CIDStr == "ghoul" || CIDStr == "ghoultrooper")
+				{
+					CIDStr = "CID_029_Athena_Commando_F_Halloween";
+				}
+				else if (CIDStr == "skull" || CIDStr == "skulltrooper")
+				{
+					CIDStr = "CID_030_Athena_Commando_M_Halloween";
+				}
+				else if (CIDStr == "aerial" || CIDStr == "aerialassault")
+				{
+					CIDStr = "CID_017_Athena_Commando_M";
+				}
+				else if (CIDStr == "recon" || CIDStr == "reconexpert")
+				{
+					CIDStr = "CID_022_Athena_Commando_F";
+				}
+				else if (CIDStr == "desperado")
+				{
+					CIDStr = "CID_026_Athena_Commando_M";
+				}
+				else if (CIDStr == "blackknight" || CIDStr == "bk")
+				{
+					CIDStr = "CID_035_Athena_Commando_M_Medieval";
+				}
+				else if (CIDStr == "sparkle" || CIDStr == "sparklespecialist")
+				{
+					CIDStr = "CID_039_Athena_Commando_F_Disco";
+				}
+				else if (CIDStr == "rednosed" || CIDStr == "rnr" || CIDStr == "reindeer")
+				{
+					CIDStr = "CID_047_Athena_Commando_F_HolidayReindeer";
+				}
+				else if (CIDStr == "ginger")
+				{
+					CIDStr = "CID_048_Athena_Commando_F_HolidayGingerbread";
+				}
+				else if (CIDStr == "mogul")
+				{
+					CIDStr = "CID_061_Athena_Commando_F_SkiGirl";
+				}
+				else if (CIDStr == "usa")
+				{
+					CIDStr = "CID_062_Athena_Commando_F_SkiGirl_USA";
+				}
+				else if (CIDStr == "can")
+				{
+					CIDStr = "CID_063_Athena_Commando_F_SkiGirl_CAN";
+				}
+				else if (CIDStr == "gbr")
+				{
+					CIDStr = "CID_064_Athena_Commando_F_SkiGirl_GBR";
+				}
+				else if (CIDStr == "fra")
+				{
+					CIDStr = "CID_065_Athena_Commando_F_SkiGirl_FRA";
+				}
+				else if (CIDStr == "ger")
+				{
+					CIDStr = "CID_066_Athena_Commando_F_SkiGirl_GER";
+				}
+				else if (CIDStr == "chn")
+				{
+					CIDStr = "CID_067_Athena_Commando_F_SkiGirl_CHN";
+				}
+				else if (CIDStr == "kor")
+				{
+					CIDStr = "CID_068_Athena_Commando_F_SkiGirl_KOR";
+				}
+				else if (CIDStr == "rapscallion")
+				{
+					CIDStr = "CID_135_Athena_Commando_F_Jailbird";
+				}
+				else if (CIDStr == "galaxy")
+				{
+					CIDStr = "CID_175_Athena_Commando_M_Celestial";
+				}
+				else if (CIDStr == "heidi")
+				{
+					CIDStr = "CID_226_Athena_Commando_F_Octoberfest";
+				}
+				else if (CIDStr == "ikonik")
+				{
+					CIDStr = "CID_313_Athena_Commando_M_KpopFashion";
+				}
+				else if (CIDStr == "kuno")
+				{
+					CIDStr = "CID_362_Athena_Commando_F_BandageNinja";
+				}
+				else if (CIDStr == "aura")
+				{
+					CIDStr = "CID_397_Athena_Commando_F_TreasureHunterFashion";
+				}
+				else if (CIDStr == "wonder")
+				{
+					CIDStr = "CID_434_Athena_Commando_F_StealthHonor";
+				}
+				else if (CIDStr == "worldcup" || CIDStr == "wc")
+				{
+					CIDStr = "CID_478_Athena_Commando_F_WorldCup";
+				}
+				else if (CIDStr == "crystal")
+				{
+					CIDStr = "CID_493_Athena_Commando_F_JurassicArchaeology";
+				}
+				else if (CIDStr == "fennix")
+				{
+					CIDStr = "CID_504_Athena_Commando_M_Lopex";
+				}
+
+				auto CIDDef = FindObject(CIDStr, nullptr, ANY_PACKAGE);
+
+				if (!CIDDef)
+				{
+					SendMessageToConsole(PlayerController, L"Invalid character item definition!");
+					return;
+				}
+
+				LOG_INFO(LogDev, "Applying {}", CIDDef->GetFullName());
+
+				if (!ApplyCID(FortPlayerPawn, CIDDef))
+				{
+					SendMessageToConsole(PlayerController, L"Failed while applying skin! Please check the server log.");
+					return;
+				}
+
+				SendMessageToConsole(PlayerController, L"Applied CID!");
+			}
 		}
 		else if (Command == "applyhid" || Command == "hero")
 		{
@@ -2504,7 +3541,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		}
 		else if (Command == "savewaypoint" || Command == "s")
 		{
-			if (NumArgs < 1) 
+			if (NumArgs < 1)
 			{
 				SendMessageToConsole(PlayerController, L"Please provide a phrase to save the waypoint.");
 				return;
@@ -2512,16 +3549,32 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			auto Pawn = ReceivingController->GetMyFortPawn();
 
-			if (!Pawn) 
+			if (!Pawn)
 			{
 				SendMessageToConsole(PlayerController, L"No pawn to get location from!");
 				return;
 			}
 
 			auto PawnLocation = Pawn->GetActorLocation();
-			Waypoints[Arguments[1]] = PawnLocation;
+			std::string Phrase = Arguments[1];
 
-			SendMessageToConsole(PlayerController, L"Waypoint saved! Use « cheat waypoint (phrase) » to teleport to that location!");
+			if (Waypoints.find(Phrase) != Waypoints.end())
+			{
+				if (NumArgs >= 2 && Arguments[2] == "override" || "o")
+				{
+					Waypoints[Phrase] = PawnLocation;
+					SendMessageToConsole(PlayerController, L"Waypoint overridden successfully!");
+				}
+				else
+				{
+					SendMessageToConsole(PlayerController, L"A waypoint with this phrase already exists! Use 'waypoint {phrase} override' to overwrite it.");
+				}
+			}
+			else
+			{
+				Waypoints[Phrase] = PawnLocation;
+				SendMessageToConsole(PlayerController, L"Waypoint saved! Use « cheat waypoint (phrase) » to teleport to that location!");
+			}
 		}
 		else if (Command == "waypoint" || Command == "w")
 		{
@@ -3031,7 +4084,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, L"Regenerated health and shield for all players!\n");
 		}
-		else if (Command == "giveall" || Command == "giveallammo" || Command == "giveammoall" || Command == "grantall")
+		else if (Command == "giveall" || Command == "grantall")
 		{
 			static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
 			auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
@@ -3511,60 +4564,60 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 	if (bSendHelpMessage)
 	{
 		FString HelpMessage = LR"(
-- cheat giveitem {ID} - Gives a weapon to the executing player, if inventory is full drops a pickup on the player.
-- cheat give {NAMEOFITEM_RARITY || Use cheat givenames} - Gives a weapon using a shortcut name, without ID.
-- cheat givenames - Sends a message to the console of all of the names that work with the "cheat give" command.
-- cheat summon {full path of object} {optional: X, Y, Z} - Summons the specified blueprint class at the executing player's location. Note: There is a limit on the count.
-- cheat spawn {name of object, use cheat spawnnames} {optional: X, Y, Z} - Spawns a blueprint actor on player using a shorter name.
-- cheat spawnnames - Sends a message to the console of all of the names that work with the "cheat spawn" command.
-- cheat savewaypoint {phrase/number} - Gets the location of where you are standing and saves it as a waypoint. **NEW!**
-- cheat waypoint {saved phrase/number} - Teleports the player to the selected existing waypoint. **NEW!**
-- cheat bugitgo {X Y Z} - Teleport to a location.
-- cheat getlocation - Gives you the current XYZ cords of where you are standing and copies them to your clipboard (useful for bugitgo)
-- cheat infammo - Toggles Infinite Ammo.
-- cheat buildfree - Toggles Infinite Materials.
-- cheat launch/fling {X Y Z} - Launches a player.
-- cheat fly - Toggles flight.
-- cheat ghost - Toggles flight and disables collision.
-- cheat rift - Rifts the player into the air.
-- cheat speed - Changes player's movement speed (buggy running but works with cheat fly)
-- cheat listplayers - Gives you all players names.
-- cheat kick - Kicks the player from the game.
 - cheat ban - Permanently bans the player from the game. (IP Ban)
-- cheat pausesafezone - Pauses the zone.
-- cheat demospeed - Speeds up/slows down the speed of the game.
-- cheat tptomax - Teleports player to max height, in the middle of the map.
-- cheat health {#} - Sets executing player's health.
-- cheat shield {#} - Sets executing player's shield.
-- cheat maxhealth {#} - Sets the maximum health of the player.
-- cheat maxshield {#} - Sets the maximum shield of the player.
-- cheat regen - Regenerates the players health and shield to their max.
-- cheat siphon {#} - Changes the amount of health and shield a player gets for killing someone.
-- cheat falldamage - Permanently turn off fall damage. **NEW!**
-- cheat skin {CID} - Sets a player's character.
-- cheat spawnpickup {WID} {#} - Spawns a pickup at specified player.
-- cheat tp - Teleports to what the player is looking at.
 - cheat bot {#} - Spawns a bot at the player (experimental).
-- cheat pickaxe {Pickaxe (W)ID} - Set player's pickaxe. Can be either the PID or WID
-- cheat wipe/clear {Primary = Guns || Secondary = Ammo & Mats} - Removes the specified quickbar.
-- cheat wipeall/clearall - Removes the player's entire inventory.
-- cheat suicide - Insta-kills player.
-- cheat healthall - Heals all players health.
-- cheat shieldall - Heals all players shield.
-- cheat regenall - Heals all players health and shield.
-- cheat godall - Gods all players.
-- cheat giveall - Gives all players Ammo, Materials, and Traps maxed out.
-- cheat tpalltomax - Teleports everyone to max height, in the middle of the map.
-- cheat togglesnowmap - Toggles the map to have snow or not. (7.10, 7.30, 11.31, 15.10, 19.01, & 19.10 ONLY)
+- cheat buildfree - Toggles Infinite Materials.
+- cheat bugitgo {X Y Z} - Teleport to a location.
+- cheat damagetarget {#} - Damages the Actor in front of you by the specified amount.
+- cheat demospeed - Speeds up/slows down the speed of the game.
 - cheat destroy - Destroys the actor that the player is looking at.
 - cheat destroyall {ClassPathName} - Destroys every actor of a given class. Useful for removing all floorloot for example.
-- cheat damagetarget {#} - Damages the Actor in front of you by the specified amount.
-- cheat getscript - Opens the Project Reboot V3 Script on your preferred browser (host only).
-- cheat tutorial - Opens the Project Reboot V3 Tutorial (host only).
+- cheat falldamage - Permanently turn off fall damage.
+- cheat fly - Toggles flight.
+- cheat ghost - Toggles flight and disables collision.
+- cheat give {NAMEOFITEM_RARITY || Use cheat givenames} - Gives a weapon using a shortcut name, without ID.
+- cheat giveall - Gives all players Ammo, Materials, and Traps maxed out.
+- cheat giveitem {ID} - Gives a weapon to the executing player, if inventory is full drops a pickup on the player.
+- cheat givenames - Sends a message to the console of all of the names that work with the "cheat give" command.
+- cheat godall - Gods all players.
+- cheat health {#} - Sets executing player's health.
+- cheat healthall - Heals all players health.
+- cheat infammo - Toggles Infinite Ammo.
+- cheat kick - Kicks the player from the game.
 - cheat killserver - Ends the running task of the hosting window (host only).
-- cheat startaircraft - Starts the bus.
+- cheat launch/fling {X Y Z} - Launches a player.
+- cheat listplayers - Gives you all players names.
+- cheat maxhealth {#} - Sets the maximum health of the player.
+- cheat maxshield {#} - Sets the maximum shield of the player.
+- cheat pausesafezone - Pauses the zone.
+- cheat pausetimeofday - Pauses the current time of day cycle.
+- cheat pickaxe {ID} - Set player's pickaxe. Can be either the PID or WID.
+- cheat pickaxeall {ID} - Gives all players a specified pickaxe.
+- cheat regen - Regenerates the players health and shield to their max.
+- cheat regenall - Heals all players health and shield.
+- cheat rift - Rifts the player into the air.
+- cheat savewaypoint {phrase/number} - Gets the location of where you are standing and saves it as a waypoint.
 - cheat settimeofday {1-23} - Changes the time of day in game to a 24H time period.
-- cheat pausetimeofday - Pauses the current time of day cycle. **NEW!**
+- cheat shield {#} - Sets executing player's shield.
+- cheat shieldall - Heals all players shield.
+- cheat siphon {#} - Changes the amount of health and shield a player gets for killing someone.
+- cheat skin {CID} - Sets a player's skin.
+- cheat skinall {CID} - Gives all players a certain skin.
+- cheat spawn {name of object, use cheat spawnnames} {optional: X, Y, Z} - Spawns a blueprint actor on player using a shorter name.
+- cheat spawnnames - Sends a message to the console of all of the names that work with the "cheat spawn" command.
+- cheat spawnpickup {WID} {#} - Spawns a pickup at specified player.
+- cheat speed - Changes player's movement speed (buggy running but works with cheat fly).
+- cheat startaircraft - Starts the bus.
+- cheat summon {full path of object} {optional: X, Y, Z} - Summons the specified blueprint class at the executing player's location. Note: There is a limit on the count.
+- cheat suicide - Insta-kills player.
+- cheat togglesnowmap - Toggles the map to have snow or not. (7.10, 7.30, 11.31, 15.10, 19.01, & 19.10 ONLY).
+- cheat tp - Teleports to what the player is looking at.
+- cheat tpalltomax - Teleports everyone to max height, in the middle of the map.
+- cheat tptomax - Teleports player to max height, in the middle of the map.
+- cheat tutorial - Opens the Project Reboot V3 Tutorial (host only).
+- cheat waypoint {saved phrase/number} - Teleports the player to the selected existing waypoint.
+- cheat wipe/clear {Primary = Guns || Secondary = Ammo & Mats} - Removes the specified quickbar.
+- cheat wipeall/clearall - Removes the player's entire inventory.
 
 - NOTE: If you want to execute a command on a player, quote their name after the command. Example: cheat op "Ralzify")";
 

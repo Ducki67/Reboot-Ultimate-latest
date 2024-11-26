@@ -625,10 +625,10 @@ static inline void StaticUI()
 
 	// ImGui::Checkbox("No MCP", &Globals::bNoMCP);
 
-	if (Addresses::ApplyGadgetData && Addresses::RemoveGadgetData && Engine_Version < 424)
+	/*if (Addresses::ApplyGadgetData && Addresses::RemoveGadgetData && Engine_Version < 424)
 	{
 		ImGui::Checkbox("Enable Gadgets", &Globals::bEnableAGIDs);
-	}
+	}*/
 
 	if (Fortnite_Version >= 11 && Engine_Version < 500 && !Globals::bStartedListening)
 	{
@@ -1130,7 +1130,7 @@ static inline void MainUI()
 				ImGui::Text(std::format("Joinable: {}", Globals::bStartedListening).c_str());
 				ImGui::Text(std::format("Started: {}", bStartedBus).c_str());
 				ImGui::Text(std::format("Ended: {}", GameState->GetGamePhase() > EAthenaGamePhase::Warmup && !GameMode->IsMatchInProgress()).c_str());
-				ImGui::Text(std::format("Gamemode: {} {}", (isLateGame ? "Lategame " : "Full Map "), PlaylistShortName).c_str());
+				ImGui::Text(std::format("Gamemode: {} {}", (isLateGame ? "Lategame" : "Full Map"), PlaylistShortName).c_str());
 				ImGui::Text(std::format("Players: {}", GameState->GetPlayersLeft()).c_str());
 
 				if (!Globals::bStartedListening) // hm
