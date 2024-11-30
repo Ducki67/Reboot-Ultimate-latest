@@ -14,6 +14,7 @@
 #include <sstream>
 #include <map>
 #include <string>
+#include <algorithm>
 
 std::map<std::string, FVector> Waypoints;
 
@@ -191,6 +192,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			}
 
 			auto& weaponName = Arguments[1];
+
+			std::replace(weaponName.begin(), weaponName.end(), '-', '_');
 
 			if (weaponName == "ar_uc")
 			{
@@ -1411,14 +1414,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "WID_Shotgun_HighSemiAuto_Athena_SR_Ore_T03";
 			}
-			else if (weaponName == "doublebarrel_vr")
-			{
-				weaponName = "WID_Shotgun_BreakBarrel_Athena_VR_Ore_T03";
-			}
-			else if (weaponName == "doublebarrel_sr" || weaponName == "doublebarrel")
-			{
-				weaponName = "WID_Shotgun_BreakBarrel_Athena_SR_Ore_T03";
-			}
 			else if (weaponName == "flint_c")
 			{
 				weaponName = "WID_Pistol_Flintlock_Athena_C";
@@ -2463,6 +2458,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				Health.GetMinimum() = 0;
 				SendMessageToConsole(PlayerController, L"God OFF.");
 			}
+
+			// Pawn->SetCanBeDamaged(!Pawn->CanBeDamaged());
 		}
 		else if (Command == "oldgod" || Command == "canbedamaged")
 		{
@@ -2627,7 +2624,95 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				return;
 			}
 
-			TSubclassOf<AActor> AClass = FindObject<UClass>(Arguments[1]);
+			std::string InputClass = Arguments[1];
+			std::string FullPathClass;
+
+			if (InputClass == "driftboard" || InputClass == "hoverboard")
+				FullPathClass = "/Game/Athena/DrivableVehicles/JackalVehicle_Athena.JackalVehicle_Athena_C";
+			else if (InputClass == "surfboard")
+				FullPathClass = "/Game/Athena/DrivableVehicles/SurfboardVehicle_Athena.SurfboardVehicle_Athena_C";
+			else if (InputClass == "quadcrasher" || InputClass == "quad")
+				FullPathClass = "/Game/Athena/DrivableVehicles/AntelopeVehicle.AntelopeVehicle_C";
+			else if (InputClass == "baller")
+				FullPathClass = "/Game/Athena/DrivableVehicles/Octopus/OctopusVehicle.OctopusVehicle_C";
+			else if (InputClass == "plane")
+				FullPathClass = "/Game/Athena/DrivableVehicles/Biplane/BluePrints/FerretVehicle.FerretVehicle_C";
+			else if (InputClass == "golfcart" || InputClass == "golf")
+				FullPathClass = "/Game/Athena/DrivableVehicles/Golf_Cart/Golf_Cart_Base/Blueprints/GolfCartVehicleSK.GolfCartVehicleSK_C";
+			else if (InputClass == "ufo")
+				FullPathClass = "/Nevada/Blueprints/Vehicle/Nevada_Vehicle_V2.Nevada_Vehicle_V2_C";
+			else if (InputClass == "cannon")
+				FullPathClass = "/Game/Athena/DrivableVehicles/PushCannon.PushCannon_C";
+			else if (InputClass == "shoppingcart" || InputClass == "shopping")
+				FullPathClass = "/Game/Athena/DrivableVehicles/ShoppingCartVehicleSK.ShoppingCartVehicleSK_C";
+			else if (InputClass == "mech" || InputClass == "brute")
+				FullPathClass = "/Game/Athena/DrivableVehicles/Mech/TestMechVehicle.TestMechVehicle_C";
+			else if (InputClass == "bear" || InputClass == "truck")
+				FullPathClass = "/Valet/BasicTruck/Valet_BasicTruck_Vehicle.Valet_BasicTruck_Vehicle_C";
+			else if (InputClass == "prevelant" || InputClass == "car")
+				FullPathClass = "/Valet/BasicCar/Valet_BasicCar_Vehicle.Valet_BasicCar_Vehicle_C";
+			else if (InputClass == "whiplash" || InputClass == "sportscar")
+				FullPathClass = "/Valet/SportsCar/Valet_SportsCar_Vehicle.Valet_SportsCar_Vehicle_C";
+			else if (InputClass == "taxi")
+				FullPathClass = "/Valet/TaxiCab/Valet_TaxiCab_Vehicle.Valet_TaxiCab_Vehicle_C";
+			else if (InputClass == "mudflap")
+				FullPathClass = "/Valet/BigRig/Valet_BigRig_Vehicle.Valet_BigRig_Vehicle_C";
+			else if (InputClass == "stark")
+				FullPathClass = "/Valet/SportsCar/Valet_SportsCar_Vehicle_HighTower.Valet_SportsCar_Vehicle_HighTower_C";
+			else if (InputClass == "boat")
+				FullPathClass = "/Game/Athena/DrivableVehicles/Meatball/Meatball_Large/MeatballVehicle_L.MeatballVehicle_L_C";
+			else if (InputClass == "heli" || InputClass == "helicopter")
+				FullPathClass = "/Hoagie/HoagieVehicle.HoagieVehicle_C";
+			else if (InputClass == "shark")
+				FullPathClass = "/SpicySake/Pawns/NPC_Pawn_SpicySake_Parent.NPC_Pawn_SpicySake_Parent_C";
+			else if (InputClass == "klombo")
+				FullPathClass = "/ButterCake/Pawns/NPC_Pawn_ButterCake_Base.NPC_Pawn_ButterCake_Base_C";
+			else if (InputClass == "umbrella")
+				FullPathClass = "/Game/Athena/Apollo/Environments/BuildingActors/Papaya/Papaya_BouncyUmbrella_C.Papaya_BouncyUmbrella_C_C";
+			else if (InputClass == "dumpster")
+				FullPathClass = "/Game/Athena/Items/EnvironmentalItems/HidingProps/Props/B_HidingProp_Dumpster.B_HidingProp_Dumpster_C";
+			else if (InputClass == "tire")
+				FullPathClass = "/Game/Building/ActorBlueprints/Prop/Prop_TirePile_04.Prop_TirePile_04_C";
+			else if (InputClass == "llama")
+				FullPathClass = "/Game/Athena/SupplyDrops/Llama/AthenaSupplyDrop_Llama.AthenaSupplyDrop_Llama_C";
+			else if (InputClass == "rift")
+				FullPathClass = "/Game/Athena/Items/ForagedItems/Rift/BGA_RiftPortal_Athena_Spawner.BGA_RiftPortal_Athena_Spawner_C";
+			else if (InputClass == "airvent")
+				FullPathClass = "/Game/Athena/Environments/Blueprints/DUDEBRO/BGA_HVAC.BGA_HVAC_C";
+			else if (InputClass == "geyser")
+				FullPathClass = "/Game/Athena/Environments/Blueprints/DudeBro/BGA_DudeBro_Mini.BGA_DudeBro_Mini_C";
+			else if (InputClass == "nobuildzone")
+				FullPathClass = "/Game/Athena/Prototype/Blueprints/Galileo/BP_Galileo_NoBuildZone.BP_Galileo_NoBuildZone_C";
+			else if (InputClass == "launch" || InputClass == "launchpad")
+				FullPathClass = "/Game/Athena/Items/Traps/Launchpad/BluePrint/Trap_Floor_Player_Launch_Pad.Trap_Floor_Player_Launch_Pad_C";
+			else if (InputClass == "gascan" || InputClass == "gas")
+				FullPathClass = "/Game/Athena/Items/Weapons/Prototype/PetrolPump/BGA_Petrol_Pickup.BGA_Petrol_Pickup_C";
+			else if (InputClass == "supplydrop" || InputClass == "drop")
+				if (Fortnite_Version >= 12.30 && Fortnite_Version <= 12.61)
+					FullPathClass = "/Game/Athena/SupplyDrops/AthenaSupplyDrop_Donut.AthenaSupplyDrop_Donut_C";
+				else if (Fortnite_Version == 5.10 || Fortnite_Version == 9.41 || Fortnite_Version == 14.20 || Fortnite_Version == 18.00)
+					FullPathClass = "/Game/Athena/SupplyDrops/AthenaSupplyDrop_BDay.AthenaSupplyDrop_BDay_C";
+				else if (Fortnite_Version == 1.11 || Fortnite_Version == 7.10 || Fortnite_Version == 7.20 || Fortnite_Version == 7.30 || Fortnite_Version == 11.31 || Fortnite_Version == 15.10 || Fortnite_Version == 19.01)
+					FullPathClass = "/Game/Athena/SupplyDrops/AthenaSupplyDrop_Holiday.AthenaSupplyDrop_Holiday_C";
+				else if (Fortnite_Version == 5.40 || Fortnite_Version == 5.41)
+					FullPathClass = "/Game/Athena/SupplyDrops/Bling/AthenaSupplyDrop_Bling.AthenaSupplyDrop_Bling_C";
+				else FullPathClass = "/Game/Athena/SupplyDrops/AthenaSupplyDrop.AthenaSupplyDrop_C";
+			else if (InputClass == "zeropoint")
+				if (Fortnite_Version < 15.00)
+					FullPathClass = "/Game/Athena/Environments/Nexus/Blueprints/BP_ZeroPoint_Exploding.BP_ZeroPoint_Exploding_C";
+				else FullPathClass = "/Game/Athena/Environments/Nexus/Blueprints/BP_ZeroPoint_2Point0.BP_ZeroPoint_2Point0_C";
+			else if (InputClass == "lowgrav" || InputClass == "lowgravzone")
+				if (Fortnite_Version < 12.00)
+					FullPathClass = "/Game/Athena/Prototype/Blueprints/Cube/BGA_Cube_Area_Effect.BGA_Cube_Area_Effect_C";
+				else FullPathClass = "/MotherGameplay/Items/Alpaca/BGA_Alpaca_AbductedPOI.BGA_Alpaca_AbductedPOI_C";
+
+			TSubclassOf<AActor> AClass = FindObject<UClass>(FullPathClass.c_str());
+
+			if (!AClass)
+			{
+				SendMessageToConsole(PlayerController, L"Invalid class provided or class not found!");
+				return;
+			}
 
 			auto CheatManager = ReceivingController->SpawnCheatManager(UCheatManager::StaticClass());
 
@@ -3560,14 +3645,14 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			if (Waypoints.find(Phrase) != Waypoints.end())
 			{
-				if (NumArgs >= 2 && Arguments[2] == "override" || "o")
+				if (NumArgs >= 2 && Arguments[2] == "override" || Arguments[2] == "o")
 				{
 					Waypoints[Phrase] = PawnLocation;
 					SendMessageToConsole(PlayerController, L"Waypoint overridden successfully!");
 				}
 				else
 				{
-					SendMessageToConsole(PlayerController, L"A waypoint with this phrase already exists! Use 'waypoint {phrase} override' to overwrite it.");
+					SendMessageToConsole(PlayerController, L"A waypoint with this phrase already exists! Use 'waypoint {phrase} override' to override it.");
 				}
 			}
 			else
@@ -4080,6 +4165,9 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 				Pawn->SetHealth(100.f);
 				Pawn->SetShield(100.f);
+
+				if (auto Pawn = Cast<AFortPlayerPawn>(PlayerController->GetMyFortPawn()))
+					PlayerState->ApplySiphonEffect();
 			}
 
 			SendMessageToConsole(PlayerController, L"Regenerated health and shield for all players!\n");
@@ -4405,6 +4493,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		}
 		else if (Command == "givenames")
 		{
+			SendMessageToConsole(PlayerController, L"NOTE: In a recent update, the underscore is now interchangeable with a dash (ex: cheat give ar_uc OR cheat give ar-uc)");
+			SendMessageToConsole(PlayerController, L"");
 			SendMessageToConsole(PlayerController, L"ar_uc || Uncommon Assalt Rifle");
 			SendMessageToConsole(PlayerController, L"ar_r/ar || Rare Assalt Rifle");
 			SendMessageToConsole(PlayerController, L"ar_vr/scar_vr || Epic Assalt Rifle");
