@@ -50,6 +50,9 @@ class UClass : public UStruct
 {
 public:
 	UObject* CreateDefaultObject();
+
+	template<typename UEType = UObject>
+	UEType* GetDefaultObject() { return *(UEType**)(__int64(this) + Offsets::DefaultObject); }
 };
 
 class UFunction : public UStruct

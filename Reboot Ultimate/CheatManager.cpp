@@ -44,6 +44,12 @@ void UCheatManager::DestroyAll(TSubclassOf<AActor> AClass)
 	this->ProcessEvent(DestroyAllFn, &UCheatManager_DestroyAll_Params);
 }
 
+void UCheatManager::ToggleDebugCamera()
+{
+	static auto ToggleDebugCameraFn = FindObject<UFunction>("/Script/Engine.CheatManager.ToggleDebugCamera");
+	this->ProcessEvent(ToggleDebugCameraFn);
+}
+
 UClass* UCheatManager::StaticClass()
 {
 	static auto Class = FindObject<UClass>(L"/Script/Engine.CheatManager");

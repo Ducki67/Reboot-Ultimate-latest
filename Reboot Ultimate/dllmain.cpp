@@ -123,7 +123,7 @@ static __int64 DispatchRequestHook(__int64 a1, __int64* a2, int a3)
 
 static bool (*CanCreateInCurrentContextOriginal)(UObject* Template);
 
-bool CanCreateInCurrentContextHook(UObject* Template)
+static bool CanCreateInCurrentContextHook(UObject* Template)
 {
     auto originalRet = CanCreateInCurrentContextOriginal(Template);
 
@@ -144,7 +144,7 @@ void (*ApplyHomebaseEffectsOnPlayerSetupOriginal)(
     char a6,
     unsigned __int8 a7);
 
-void __fastcall ApplyHomebaseEffectsOnPlayerSetupHook(
+static void __fastcall ApplyHomebaseEffectsOnPlayerSetupHook(
     __int64* GameState,
     __int64 a2,
     __int64 a3,
@@ -206,7 +206,7 @@ unsigned __int8 SpecialEventScript_ActivatePhaseHook(UObject* SpecialEventScript
 
 static void (*ActivatePhaseAtIndexOriginal)(UObject* SpecialEventScript, int Index);
 
-void ActivatePhaseAtIndexHook(UObject* SpecialEventScript, int Index)
+static void ActivatePhaseAtIndexHook(UObject* SpecialEventScript, int Index)
 {
     LOG_INFO(LogDev, "ActivatePhaseAtIndexHook {}!", Index);
 
@@ -476,7 +476,7 @@ void ActivatePhaseAtIndexHook(UObject* SpecialEventScript, int Index)
 }
 
 static void (*AttemptFinishPhaseOriginal)(AActor* SpecialEventScript, FGameplayTag PhaseTag);
-void AttemptFinishPhaseHook(AActor* SpecialEventScript, FGameplayTag PhaseTag)
+static void AttemptFinishPhaseHook(AActor* SpecialEventScript, FGameplayTag PhaseTag)
 {
     LOG_INFO(LogDev, "SpecialEventScript::AttemptFinishPhase PhaseTag: {}", PhaseTag.TagName.ToString());
 
@@ -519,7 +519,7 @@ void AttemptFinishPhaseHook(AActor* SpecialEventScript, FGameplayTag PhaseTag)
 
 // Used to teleport the pawn in some events, not used in all parts of rift tour for some reason.
 static void (*TeleportPlayerPawnOriginal)(UObject* Context, FFrame& Stack, void* Ret);
-void TeleportPlayerPawnHook(UObject* Context, FFrame& Stack, void* Ret)
+static void TeleportPlayerPawnHook(UObject* Context, FFrame& Stack, void* Ret)
 {
     LOG_INFO(LogEvent, "Teleported PlayerPawn!");
 
@@ -543,7 +543,7 @@ void TeleportPlayerPawnHook(UObject* Context, FFrame& Stack, void* Ret)
 }
 
 static void (*StartEventAtIndexOriginal)(UObject* Context, FFrame& Stack, void* Ret);
-void StartEventAtIndexHook(UObject* Context, FFrame& Stack, void* Ret)
+static void StartEventAtIndexHook(UObject* Context, FFrame& Stack, void* Ret)
 {
     int32 InStartingIndex;
     Stack.StepCompiledIn(&InStartingIndex);
@@ -575,7 +575,7 @@ void StartEventAtIndexHook(UObject* Context, FFrame& Stack, void* Ret)
 
 static __int64 (*FlowStep_SetPhaseToActiveOriginal)(AActor* SpecialEventPhase);
 
-__int64 FlowStep_SetPhaseToActiveHook(AActor* SpecialEventPhase)
+static __int64 FlowStep_SetPhaseToActiveHook(AActor* SpecialEventPhase)
 {
     LOG_INFO(LogDev, "FlowStep_SetPhaseToActiveHook!");
 
@@ -589,7 +589,7 @@ __int64 FlowStep_SetPhaseToActiveHook(AActor* SpecialEventPhase)
     return ret;
 }
 
-UObject* GetGoalManagerHook(UObject* WorldContextObject)
+static UObject* GetGoalManagerHook(UObject* WorldContextObject)
 {
     auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
     static auto AIGoalManagerOffset = GameMode->GetOffset("AIGoalManager");
@@ -599,7 +599,7 @@ UObject* GetGoalManagerHook(UObject* WorldContextObject)
     return GameMode->Get(AIGoalManagerOffset);
 }
 
-UObject* GetAIDirectorHook()
+static UObject* GetAIDirectorHook()
 {
     auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
     static auto AIDirectorOffset = GameMode->GetOffset("AIDirector");
@@ -668,7 +668,7 @@ static void Athena_MedConsumable_TriggeredHook(UObject* Context, FFrame& Stack, 
     return Athena_MedConsumable_TriggeredOriginal(Context, Stack, Ret);
 }
 
-void ChangeLevels()
+static void ChangeLevels()
 {
     constexpr bool bUseRemovePlayer = false;
     constexpr bool bUseSwitchLevel = false;
@@ -772,7 +772,7 @@ void ChangeLevels()
     }
 }
 
-void ApplyNullAndRetTrues()
+static void ApplyNullAndRetTrues()
 {
     static auto FortPlayerControllerAthenaDefault = FindObject<AFortPlayerControllerAthena>(L"/Script/FortniteGame.Default__FortPlayerControllerAthena"); // FindObject<UClass>(L"/Game/Athena/Athena_PlayerController.Default__Athena_PlayerController_C");
 
@@ -1011,6 +1011,13 @@ DWORD WINAPI Main(LPVOID)
         Hooking::MinHook::Hook((PVOID)(__int64(GetModuleHandleW(0)) + 0x416A93C), (PVOID)ReturnTrueHook, nullptr); // 7FF79E3EA93C
         // Hooking::MinHook::Hook((PVOID)(__int64(GetModuleHandleW(0)) + ), (PVOID)ReturnFalseHook, nullptr);
         Hooking::MinHook::Hook((PVOID)(__int64(GetModuleHandleW(0)) + 0x41624C8), (PVOID)ActivatePhaseAtIndexHook, (PVOID*)&ActivatePhaseAtIndexOriginal); // 7FF79E3E24C8  
+    }
+
+    if (Fortnite_Version >= 17.00) // Fixes random crash that happens a couple minutes after server starts for s17+
+    {
+        uintptr_t ServerCrashFix = Memcury::Scanner::FindPattern("48 89 5C 24 10 48 89 6C 24 20 56 57 41 54 41 56 41 57 48 81 EC ? ? ? ? 65 48 8B 04 25 ? ? ? ? 4C 8B F9").Get();
+        LOG_INFO(LogDev, "ServerCrashFix: 0x{:x}", ServerCrashFix);
+        Hooking::MinHook::Hook((PVOID)ServerCrashFix, (PVOID)ReturnFalseHook, nullptr);
     }
 
     if (std::floor(Fortnite_Version) == 4)

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "inc.h"
 #include "log.h"
+#include "UnrealNames.h"
 
 struct FNameEntryId
 {
@@ -41,7 +41,12 @@ struct FName
 
 	FName(uint32 Value) : ComparisonIndex(Value), Number(0) {}
 
-	bool IsValid() { return ComparisonIndex.Value > 0; } // for real
+	FName(const FString& Name);
+
+	FORCEINLINE FName(EName Ename)
+		: FName(CreateFNameFromEName(Ename)) {}
+
+	bool IsValid() const { return ComparisonIndex.Value > 0; } // for real
 
 	FORCEINLINE bool operator==(const FName& Other) const // HMM??
 	{
@@ -54,6 +59,27 @@ struct FName
 	}
 
 	int32 Compare(const FName& Other) const;
+
+	FORCEINLINE static FName CreateFNameFromEName(EName Ename)
+	{
+		FString NameStr = NamePool[uint32(Ename)];
+
+		return FName(NameStr);
+	}
+
+	FORCEINLINE static FName CreateNumberedNameIfNecessary(FNameEntryId ComparisonId, FNameEntryId DisplayId, int32 Number)
+	{
+		FName Out;
+		Out.ComparisonIndex = ComparisonId;
+		Out.Number = Number;
+
+		return Out;
+	}
+
+	FORCEINLINE static FName CreateNumberedNameIfNecessary(FNameEntryId ComparisonId, int32 Number)
+	{
+		return CreateNumberedNameIfNecessary(ComparisonId, ComparisonId, Number);
+	}
 
 	/* FORCEINLINE bool operator<(const FName& Other) const
 	{

@@ -103,8 +103,8 @@ void SetZoneToIndexHook(AFortGameModeAthena* GameModeAthena, int OverridePhaseMa
 		if (!FortGameData)
 			FortGameData = FindObject<UCurveTable>(L"/Game/Balance/AthenaGameData.AthenaGameData");
 
-		auto ShrinkTimeFName = UKismetStringLibrary::Conv_StringToName(L"Default.SafeZone.ShrinkTime");
-		auto HoldTimeFName = UKismetStringLibrary::Conv_StringToName(L"Default.SafeZone.WaitTime");
+		FName ShrinkTimeFName(L"Default.SafeZone.ShrinkTime");
+		FName HoldTimeFName(L"Default.SafeZone.WaitTime");
 
 		for (int i = 0; i < ZoneDurations.Num(); i++)
 		{

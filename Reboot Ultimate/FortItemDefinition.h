@@ -3,6 +3,7 @@
 #include "FortItem.h"
 #include "Object.h"
 #include "Class.h"
+#include "Text.h"
 
 #include "SoftObjectPath.h"
 #include "SoftObjectPtr.h"
@@ -168,6 +169,12 @@ public:
 		static auto bAllowMultipleStacksOffset = GetOffset("bAllowMultipleStacks");
 		static auto bAllowMultipleStacksFieldMask = GetFieldMask(GetProperty("bAllowMultipleStacks"));
 		return ReadBitfieldValue(bAllowMultipleStacksOffset, bAllowMultipleStacksFieldMask);
+	}
+
+	FText GetDisplayName()
+	{
+		static auto DisplayNameOffset = GetOffset("DisplayName");
+		return Get<FText>(DisplayNameOffset);
 	}
 
 	FSoftObjectPath& GetDisplayAssetPath()

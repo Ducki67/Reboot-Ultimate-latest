@@ -46,9 +46,11 @@
 #include "calendar.h"
 #include "botnames.h"
 #include "KismetRenderingLibrary.h"
+#include "FortLootPackage.h"
 
 #define PREGAME_GAME_TAB 1
 #define PREGAME_PLAYLIST_TAB 2
+#define PREGAME_BOTS_TAB 3
 
 #define GAME_TAB 1
 #define PLAYERS_TAB 2
@@ -75,6 +77,7 @@ using json = nlohmann::json;
 using namespace std::chrono;
 
 static inline float DefaultCannonMultiplier = 1.f;
+extern inline std::map<std::string, TArray<FCustomLootPoolItemRow>> CustomLootpoolMap{};
 
 extern inline int StartReverseZonePhase = 7;
 extern inline int EndReverseZonePhase = 5;
@@ -85,7 +88,7 @@ extern inline bool bHandleDeath = true;
 extern inline bool bUseCustomMap = false;
 extern inline std::string CustomMapName = "";
 extern inline int AmountToSubtractIndex = 1;
-extern inline int SecondsUntilTravel = 25;
+extern inline int SecondsUntilTravel = 30;
 extern inline bool bSwitchedInitialLevel = false;
 extern inline bool bIsInAutoRestart = false;
 extern inline float AutoBusStartSeconds = 60;
@@ -109,7 +112,6 @@ extern inline float* CannonYMultiplier = &DefaultCannonMultiplier;
 extern inline float* CannonZMultiplier = &DefaultCannonMultiplier;
 extern inline bool bMarkToTeleport = false;
 extern inline int Tick = 0;
-extern inline std::map<std::string, TArray<ItemRow>> CustomLootpoolMap{};
 
 // THE BASE CODE IS FROM IMGUI GITHUB
 
@@ -216,7 +218,7 @@ static inline void Restart() // todo move?
 
 	*/
 
-	// UGameplayStatics::OpenLevel(GetWorld(), UKismetStringLibrary::Conv_StringToName(LevelA), true, FString());
+	// UGameplayStatics::OpenLevel(GetWorld(), FName(LevelA), true, FString());
 }
 
 enum class Playlist : int
@@ -629,11 +631,6 @@ static inline void StaticUI()
 	{
 		ImGui::Checkbox("Enable Gadgets", &Globals::bEnableAGIDs);
 	}*/
-
-	if (Fortnite_Version >= 11 && Engine_Version < 500 && !Globals::bStartedListening)
-	{
-		if (ImGui::Checkbox("Toggle Bot PC", &Globals::bBotPC));
-	}
 }
 
 static inline void PregameTabs()
@@ -651,6 +648,14 @@ static inline void PregameTabs()
 		if (ImGui::BeginTabItem("Playlist"))
 		{
 			PregameTab = PREGAME_PLAYLIST_TAB;
+			PlayerTab = -1;
+			bInformationTab = false;
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Bots"))
+		{
+			PregameTab = PREGAME_BOTS_TAB;
 			PlayerTab = -1;
 			bInformationTab = false;
 			ImGui::EndTabItem();
@@ -733,13 +738,13 @@ static inline void MainTabs()
 			ImGui::EndTabItem();
 		}
 
-		if (ImGui::BeginTabItem("Extra"))
+		/*if (ImGui::BeginTabItem("Extra"))
 		{
 			Tab = FUN_TAB;
 			PlayerTab = -1;
 			bInformationTab = false;
 			ImGui::EndTabItem();
-		}
+		}*/
 
 #if 0
 		if (bannedStream.is_open() && ImGui::BeginTabItem("Unban")) // skunked
@@ -751,13 +756,13 @@ static inline void MainTabs()
 		}
 #endif
 
-		/*if (ImGui::BeginTabItem(("Settings")))
+		if (ImGui::BeginTabItem(("Settings")))
 		{
 			Tab = SETTINGS_TAB;
 			PlayerTab = -1;
 			bInformationTab = false;
 			ImGui::EndTabItem();
-		}*/
+		}
 
 		// maybe a Replication Stats for >3.3?
 
@@ -1356,7 +1361,7 @@ static inline void MainUI()
 
 					if (EventScripting)
 					{
-						FName Name = UKismetStringLibrary::Conv_StringToName(L"DrumGun");
+						FName Name(L"DrumGun");
 						EventScripting->ProcessEvent(SetUnvaultItemNameFn, &Name);
 
 						static auto PillarsConcludedFn = FindObject<UFunction>(L"/Game/Athena/Prototype/Blueprints/White/BP_SnowScripting.BP_SnowScripting_C.PillarsConcluded");
@@ -1732,91 +1737,7 @@ static inline void MainUI()
 		}
 		else if (Tab == FUN_TAB)
 		{
-			static std::string ItemToGrantEveryone;
-			static int AmountToGrantEveryone = 1;
 
-			ImGui::InputFloat("Starting Shield", &StartingShield);
-			ImGui::InputText("Item to Give", &ItemToGrantEveryone);
-			ImGui::InputInt("Amount to Give", &AmountToGrantEveryone);
-
-			if (ImGui::Button("Destroy All Player Builds"))
-			{
-				bShouldDestroyAllPlayerBuilds = true;
-			}
-
-			if (ImGui::Button("Give Item to Everyone"))
-			{
-				auto ItemDefinition = FindObject<UFortItemDefinition>(ItemToGrantEveryone, nullptr, ANY_PACKAGE);
-				
-				if (ItemDefinition)
-				{
-					static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
-					auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
-					auto& ClientConnections = WorldNetDriver->GetClientConnections();
-
-					for (int i = 0; i < ClientConnections.Num(); i++)
-					{
-						auto PlayerController = Cast<AFortPlayerController>(ClientConnections.at(i)->GetPlayerController());
-
-						if (!PlayerController->IsValidLowLevel())
-							continue;
-
-						auto WorldInventory = PlayerController->GetWorldInventory();
-
-						if (!WorldInventory->IsValidLowLevel())
-							continue;
-
-						bool bShouldUpdate = false;
-						WorldInventory->AddItem(ItemDefinition, &bShouldUpdate, AmountToGrantEveryone);
-
-						if (bShouldUpdate)
-							WorldInventory->Update();
-					}
-				}
-				else
-				{
-					ItemToGrantEveryone = "";
-					LOG_WARN(LogUI, "Invalid Item Definition!");
-				}
-			}
-
-			auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
-
-			if (GameState)
-			{
-				static auto DefaultGliderRedeployCanRedeployOffset = FindOffsetStruct("/Script/FortniteGame.FortGameStateAthena", "DefaultGliderRedeployCanRedeploy", false);
-				static auto DefaultParachuteDeployTraceForGroundDistanceOffset = GameState->GetOffset("DefaultParachuteDeployTraceForGroundDistance", false);
-
-				/*if (Globals::bStartedListening) // it resets accordingly to ProHenis b4 this
-				{
-					if (DefaultParachuteDeployTraceForGroundDistanceOffset != -1)
-					{
-						ImGui::InputFloat("Automatic Parachute Pullout Distance", GameState->GetPtr<float>(DefaultParachuteDeployTraceForGroundDistanceOffset));
-					}
-				}*/
-
-				if (DefaultGliderRedeployCanRedeployOffset != -1)
-				{
-					bool EnableGliderRedeploy = (bool)GameState->Get<float>(DefaultGliderRedeployCanRedeployOffset);
-
-					if (ImGui::Checkbox("Enable Glider Redeploy", &EnableGliderRedeploy))
-					{
-						GameState->Get<float>(DefaultGliderRedeployCanRedeployOffset) = EnableGliderRedeploy;
-					}
-				}
-
-				GET_PLAYLIST(GameState);
-
-				if (CurrentPlaylist)
-				{
-					bool bRespawning = CurrentPlaylist->GetRespawnType() == EAthenaRespawnType::InfiniteRespawn || CurrentPlaylist->GetRespawnType() == EAthenaRespawnType::InfiniteRespawnExceptStorm;
-
-					if (ImGui::Checkbox("Respawning", &bRespawning))
-					{
-						CurrentPlaylist->GetRespawnType() = (EAthenaRespawnType)bRespawning;
-					}
-				}
-			}
 		}
 		else if (Tab == DEVELOPER_TAB)
 		{
@@ -1981,6 +1902,92 @@ static inline void MainUI()
 		}
 		else if (Tab == SETTINGS_TAB)
 		{
+			static std::string ItemToGrantEveryone;
+			static int AmountToGrantEveryone = 1;
+
+			ImGui::InputFloat("Starting Shield", &StartingShield);
+			ImGui::InputText("Item to Give", &ItemToGrantEveryone);
+			ImGui::InputInt("Amount to Give", &AmountToGrantEveryone);
+
+			if (ImGui::Button("Destroy All Player Builds"))
+			{
+				bShouldDestroyAllPlayerBuilds = true;
+			}
+
+			if (ImGui::Button("Give Item to Everyone"))
+			{
+				auto ItemDefinition = FindObject<UFortItemDefinition>(ItemToGrantEveryone, nullptr, ANY_PACKAGE);
+
+				if (ItemDefinition)
+				{
+					static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
+					auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
+					auto& ClientConnections = WorldNetDriver->GetClientConnections();
+
+					for (int i = 0; i < ClientConnections.Num(); i++)
+					{
+						auto PlayerController = Cast<AFortPlayerController>(ClientConnections.at(i)->GetPlayerController());
+
+						if (!PlayerController->IsValidLowLevel())
+							continue;
+
+						auto WorldInventory = PlayerController->GetWorldInventory();
+
+						if (!WorldInventory->IsValidLowLevel())
+							continue;
+
+						bool bShouldUpdate = false;
+						WorldInventory->AddItem(ItemDefinition, &bShouldUpdate, AmountToGrantEveryone);
+
+						if (bShouldUpdate)
+							WorldInventory->Update();
+					}
+				}
+				else
+				{
+					ItemToGrantEveryone = "";
+					LOG_WARN(LogUI, "Invalid Item Definition!");
+				}
+			}
+
+			auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
+
+			if (GameState)
+			{
+				static auto DefaultGliderRedeployCanRedeployOffset = FindOffsetStruct("/Script/FortniteGame.FortGameStateAthena", "DefaultGliderRedeployCanRedeploy", true);
+				static auto DefaultParachuteDeployTraceForGroundDistanceOffset = GameState->GetOffset("DefaultParachuteDeployTraceForGroundDistance", false);
+
+				/*if (Globals::bStartedListening) // it resets accordingly to ProHenis b4 this
+				{
+					if (DefaultParachuteDeployTraceForGroundDistanceOffset != -1)
+					{
+						ImGui::InputFloat("Automatic Parachute Pullout Distance", GameState->GetPtr<float>(DefaultParachuteDeployTraceForGroundDistanceOffset));
+					}
+				}*/
+
+				if (DefaultGliderRedeployCanRedeployOffset != -1)
+				{
+					bool EnableGliderRedeploy = (bool)GameState->Get<float>(DefaultGliderRedeployCanRedeployOffset);
+
+					if (ImGui::Checkbox("Enable Glider Redeploy", &EnableGliderRedeploy))
+					{
+						GameState->Get<float>(DefaultGliderRedeployCanRedeployOffset) = EnableGliderRedeploy;
+					}
+				}
+
+				GET_PLAYLIST(GameState);
+
+				if (CurrentPlaylist)
+				{
+					bool bRespawning = CurrentPlaylist->GetRespawnType() == EAthenaRespawnType::InfiniteRespawn || CurrentPlaylist->GetRespawnType() == EAthenaRespawnType::InfiniteRespawnExceptStorm;
+
+					if (ImGui::Checkbox("Respawning", &bRespawning))
+					{
+						CurrentPlaylist->GetRespawnType() = (EAthenaRespawnType)bRespawning;
+					}
+				}
+			}
+
 			if (ImGui::Checkbox("Use Custom Lootpool (EXPERIMENTAL)", &Globals::bCustomLootpool))
 			{
 				if (Globals::bCustomLootpool)
@@ -1990,15 +1997,11 @@ static inline void MainUI()
 					std::string::size_type Position = std::string(Path).find_last_of("\\/");
 					std::string Directory = std::string(Path).substr(0, Position);
 					std::string LootPoolFilePath = Directory + "\\lootpool.json";
-
 					LOG_INFO(LogDev, "Passed check 1.");
-
 					std::ifstream LootpoolFile(LootPoolFilePath);
-
 					if (LootpoolFile.is_open())
 					{
 						json JsonData;
-
 						try
 						{
 							LootpoolFile >> JsonData;
@@ -2007,21 +2010,15 @@ static inline void MainUI()
 						{
 							LOG_ERROR(LogDev, "Failed to parse loot pool file!");
 						}
-
 						LOG_INFO(LogDev, "Passed check 2.");
-
-						std::vector<std::pair<std::pair<std::string, std::string>, std::pair<std::string, std::pair<std::string, std::vector<std::string>>>>> AllItemRows;
-
+						std::vector<std::pair<std::pair<std::string, std::string>, std::pair<std::string, std::vector<std::string>>>> AllItemRows;
 						for (const auto& JsonItem : JsonData)
 						{
 							std::string Definition = JsonItem["Definition"].get<std::string>();
 							std::string DropCount = JsonItem["DropCount"].get<std::string>();
-							std::string LoadedAmmo = JsonItem["LoadedAmmo"].get<std::string>();
 							std::string Weight = JsonItem["Weight"].get<std::string>();
 							std::vector<std::string> LootTiers;
-
 							LOG_INFO(LogDev, "Passed check 3.");
-
 							for (const auto& LootTier : JsonItem)
 							{
 								if (LootTier.is_array())
@@ -2030,55 +2027,41 @@ static inline void MainUI()
 										LootTiers.push_back(String.get<std::string>());
 								}
 							}
-
 							LOG_INFO(LogDev, "Passed check 4.");
-
-							AllItemRows.push_back(std::make_pair(
+							AllItemRows.push_back
+							(
 								std::make_pair(
-									Definition, DropCount
-								),
-								std::make_pair(
-									LoadedAmmo,
+									std::make_pair(
+										Definition,
+										DropCount
+									),
 									std::make_pair(
 										Weight,
 										LootTiers
 									)
 								)
-							));
-
+							);
 							LOG_INFO(LogDev, "Passed check 5.");
 						}
-
-						ItemRow ItemRow{};
-
+						FCustomLootPoolItemRow ItemRow{};
 						for (int i = 0; i < AllItemRows.size(); i++)
 						{
-							auto CurrentItemRow = AllItemRows[i];
-
+							auto& CurrentItemRow = AllItemRows[i];
 							LOG_INFO(LogDev, "Passed check 6.");
-
 							UFortItemDefinition* Definition = FindObject<UFortItemDefinition>(CurrentItemRow.first.first, nullptr, ANY_PACKAGE);
 							int DropCount = std::stoi(CurrentItemRow.first.second);
-							int LoadedAmmo = std::stoi(CurrentItemRow.second.first);
-							double Weight = std::stod(CurrentItemRow.second.second.first);
-							std::vector<std::string> LootTiers = CurrentItemRow.second.second.second;
-
+							double Weight = std::stod(CurrentItemRow.second.first);
+							std::vector<std::string> LootTiers = CurrentItemRow.second.second;
 							LOG_INFO(LogDev, "Passed check 7.");
-
 							ItemRow.Definition = Definition;
 							ItemRow.DropCount = DropCount;
-							ItemRow.LoadedAmmo = Cast<UFortWeaponItemDefinition>(Definition)->GetClipSize();
 							ItemRow.Weight = Weight;
-
 							LOG_INFO(LogDev, "Passed check 8.");
-
 							for (int i = 0; i < LootTiers.size(); i++)
 							{
-								auto LootTierString = LootTiers.at(i);
-
+								auto& LootTierString = LootTiers.at(i);
 								CustomLootpoolMap[LootTierString].Add(ItemRow);
 							}
-
 							LOG_INFO(LogDev, "Passed check 9.");
 						}
 					}
@@ -2092,6 +2075,58 @@ static inline void MainUI()
 				{
 					CustomLootpoolMap.clear();
 				}
+
+/*
+[
+    {
+        "Definition": "WID_Assault_AutoDrum_Athena_R_Ore_T03",
+        "DropCount": "1",
+        "Weight": "0.2",
+        "LootTiers":
+        [
+            "Loot_AthenaFloorLoot_Warmup",
+            "Loot_AthenaFloorLoot",
+            "Loot_AthenaTreasure",
+	        "Loot_AthenaIceBox"
+        ]
+    },
+    {
+        "Definition": "WID_Shotgun_Standard_Athena_C_Ore_T03",
+        "DropCount": "1",
+        "Weight": "0.2",
+        "LootTiers":
+        [
+            "Loot_AthenaFloorLoot_Warmup",
+            "Loot_AthenaFloorLoot",
+            "Loot_AthenaTreasure"
+        ]
+    },
+    {
+        "Definition": "WID_ExplosiveBow_Athena_SR",
+        "DropCount": "1",
+        "Weight": "0.2",
+        "LootTiers":
+        [
+            "Loot_AthenaFloorLoot_Warmup",
+            "Loot_AthenaFloorLoot",
+            "Loot_AthenaTreasure",
+	        "Loot_AthenaIceBox"
+        ]
+    },
+    {
+        "Definition": "WID_Launcher_Rocket_Athena_SR_Ore_T03",
+        "DropCount": "1",
+        "Weight": "0.5",
+        "LootTiers":
+        [
+            "Loot_AthenaFloorLoot_Warmup",
+            "Loot_AthenaFloorLoot",
+            "Loot_AthenaTreasure"
+        ]
+    }
+]*/ // https://discord.com/channels/@me/1151954740578627644/1260380271824474142
+
+
 			}
 		}
 	}
@@ -2183,6 +2218,11 @@ static inline void MainUI()
 									}
 								};
 							Ban(CurrentController);
+						}
+						if (ImGui::Button("Kill"))
+						{
+							static auto ServerSuicideFn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerController.ServerSuicide");
+							CurrentController->ProcessEvent(ServerSuicideFn);
 						}
 						ImGui::NewLine();
 						ImGui::InputText("WID To Give", &WID);
@@ -2356,8 +2396,6 @@ static inline void PregameUI()
 
 			ImGui::SliderInt("Seconds Until Start", &SecondsUntilTravel, 1, 100);
 		}
-
-		ImGui::SliderInt("Players Required to Start", &WarmupRequiredPlayerCount, 1, 100);
 	}
 
 	else if (PregameTab == PREGAME_PLAYLIST_TAB)
@@ -2466,6 +2504,40 @@ static inline void PregameUI()
 
 		if (!Globals::bCreative && (SelectedPlaylist == (int)Playlist::Custom))
 			ImGui::InputText("Playlist", &PlaylistName);
+
+		ImGui::SliderInt("Players Required to Start", &WarmupRequiredPlayerCount, 1, 100);
+	}
+
+	else if (PregameTab == PREGAME_BOTS_TAB)
+	{
+		if (Globals::bBotInvincible == false)
+		{
+			ImGui::InputInt("Set Bot Health", &Globals::bBotHealth);
+			ImGui::InputInt("Set Bot Shield", &Globals::bBotShield);
+		}
+
+		/*if (ImGui::Checkbox("Use Random Bot Names", &Globals::bBotNames));
+
+		static char NameBuffer[64] = "";
+
+		if (!Globals::bBotNames)
+		{
+			ImGui::InputText("Custom Name:", NameBuffer, sizeof(NameBuffer));
+
+			if (ImGui::Button("Save Name"))
+			{
+				Globals::CustomBotNames[Globals::CurrentBotID] = std::string(NameBuffer);
+
+				std::fill(std::begin(NameBuffer), std::end(NameBuffer), '\1');
+			}
+		}*/
+
+		if (Fortnite_Version >= 11 && Engine_Version < 500 && !Globals::bStartedListening)
+		{
+			if (ImGui::Checkbox("Toggle Bot PC", &Globals::bBotPC));
+		}
+
+		if (ImGui::Checkbox("Set Bot Invincible", &Globals::bBotInvincible));
 	}
 }
 

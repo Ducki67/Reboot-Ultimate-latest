@@ -228,10 +228,10 @@ static void StreamLevel(const std::string& LevelName, FVector Location = {})
 
 	auto StreamingData = BuildingFoundation->GetPtr<__int64>(StreamingDataOffset);
 
-	*(FName*)(__int64(StreamingData) + FoundationNameOffset) = UKismetStringLibrary::Conv_StringToName(std::wstring(LevelName.begin(), LevelName.end()).c_str());
+	*(FName*)(__int64(StreamingData) + FoundationNameOffset) = FName(std::wstring(LevelName.begin(), LevelName.end()).c_str());
 	*(FVector*)(__int64(StreamingData) + FoundationLocationOffset) = Location;
 
-	*(FName*)(__int64(BuildingFoundation) + LevelToStreamOffset) = UKismetStringLibrary::Conv_StringToName(std::wstring(LevelName.begin(), LevelName.end()).c_str());
+	*(FName*)(__int64(BuildingFoundation) + LevelToStreamOffset) = FName(std::wstring(LevelName.begin(), LevelName.end()).c_str());
 
 	static auto OnRep_LevelToStreamFn = FindObject<UFunction>(L"/Script/FortniteGame.BuildingFoundation.OnRep_LevelToStream");
 	BuildingFoundation->ProcessEvent(OnRep_LevelToStreamFn);

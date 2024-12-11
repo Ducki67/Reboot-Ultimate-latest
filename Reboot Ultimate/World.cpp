@@ -13,10 +13,8 @@ AWorldSettings* UWorld::K2_GetWorldSettings()
 	return WorldSettings;
 }
 
-void UWorld::Listen()
+void UWorld::Listen() const
 {
-	auto GameNetDriverName = UKismetStringLibrary::Conv_StringToName(L"GameNetDriver");
-
 	UNetDriver* NewNetDriver = nullptr;
 
 	constexpr bool bUseBeacons = true;
@@ -48,7 +46,7 @@ void UWorld::Listen()
 	}
 	else
 	{
-		NewNetDriver = GetEngine()->CreateNetDriver(GetWorld(), GameNetDriverName);
+		NewNetDriver = GetEngine()->CreateNetDriver(GetWorld(), NAME_GameNetDriver);
 	}
 
 	if (!NewNetDriver)
@@ -58,7 +56,7 @@ void UWorld::Listen()
 	}
 
 	static auto NetDriverNameOffset = NewNetDriver->GetOffset("NetDriverName");
-	NewNetDriver->Get<FName>(NetDriverNameOffset) = GameNetDriverName;
+	NewNetDriver->Get<FName>(NetDriverNameOffset) = NAME_GameNetDriver;
 
 	static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
 	GetWorld()->Get(World_NetDriverOffset) = NewNetDriver;

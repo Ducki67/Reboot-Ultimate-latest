@@ -25,7 +25,6 @@
 #include "FortAthenaMutator_InventoryOverride.h"
 #include "FortAthenaMutator_GG.h"
 #include "quests.h"
-#include "globals.h"
 
 void AFortPlayerController::ClientReportDamagedResourceBuilding(ABuildingSMActor* BuildingSMActor, EFortResourceType PotentialResourceType, int PotentialResourceCount, bool bDestroyed, bool bJustHitWeakspot)
 {
@@ -621,7 +620,7 @@ void AFortPlayerController::ServerAttemptInteractHook(UObject* Context, FFrame* 
 	}
 	else if (ReceivingActor->IsA(BuildingItemCollectorActorClass))
 	{
-		if (Engine_Version >= 424 && Fortnite_Version < 15 && ReceivingActor->GetFullName().contains("Wumba"))
+		if (Engine_Version > 424 && Fortnite_Version < 15 && ReceivingActor->GetFullName().contains("Wumba")) // s11 is weird ngl
 		{
 			static auto InteractionBeingAttemptedOffset = FindOffsetStruct(StructName, "InteractionBeingAttempted");
 			auto InteractionBeingAttempted = *(EInteractionBeingAttempted*)(__int64(Params) + InteractionBeingAttemptedOffset);
@@ -671,7 +670,7 @@ void AFortPlayerController::ServerAttemptInteractHook(UObject* Context, FFrame* 
 			if (!FoundRow)
 			{
 				LOG_WARN(LogGame, "Failed to find row!");
-				return;
+				return ServerAttemptInteractOriginal(Context, Stack);
 			}
 	
 			auto NewDefinition = FoundRow->UpgradedWeaponDef;
@@ -917,7 +916,7 @@ void AFortPlayerController::ServerAttemptAircraftJumpHook(AFortPlayerController*
 		{
 			// honestly idk why this doesnt work
 
-			auto NAME_Inactive = UKismetStringLibrary::Conv_StringToName(L"NAME_Inactive");
+			FName NAME_Inactive(L"NAME_Inactive");
 
 			LOG_INFO(LogDev, "name Comp: {}", NAME_Inactive.ComparisonIndex.Value);
 
@@ -1431,6 +1430,24 @@ void VictoryCrownSlowmo()
 	}
 }
 
+void DBNOToggleOnWin()
+{
+	static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
+	auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
+	auto& ClientConnections = WorldNetDriver->GetClientConnections();
+
+	for (int z = 0; z < ClientConnections.Num(); z++)
+	{
+		auto ClientConnection = ClientConnections.at(z);
+
+		auto PlayerController = Cast<AFortPlayerController>(ClientConnection->GetPlayerController());
+
+		auto Pawn = PlayerController->GetMyFortPawn();
+
+		Pawn->SetDBNO(false);
+	}
+}
+
 void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerController, void* DeathReport)
 {
 	auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
@@ -1452,6 +1469,8 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 
 		victory.detach();
 	}
+
+	// std::thread victory(DBNOToggleOnWin);
 
 	static auto FallDamageEnumValue = 1;
 

@@ -166,7 +166,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			auto& lootTierGroup = Arguments[1];
 
-			auto LootDrops = PickLootDrops(UKismetStringLibrary::Conv_StringToName(std::wstring(lootTierGroup.begin(), lootTierGroup.end()).c_str()), -1, true);
+			auto LootDrops = PickLootDrops(FName(std::wstring(lootTierGroup.begin(), lootTierGroup.end()).c_str()), -1, true);
 
 			for (int i = 0; i < LootDrops.size(); ++i)
 			{
@@ -2448,6 +2448,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			static auto HealthOffset = HealthSet->GetOffset("Health");
 			auto& Health = HealthSet->Get<FFortGameplayAttributeData>(HealthOffset);
 
+			Pawn->SetHealth(100.f);
+
 			if (Health.GetMinimum() != MaxHealth)
 			{
 				Health.GetMinimum() = MaxHealth;
@@ -3376,85 +3378,128 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			Pawn->ProcessEvent(Pawn->FindFunction("TeleportToSkyDive"), &height);
 			SendMessageToConsole(PlayerController, L"Teleported player to max height!");
 		}
-		else if (Command == "spawnbot" || Command == "bot")
+		else if (Command == "toggledebugcamera")
 		{
-			auto Pawn = ReceivingController->GetPawn();
+			auto CheatManager = ReceivingController->SpawnCheatManager(UCheatManager::StaticClass());
 
-			if (!Pawn)
+			if (!CheatManager)
 			{
-				SendMessageToConsole(PlayerController, L"No pawn to spawn bot at!");
+				SendMessageToConsole(PlayerController, L"Failed to spawn player's cheat manager!");
 				return;
 			}
+			CheatManager->ToggleDebugCamera();
+			CheatManager = nullptr;
+		}
+		else if (Command == "restart" || Command == "restartserver")
+		{
+			auto& IP = PlayerState->GetSavedNetworkAddress();
+			auto IPStr = IP.ToString();
 
-			int Count = 1;
-
-			if (Arguments.size() >= 2)
+			if (IPStr == "127.0.0.1")
 			{
-				try { Count = std::stod(Arguments[1]); }
-				catch (...) {}
-			}
-
-			auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
-
-			bool bShouldSpawnAtZoneCenter = false;
-
-			if (NumArgs >= 3 && Arguments[2] == "center")
-				bShouldSpawnAtZoneCenter = true;
-
-			if (bShouldSpawnAtZoneCenter && GameMode->GetGameStateAthena()->GetGamePhaseStep() <= EAthenaGamePhaseStep::BusFlying)
-				bShouldSpawnAtZoneCenter = false;
-
-			FRotator SpawnRotation = Pawn->GetActorRotation();
-
-			int SizeMultiplier = 1;
-
-			if (Arguments.size() >= 4)
-			{
-				try { SizeMultiplier = std::stod(Arguments[3]); }
-				catch (...) {}
-			}
-
-			constexpr int Max = 99;
-
-			if (Count > Max)
-			{
-				SendMessageToConsole(PlayerController, (std::wstring(L"You went over the limit! Only spawning ") + std::to_wstring(Max) + L".").c_str());
-				Count = Max;
-			}
-
-			int AmountSpawned = 0;
-
-			for (int i = 0; i < Count; i++)
-			{
-				FActorSpawnParameters SpawnParameters{};
-				// SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-				auto SafeZoneIndicator = GameMode->GetSafeZoneIndicator();
-
-				auto Loc = bShouldSpawnAtZoneCenter ? SafeZoneIndicator->GetSafeZoneCenter() : Pawn->GetActorLocation();
-				Loc.Z += bShouldSpawnAtZoneCenter ? 10000 : 1000;
-
-				FTransform Transform;
-				Transform.Translation = Loc;
-				Transform.Scale3D = FVector(1 * SizeMultiplier, 1 * SizeMultiplier, 1 * SizeMultiplier);
-				Transform.Rotation = SpawnRotation.Quaternion();
-
-				auto NewActor = Bots::SpawnBot(Transform, Pawn);
-
-				if (!NewActor)
+				if (Engine_Version < 424)
 				{
-					SendMessageToConsole(PlayerController, L"Failed to spawn an actor!");
+					Restart();
+					LOG_INFO(LogGame, "Host has restarted game!");
 				}
 				else
 				{
-					AmountSpawned++;
+					SendMessageToConsole(PlayerController, L"Restarting is not supported on chapter 2 and above! Try closing out of the DLL and re-hosting.");
 				}
 			}
-
-			if (!bShouldSpawnAtZoneCenter)
-				SendMessageToConsole(PlayerController, L"Summoned!");
 			else
-				SendMessageToConsole(PlayerController, L"Summoned at zone center!");
+			{
+				SendMessageToConsole(PlayerController, L"Only the host can run this command!");
+				return;
+			}
+		}
+		else if (Command == "spawnbot" || Command == "bot")
+		{
+			if (Fortnite_Version == 8.51 || Fortnite_Version == 7.40)
+			{
+				SendMessageToConsole(PlayerController, L"You cannot spawn a bot on this version!");
+				SendMessageToConsole(PlayerController, L"Try restarting the server using « cheat restart » and using another account as a bot instead!");
+			}
+			else
+			{
+				auto Pawn = ReceivingController->GetPawn();
+
+				if (!Pawn)
+				{
+					SendMessageToConsole(PlayerController, L"No pawn to spawn bot at!");
+					return;
+				}
+
+				int Count = 1;
+
+				if (Arguments.size() >= 2)
+				{
+					try { Count = std::stod(Arguments[1]); }
+					catch (...) {}
+				}
+
+				auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
+
+				bool bShouldSpawnAtZoneCenter = false;
+
+				if (NumArgs >= 3 && Arguments[2] == "center")
+					bShouldSpawnAtZoneCenter = true;
+
+				if (bShouldSpawnAtZoneCenter && GameMode->GetGameStateAthena()->GetGamePhaseStep() <= EAthenaGamePhaseStep::BusFlying)
+					bShouldSpawnAtZoneCenter = false;
+
+				FRotator SpawnRotation = Pawn->GetActorRotation();
+
+				int SizeMultiplier = 1;
+
+				if (Arguments.size() >= 4)
+				{
+					try { SizeMultiplier = std::stod(Arguments[3]); }
+					catch (...) {}
+				}
+
+				constexpr int Max = 99;
+
+				if (Count > Max)
+				{
+					SendMessageToConsole(PlayerController, (std::wstring(L"You went over the limit! Only spawning ") + std::to_wstring(Max) + L".").c_str());
+					Count = Max;
+				}
+
+				int AmountSpawned = 0;
+
+				for (int i = 0; i < Count; i++)
+				{
+					FActorSpawnParameters SpawnParameters{};
+					// SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+					auto SafeZoneIndicator = GameMode->GetSafeZoneIndicator();
+
+					auto Loc = bShouldSpawnAtZoneCenter ? SafeZoneIndicator->GetSafeZoneCenter() : Pawn->GetActorLocation();
+					Loc.Z += bShouldSpawnAtZoneCenter ? 10000 : 1000;
+
+					FTransform Transform;
+					Transform.Translation = Loc;
+					Transform.Scale3D = FVector(1 * SizeMultiplier, 1 * SizeMultiplier, 1 * SizeMultiplier);
+					Transform.Rotation = SpawnRotation.Quaternion();
+
+					auto NewActor = Bots::SpawnBot(Transform, Pawn);
+
+					if (!NewActor)
+					{
+						SendMessageToConsole(PlayerController, L"Failed to spawn an actor!");
+					}
+					else
+					{
+						AmountSpawned++;
+					}
+				}
+
+				if (!bShouldSpawnAtZoneCenter)
+					SendMessageToConsole(PlayerController, L"Summoned!");
+				else
+					SendMessageToConsole(PlayerController, L"Summoned at zone center!");
+			}
 		}
 		else if (Command == "marktoteleport" || Command == "marktotp" || Command == "markertp" || Command == "marktp" || Command == "mark" || Command == "marker")
 		{
@@ -4685,6 +4730,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 - cheat pickaxeall {ID} - Gives all players a specified pickaxe.
 - cheat regen - Regenerates the players health and shield to their max.
 - cheat regenall - Heals all players health and shield.
+- cheat restart - Restarts the game. (Chapter 1 & Host ONLY)
 - cheat rift - Rifts the player into the air.
 - cheat savewaypoint {phrase/number} - Gets the location of where you are standing and saves it as a waypoint.
 - cheat settimeofday {1-23} - Changes the time of day in game to a 24H time period.

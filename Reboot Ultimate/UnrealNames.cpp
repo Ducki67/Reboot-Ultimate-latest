@@ -5,6 +5,11 @@
 
 #include "KismetStringLibrary.h"
 
+FName::FName(const FString& Name)
+{
+	*this = UKismetStringLibrary::Conv_StringToName(Name);
+}
+
 std::string FName::ToString() const
 {
 	static auto KismetStringLibrary = FindObject<UKismetStringLibrary>(L"/Script/Engine.Default__KismetStringLibrary");
@@ -17,6 +22,23 @@ std::string FName::ToString() const
 
 	auto Str = Conv_NameToString_Params.OutStr.ToString();
 	
+	// Conv_NameToString_Params.OutStr.Free();
+
+	return Str;
+}
+
+std::string FName::ToString()
+{
+	static auto KismetStringLibrary = FindObject<UKismetStringLibrary>(L"/Script/Engine.Default__KismetStringLibrary");
+
+	static auto Conv_NameToString = FindObject<UFunction>(L"/Script/Engine.KismetStringLibrary.Conv_NameToString");
+
+	struct { FName InName; FString OutStr; } Conv_NameToString_Params{ *this };
+
+	KismetStringLibrary->ProcessEvent(Conv_NameToString, &Conv_NameToString_Params);
+
+	auto Str = Conv_NameToString_Params.OutStr.ToString();
+
 	// Conv_NameToString_Params.OutStr.Free();
 
 	return Str;
@@ -64,21 +86,4 @@ int32 FName::Compare(const FName& Other) const
 	}
 
 	return GetComparisonIndexFast() < Other.GetComparisonIndexFast();
-}
-
-std::string FName::ToString()
-{
-	static auto KismetStringLibrary = FindObject<UKismetStringLibrary>(L"/Script/Engine.Default__KismetStringLibrary");
-
-	static auto Conv_NameToString = FindObject<UFunction>(L"/Script/Engine.KismetStringLibrary.Conv_NameToString");
-
-	struct { FName InName; FString OutStr; } Conv_NameToString_Params{ *this };
-
-	KismetStringLibrary->ProcessEvent(Conv_NameToString, &Conv_NameToString_Params);
-
-	auto Str = Conv_NameToString_Params.OutStr.ToString();
-
-	// Conv_NameToString_Params.OutStr.Free();
-
-	return Str;
 }

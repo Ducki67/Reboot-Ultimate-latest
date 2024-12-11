@@ -18,14 +18,10 @@ public:
 
 	FString ToString() const
 	{
-		FString Result;
-
-		Result.Set((std::to_wstring(X) + L", " + std::to_wstring(Y) + L", " + std::to_wstring(Z)).c_str());
-
-		return Result;
+		return std::wstring(std::to_wstring(X) + L", " + std::to_wstring(Y) + L", " + std::to_wstring(Z)).c_str();
 	}
 
-	bool CompareVectors(const FVector& A)
+	bool CompareVectors(const FVector& A) const
 	{
 		return X == A.X && Y == A.Y && Z == A.Z;
 	}

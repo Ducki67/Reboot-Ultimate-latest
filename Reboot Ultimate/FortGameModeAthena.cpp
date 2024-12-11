@@ -87,18 +87,19 @@ EFortAthenaPlaylist GetPlaylistForOldVersion()
 
 FName AFortGameModeAthena::RedirectLootTier(const FName& LootTier)
 {
-	static auto Loot_TreasureFName = UKismetStringLibrary::Conv_StringToName(L"Loot_Treasure");
-	static auto Loot_AmmoFName = UKismetStringLibrary::Conv_StringToName(L"Loot_Ammo");
 	static auto RedirectAthenaLootTierGroupsOffset = this->GetOffset("RedirectAthenaLootTierGroups", false);
 
 	if (RedirectAthenaLootTierGroupsOffset == -1)
 	{
+		static auto Loot_TreasureFName = FName(L"Loot_Treasure");
+		static auto Loot_AmmoFName = FName(L"Loot_Ammo");
+
 		if (LootTier == Loot_TreasureFName)
-			return UKismetStringLibrary::Conv_StringToName(L"Loot_AthenaTreasure");
+			return FName(L"Loot_AthenaTreasure");
 
 		if (LootTier == Loot_AmmoFName)
-			return UKismetStringLibrary::Conv_StringToName(L"Loot_AthenaAmmoLarge");
-		
+			return FName(L"Loot_AthenaAmmoLarge");
+
 		return LootTier;
 	}
 
@@ -111,18 +112,7 @@ FName AFortGameModeAthena::RedirectLootTier(const FName& LootTier)
 
 		// LOG_INFO(LogDev, "[{}] {} {}", i, Key.ComparisonIndex.Value ? Key.ToString() : "NULL", Key.ComparisonIndex.Value ? Value.ToString() : "NULL");
 
-		FName TempLootTier = LootTier;
-
-		if (Fortnite_Version >= 20)
-		{
-			if (TempLootTier == Loot_TreasureFName)
-				TempLootTier = UKismetStringLibrary::Conv_StringToName(L"Loot_AthenaTreasure");
-
-			if (TempLootTier == Loot_AmmoFName)
-				TempLootTier = UKismetStringLibrary::Conv_StringToName(L"Loot_AthenaTreasure");
-		}
-
-		if (Key == TempLootTier)
+		if (Key == LootTier)
 			return Value;
 	}
 
@@ -379,7 +369,7 @@ bool AFortGameModeAthena::Athena_ReadyToStartMatchHook(AFortGameModeAthena* Game
 			SetupAIDirector();
 			BotManager = SetupServerBotManager();
 		}
-		// SetupNavConfig(UKismetStringLibrary::Conv_StringToName(L"MANG"));
+		// SetupNavConfig(FName(L"MANG"));
 
 		/*
 
@@ -550,9 +540,9 @@ bool AFortGameModeAthena::Athena_ReadyToStartMatchHook(AFortGameModeAthena* Game
 
 					static auto AdditionalLevelsServerOnlyOffset = CurrentPlaylist->GetOffset("AdditionalLevelsServerOnly", false);
 
-					if (AdditionalLevelsServerOnlyOffset != -1)
+					if (AdditionalLevelsServerOnlyOffset != -1 && Fortnite_Season != 13)
 					{
-						/* TArray<TSoftObjectPtr<UWorld>>& AdditionalLevelsServerOnly = CurrentPlaylist->Get<TArray<TSoftObjectPtr<UWorld>>>(AdditionalLevelsServerOnlyOffset);
+						TArray<TSoftObjectPtr<UWorld>>& AdditionalLevelsServerOnly = CurrentPlaylist->Get<TArray<TSoftObjectPtr<UWorld>>>(AdditionalLevelsServerOnlyOffset);
 						LOG_INFO(LogPlaylist, "Loading {} playlist server levels.", AdditionalLevelsServerOnly.Num());
 
 						for (int i = 0; i < AdditionalLevelsServerOnly.Num(); i++)
@@ -563,7 +553,7 @@ bool AFortGameModeAthena::Athena_ReadyToStartMatchHook(AFortGameModeAthena* Game
 							auto LevelNameWStr = std::wstring(LevelNameStr.begin(), LevelNameStr.end());
 
 							GameState->AddToAdditionalPlaylistLevelsStreamed(LevelFName, true);
-						} */
+						}
 					}
 
 					LOG_INFO(LogPlaylist, "Loading {} playlist level{}.", AdditionalLevels.Num(), AdditionalLevels.Num() > 1 ? "s" : "");
@@ -1449,8 +1439,8 @@ void AFortGameModeAthena::Athena_HandleStartingNewPlayerHook(AFortGameModeAthena
 			TArray<AActor*> SpawnIsland_FloorLoot_Actors = UGameplayStatics::GetAllActorsOfClass(GetWorld(), SpawnIsland_FloorLoot);
 			TArray<AActor*> BRIsland_FloorLoot_Actors = UGameplayStatics::GetAllActorsOfClass(GetWorld(), BRIsland_FloorLoot);
 
-			auto SpawnIslandTierGroup = UKismetStringLibrary::Conv_StringToName(L"Loot_AthenaFloorLoot_Warmup");
-			auto BRIslandTierGroup = UKismetStringLibrary::Conv_StringToName(L"Loot_AthenaFloorLoot");
+			auto SpawnIslandTierGroup = FName(L"Loot_AthenaFloorLoot_Warmup");
+			auto BRIslandTierGroup = FName(L"Loot_AthenaFloorLoot");
 
 			uint8 SpawnFlag = EFortPickupSourceTypeFlag::GetContainerValue();
 

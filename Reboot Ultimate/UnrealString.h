@@ -22,12 +22,34 @@ public:
 		return str;
 	}
 
+	FString(std::string InString)
+	{
+		std::wstring WideStr = std::wstring(InString.begin(), InString.end());
+		FString NewString = FString(WideStr.c_str());
+
+		LOG_INFO(LogDev, "InString: {}", InString);
+		LOG_INFO(LogDev, "NewString: {}", NewString.ToString());
+
+		*this = NewString;
+	}
+
+	static FString ToFString(std::string InString)
+	{
+		std::wstring WideStr = std::wstring(InString.begin(), InString.end());
+		FString NewString = FString(WideStr.c_str());
+
+		LOG_INFO(LogDev, "InString: {}", InString);
+		LOG_INFO(LogDev, "NewString: {}", NewString.ToString());
+
+		return NewString;
+	}
+
 	void Free()
 	{
 		Data.Free();
 	}
 
-	bool IsValid()
+	bool IsValid() const
 	{
 		return Data.Data;
 	}

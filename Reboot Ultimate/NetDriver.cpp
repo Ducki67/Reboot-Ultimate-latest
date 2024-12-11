@@ -720,8 +720,7 @@ int32 UNetDriver::ServerReplicateActors()
 
 			if (Engine_Version >= 422)
 			{
-				FString ActorStr = L"Actor";
-				FName ActorName = UKismetStringLibrary::Conv_StringToName(ActorStr);
+				FName ActorName(L"Actor");
 
 				int ChannelIndex = -1; // 4294967295
 				Channel = (UActorChannel*)CreateChannelByName(Connection, &ActorName, EChannelCreateFlags::OpenedLocally, ChannelIndex);
@@ -818,8 +817,7 @@ int32 UNetDriver::ServerReplicateActors()
 				{
 					if (Engine_Version >= 422)
 					{
-						FString ActorStr = L"Actor";
-						FName ActorName = UKismetStringLibrary::Conv_StringToName(ActorStr);
+						FName ActorName(L"Actor");
 
 						int ChannelIndex = -1; // 4294967295
 						Channel = (UActorChannel*)CreateChannelByName(Connection, &ActorName, EChannelCreateFlags::OpenedLocally, ChannelIndex);

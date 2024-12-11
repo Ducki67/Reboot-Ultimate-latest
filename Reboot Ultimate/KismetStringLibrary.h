@@ -2,6 +2,7 @@
 
 #include "Object.h"
 #include "UnrealString.h"
+#include "NameTypes.h"
 
 class UKismetStringLibrary : public UObject
 {

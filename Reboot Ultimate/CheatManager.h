@@ -12,6 +12,7 @@ public:
 	void God();
 	void DestroyAll(TSubclassOf<AActor> AClass);
 	void ChangeSize(float F);
+	void ToggleDebugCamera();
 
 	static UClass* StaticClass();
 };

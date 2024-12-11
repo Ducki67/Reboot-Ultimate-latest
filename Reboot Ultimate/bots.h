@@ -259,10 +259,32 @@ public:
 
 		PlayerState->SetIsBot(true);
 
-		Pawn->SetHealth(21);
-		Pawn->SetMaxHealth(21);
-		Pawn->SetShield(21);
-		Pawn->SetMaxShield(21);
+		if (Globals::bBotInvincible)
+		{
+			Pawn->SetHealth(21);
+			Pawn->SetMaxHealth(21);
+
+			auto HealthSet = Pawn->GetHealthSet();
+			static auto HealthOffset = HealthSet->GetOffset("Health");
+			auto& Health = HealthSet->Get<FFortGameplayAttributeData>(HealthOffset);
+
+			float MaxHealth = Pawn->GetMaxHealth();
+			Health.GetMinimum() = MaxHealth;
+		}
+		else
+		{
+			auto HealthSet = Pawn->GetHealthSet();
+			static auto HealthOffset = HealthSet->GetOffset("Health");
+			auto& Health = HealthSet->Get<FFortGameplayAttributeData>(HealthOffset);
+
+			float MaxHealth = Pawn->GetMaxHealth();
+			Health.GetMinimum() = 0;
+
+			Pawn->SetHealth(Globals::bBotHealth);
+			Pawn->SetMaxHealth(Globals::bBotHealth);
+			Pawn->SetShield(Globals::bBotShield);
+			Pawn->SetMaxShield(Globals::bBotShield);
+		}
 
 		auto PlayerAbilitySet = GetPlayerAbilitySet();
 		auto AbilitySystemComponent = PlayerState->GetAbilitySystemComponent();

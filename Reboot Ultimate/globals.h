@@ -1,6 +1,8 @@
 #pragma once
 
 #include <atomic>
+#include <map>
+#include <string>
 
 #include "inc.h"
 
@@ -24,7 +26,14 @@ namespace Globals
 	extern inline int AmountOfHealthSiphon = 0;
 	extern inline bool bShouldUseReplicationGraph = false;
 
+	extern inline bool bBotInvincible = false;
 	extern inline bool bBotPC = false;
+	extern inline bool bBotNames = true;
+	extern inline int bBotHealth = 21;
+	extern inline int bBotShield = 21;
+
+	// extern inline std::map<int, std::string> CustomBotNames;
+	// extern inline int CurrentBotID = 1;
 
 	extern inline bool bCustomLootpool = false;
 

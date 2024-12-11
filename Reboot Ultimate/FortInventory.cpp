@@ -99,7 +99,7 @@ std::pair<std::vector<UFortItem*>, std::vector<UFortItem*>> AFortInventory::AddI
 
 	Count = OverStack > 0 ? OverStack : Count;
 
-	auto PlayerController = Cast<APlayerController>(GetOwner());
+	auto PlayerController = Cast<APlayerController, false>(GetOwner());
 
 	if (!PlayerController)
 		return std::make_pair(NewItemInstances, ModifiedItemInstances);
@@ -213,7 +213,8 @@ std::pair<std::vector<UFortItem*>, std::vector<UFortItem*>> AFortInventory::AddI
 		}
 		else
 		{
-			LOG_INFO(LogDev, "Not Valid!");
+			if (PlayerController->IsA(APlayerController::StaticClass()))
+				LOG_INFO(LogDev, "Not Valid!");
 		}
 
 		if (FortPlayerController && Engine_Version < 420)

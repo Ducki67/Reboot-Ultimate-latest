@@ -79,6 +79,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;PROJECTREBOOT30_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(AboveS20)'!=''">ABOVE_S20;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -101,6 +102,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;PROJECTREBOOT30_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(AboveS20)'!=''">ABOVE_S20;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -125,6 +127,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;PROJECTREBOOT30_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(AboveS20)'!=''">ABOVE_S20;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -520,6 +523,7 @@
     <ClInclude Include="TypeCompatibleBytes.h" />
     <ClInclude Include="TypeWrapper.h" />
     <ClInclude Include="UnrealMathUtility.h" />
+    <ClInclude Include="UnrealNames.h" />
     <ClInclude Include="UnrealString.h" />
     <ClInclude Include="UnrealTemplate.h" />
     <ClInclude Include="UnrealTypeTraits.h" />
@@ -537,6 +541,7 @@
     <None Include="DelegateSignatureImpl.inl" />
     <None Include="ExpressionParserTypes.inl" />
     <None Include="UnrealEngine.cpp" />
+    <None Include="UnrealNames.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

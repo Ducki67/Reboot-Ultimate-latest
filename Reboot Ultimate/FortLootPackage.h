@@ -135,13 +135,11 @@ struct LootDrop
 	}
 };
 
-struct ItemRow
+struct FCustomLootPoolItemRow
 {
 	UFortItemDefinition* Definition;
 	int DropCount;
 	float Weight;
-	int LoadedAmmo = 0;
-	EFortInventoryFilter FilterOverride = EFortInventoryFilter::WeaponRanged;
 };
 
 static inline float RandomFloatForLoot(float AllWeightsSum)

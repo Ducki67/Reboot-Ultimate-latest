@@ -7,6 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "FortGameModeAthena.h"
 #include "FortLootLevel.h"
+#include "gui.h"
 
 struct FFortGameFeatureLootTableData
 {
@@ -252,7 +253,7 @@ void PickLootDropsFromLootPackage(const std::vector<UDataTable*>& LPTables, cons
                 int LootPackageCategoryToUseForLPCall = 0; // hmm
 
                 PickLootDropsFromLootPackage(LPTables,
-                    PickedPackage->GetLootPackageCall().Data.Data ? UKismetStringLibrary::Conv_StringToName(PickedPackage->GetLootPackageCall()) : FName(0),
+                    PickedPackage->GetLootPackageCall().Data.Data ? FName(PickedPackage->GetLootPackageCall()) : FName(0),
                     OutEntries, LootPackageCategoryToUseForLPCall, WorldLevel, bPrint
                 );
 
@@ -442,8 +443,8 @@ std::vector<LootDrop> PickLootDrops(FName TierGroupName, int WorldLevel, int For
         {
             if (Addresses::LoadAsset)
             {
-                LTDTables.push_back((UDataTable*)Assets::LoadAsset(UKismetStringLibrary::Conv_StringToName(L"/Game/Items/Datatables/AthenaLootTierData_Client.AthenaLootTierData_Client")));
-                LPTables.push_back((UDataTable*)Assets::LoadAsset(UKismetStringLibrary::Conv_StringToName(L"/Game/Items/Datatables/AthenaLootPackages_Client.AthenaLootPackages_Client")));
+                LTDTables.push_back((UDataTable*)Assets::LoadAsset(FName(L"/Game/Items/Datatables/AthenaLootTierData_Client.AthenaLootTierData_Client")));
+                LPTables.push_back((UDataTable*)Assets::LoadAsset(FName(L"/Game/Items/Datatables/AthenaLootPackages_Client.AthenaLootPackages_Client")));
             }
             else
             {
@@ -724,17 +725,82 @@ std::vector<LootDrop> PickLootDrops(FName TierGroupName, int WorldLevel, int For
     {
         for (int i = 0; i < AmountOfLootPackageDrops; ++i)
         {
-            if (i >= ChosenRowLootTierData->GetLootPackageCategoryMinArray().Num())
-                break;
+            bool bSkipCheck = false;
 
-            for (int j = 0; j < ChosenRowLootTierData->GetLootPackageCategoryMinArray().at(i); ++j)
+            if (TierGroupName.ToString() == "Loot_AthenaAmmoLarge" && !CustomLootpoolMap.contains(TierGroupName.ToString())) // we still want to give ammo from ammoboxes
+                bSkipCheck = true;
+
+            if (Globals::bCustomLootpool && !bSkipCheck)
             {
-                if (ChosenRowLootTierData->GetLootPackageCategoryMinArray().at(i) < 1)
+                if (!CustomLootpoolMap.contains(TierGroupName.ToString()))
+                    return LootDrops;
+
+                auto& AllItemsRowsOfTier = CustomLootpoolMap[TierGroupName.ToString()];
+
+                if (AllItemsRowsOfTier.Num() <= 0)
+                    return LootDrops;
+
+                std::shuffle(AllItemsRowsOfTier.begin(), AllItemsRowsOfTier.end(), std::default_random_engine((unsigned int)time(0)));
+
+                auto& CustomLootPoolItemRow = AllItemsRowsOfTier.at(UKismetMathLibrary::RandomIntegerInRange(0, AllItemsRowsOfTier.Num() - 1));
+
+                int rec = 0;
+
+                while (rec < 7 && (!UKismetMathLibrary::RandomBoolWithWeight(CustomLootPoolItemRow.Weight) || !CustomLootPoolItemRow.Definition))
+                {
+                    std::shuffle(AllItemsRowsOfTier.begin(), AllItemsRowsOfTier.end(), std::default_random_engine((unsigned int)time(0)));
+
+                    CustomLootPoolItemRow = AllItemsRowsOfTier.at(UKismetMathLibrary::RandomIntegerInRange(0, AllItemsRowsOfTier.Num() - 1));
+
+                    rec++;
+                }
+
+                int DropCount = CustomLootPoolItemRow.DropCount;
+
+                if (auto WorldItemDefinition = Cast<UFortWorldItemDefinition>(CustomLootPoolItemRow.Definition))
+                {
+                    DropCount = WorldItemDefinition->GetDropCount();
+                }
+
+                if (DropCount > CustomLootPoolItemRow.Definition->GetMaxStackSize())
+                {
+                    DropCount = CustomLootPoolItemRow.Definition->GetMaxStackSize();
+                }
+
+                if (DropCount < 1)
+                {
+                    DropCount = 1;
+                }
+
+                auto NewItemEntry = FFortItemEntry::MakeItemEntry(CustomLootPoolItemRow.Definition, DropCount, -1);
+
+                LootDrops.push_back(LootDrop(NewItemEntry));
+
+                if (auto WeaponItemDefinition = Cast<UFortWeaponItemDefinition>(CustomLootPoolItemRow.Definition))
+                {
+                    auto AmmoData = WeaponItemDefinition->GetAmmoData();
+
+                    // LOG_INFO(LogDev, "AmmoData: {}", AmmoData->GetFullName());
+
+                    auto AmmoItemEntry = FFortItemEntry::MakeItemEntry(AmmoData, AmmoData->GetDropCount());
+
+                    LootDrops.push_back(LootDrop(AmmoItemEntry));
+                }
+            }
+            else
+            {
+                if (i >= ChosenRowLootTierData->GetLootPackageCategoryMinArray().Num())
                     break;
 
-                int LootPackageCategory = i;
+                for (int j = 0; j < ChosenRowLootTierData->GetLootPackageCategoryMinArray().at(i); ++j)
+                {
+                    if (ChosenRowLootTierData->GetLootPackageCategoryMinArray().at(i) < 1)
+                        break;
 
-                PickLootDropsFromLootPackage(LPTables, ChosenRowLootTierData->GetLootPackage(), &LootDrops, LootPackageCategory, WorldLevel, bPrint);
+                    int LootPackageCategory = i;
+
+                    PickLootDropsFromLootPackage(LPTables, ChosenRowLootTierData->GetLootPackage(), &LootDrops, LootPackageCategory, WorldLevel, bPrint);
+                }
             }
         }
     }

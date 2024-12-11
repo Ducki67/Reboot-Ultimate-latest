@@ -86,9 +86,9 @@ static inline void FillItemCollector(ABuildingItemCollectorActor* ItemCollector,
 
 	UCurveTable* FortGameData = GetGameData();
 
-	auto WoodName = UKismetStringLibrary::Conv_StringToName(L"Default.VendingMachine.Cost.Wood");
-	auto StoneName = UKismetStringLibrary::Conv_StringToName(L"Default.VendingMachine.Cost.Stone");
-	auto MetalName = UKismetStringLibrary::Conv_StringToName(L"Default.VendingMachine.Cost.Metal");
+	FName WoodName(L"Default.VendingMachine.Cost.Wood");
+	FName StoneName(L"Default.VendingMachine.Cost.Stone");
+	FName MetalName(L"Default.VendingMachine.Cost.Metal");
 
 	static auto StoneItemData = FindObject<UFortResourceItemDefinition>(L"/Game/Items/ResourcePickups/StoneItemData.StoneItemData");
 	static auto MetalItemData = FindObject<UFortResourceItemDefinition>(L"/Game/Items/ResourcePickups/MetalItemData.MetalItemData");
@@ -195,7 +195,7 @@ static inline void FillItemCollector(ABuildingItemCollectorActor* ItemCollector,
 		bool bShouldBeNullTable = true; // Fortnite_Version < 5
 
 		ItemCollection->GetInputCount()->GetCurve().CurveTable = bShouldBeNullTable ? nullptr : FortGameData; // scuffed idc
-		ItemCollection->GetInputCount()->GetCurve().RowName = bShouldBeNullTable ? FName(0) : WoodName; // Scuffed idc 
+		ItemCollection->GetInputCount()->GetCurve().RowName = bShouldBeNullTable ? NAME_None : WoodName; // Scuffed idc 
 		ItemCollection->GetInputCount()->GetValue() = LootTier == 0 ? CommonPrice 
 			: LootTier == 1 ? UncommonPrice
 			: LootTier == 2 ? RarePrice
@@ -244,11 +244,11 @@ static inline void FillVendingMachines()
 	auto VendingMachineClass = FindObject<UClass>(L"/Game/Athena/Items/Gameplay/VendingMachine/B_Athena_VendingMachine.B_Athena_VendingMachine_C");
 	auto AllVendingMachines = UGameplayStatics::GetAllActorsOfClass(GetWorld(), VendingMachineClass);
 
-	auto OverrideLootTierGroup = UKismetStringLibrary::Conv_StringToName(L"Loot_AthenaVending"); // ItemCollector->GetLootTierGroupOverride();
+	FName OverrideLootTierGroup(L"Loot_AthenaVending"); // ItemCollector->GetLootTierGroupOverride();
 
 	std::map<int, float> ThingAndWeights; // Bro IDK WHat to name it!
 
-	auto RarityWeightsName = UKismetStringLibrary::Conv_StringToName(L"Default.VendingMachine.RarityWeights");
+	FName RarityWeightsName(L"Default.VendingMachine.RarityWeights");
 
 	auto FortGameData = GetGameData();
 

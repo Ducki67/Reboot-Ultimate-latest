@@ -1092,6 +1092,9 @@
     <ClInclude Include="finder.h">
       <Filter>Reboot\Public</Filter>
     </ClInclude>
+    <ClInclude Include="UnrealNames.h">
+      <Filter>Engine\Source\Runtime\Core\Public\UObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -1405,5 +1408,6 @@
     <None Include="ExpressionParserTypes.inl">
       <Filter>Engine\Source\Runtime\Core\Public\Misc</Filter>
     </None>
+    <None Include="UnrealNames.inl" />
   </ItemGroup>
 </Project>
