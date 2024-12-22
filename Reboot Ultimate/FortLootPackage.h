@@ -169,7 +169,7 @@ FORCEINLINE static ValueType PickWeightedElement(const std::map<KeyType, ValueTy
 			}
 
 			return acc + Weight;
-		});
+			});
 	}
 
 	float RandomNumber = // UKismetMathLibrary::RandomFloatInRange(0, TotalWeight);

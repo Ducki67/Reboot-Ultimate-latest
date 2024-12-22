@@ -1376,25 +1376,6 @@ void AFortPlayerController::ServerPlaySprayItemHook(AFortPlayerController* Playe
 	PlayerController->ServerPlayEmoteItemHook(PlayerController, SprayAsset);
 }
 
-DWORD WINAPI RestartThread(LPVOID)
-{
-	// We should probably use unreal engine's timing system for this.
-	// There is no way to restart that I know of without closing the connection to the clients.
-
-	bIsInAutoRestart = true;
-
-	float SecondsBeforeRestart = 10;
-	Sleep(SecondsBeforeRestart * 1000);
-
-	LOG_INFO(LogDev, "Auto restarting!");
-
-	Restart();
-
-	bIsInAutoRestart = false;
-
-	return 0;
-}
-
 void VictoryCrownSlowmo()
 {
 	std::this_thread::sleep_for(std::chrono::milliseconds(65));

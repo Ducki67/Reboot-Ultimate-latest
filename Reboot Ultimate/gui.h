@@ -221,6 +221,25 @@ static inline void Restart() // todo move?
 	// UGameplayStatics::OpenLevel(GetWorld(), FName(LevelA), true, FString());
 }
 
+static DWORD WINAPI RestartThread(LPVOID)
+{
+	// We should probably use unreal engine's timing system for this.
+	// There is no way to restart that I know of without closing the connection to the clients.
+
+	bIsInAutoRestart = true;
+
+	float SecondsBeforeRestart = 10;
+	Sleep(SecondsBeforeRestart * 1000);
+
+	LOG_INFO(LogDev, "Auto restarting!");
+
+	Restart();
+
+	bIsInAutoRestart = false;
+
+	return 0;
+}
+
 enum class Playlist : int
 {
 	Solos,
@@ -961,6 +980,16 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 		Sleep(1000 / MaxTickRate);
 	}
 
+	if (Globals::bAutoPauseZone)
+	{
+		while (GameMode->GetGameStateAthena()->GetGamePhaseStep() == EAthenaGamePhaseStep::BusFlying)
+		{
+			std::this_thread::sleep_for(std::chrono::seconds(15));
+
+			UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"pausesafezone", nullptr);
+		}
+	}
+
 	static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
 	auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
 	auto& ClientConnections = WorldNetDriver->GetClientConnections();
@@ -1503,28 +1532,57 @@ static inline void MainUI()
 				UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"startsafezone", nullptr);
 			}*/
 
-			if (ImGui::Button("Pause Safe Zone"))
+			if (bZonePaused == true)
 			{
-				bZonePaused = !bZonePaused;
-
-				if (Fortnite_Version == 13)
+				if (ImGui::Button("Unpause Safe Zone"))
 				{
-					UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"pausesafezone", nullptr);
+					bZonePaused = !bZonePaused;
 
-					PauseStatusMessage = bZonePaused
-						? "Next zone will be paused. It is advised to skip zone."
-						: "Zone unpaused!";
+					if (Fortnite_Version == 13)
+					{
+						UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"pausesafezone", nullptr);
+
+						PauseStatusMessage = bZonePaused
+							? "Next zone will be paused. It is advised to skip zone."
+							: "Zone unpaused!";
+					}
+					else
+					{
+						UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"pausesafezone", nullptr);
+
+						PauseStatusMessage = bZonePaused
+							? "Successfully paused zone!"
+							: "Zone unpaused!";
+					}
+
+					AddMessageTime = high_resolution_clock::now();
 				}
-				else
+			}
+			else
+			{
+				if (ImGui::Button("Pause Safe Zone"))
 				{
-					UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"pausesafezone", nullptr);
+					bZonePaused = !bZonePaused;
 
-					PauseStatusMessage = bZonePaused
-						? "Successfully paused zone!"
-						: "Zone unpaused!";
+					if (Fortnite_Version == 13)
+					{
+						UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"pausesafezone", nullptr);
+
+						PauseStatusMessage = bZonePaused
+							? "Next zone will be paused. It is advised to skip zone."
+							: "Zone unpaused!";
+					}
+					else
+					{
+						UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"pausesafezone", nullptr);
+
+						PauseStatusMessage = bZonePaused
+							? "Successfully paused zone!"
+							: "Zone unpaused!";
+					}
+
+					AddMessageTime = high_resolution_clock::now();
 				}
-
-				AddMessageTime = high_resolution_clock::now();
 			}
 
 			/*if (ImGui::Button("Skip Zone"))
@@ -1997,11 +2055,15 @@ static inline void MainUI()
 					std::string::size_type Position = std::string(Path).find_last_of("\\/");
 					std::string Directory = std::string(Path).substr(0, Position);
 					std::string LootPoolFilePath = Directory + "\\lootpool.json";
+
 					LOG_INFO(LogDev, "Passed check 1.");
+
 					std::ifstream LootpoolFile(LootPoolFilePath);
+
 					if (LootpoolFile.is_open())
 					{
 						json JsonData;
+
 						try
 						{
 							LootpoolFile >> JsonData;
@@ -2010,15 +2072,20 @@ static inline void MainUI()
 						{
 							LOG_ERROR(LogDev, "Failed to parse loot pool file!");
 						}
+
 						LOG_INFO(LogDev, "Passed check 2.");
+
 						std::vector<std::pair<std::pair<std::string, std::string>, std::pair<std::string, std::vector<std::string>>>> AllItemRows;
+
 						for (const auto& JsonItem : JsonData)
 						{
 							std::string Definition = JsonItem["Definition"].get<std::string>();
 							std::string DropCount = JsonItem["DropCount"].get<std::string>();
 							std::string Weight = JsonItem["Weight"].get<std::string>();
 							std::vector<std::string> LootTiers;
+
 							LOG_INFO(LogDev, "Passed check 3.");
+
 							for (const auto& LootTier : JsonItem)
 							{
 								if (LootTier.is_array())
@@ -2027,7 +2094,9 @@ static inline void MainUI()
 										LootTiers.push_back(String.get<std::string>());
 								}
 							}
+
 							LOG_INFO(LogDev, "Passed check 4.");
+
 							AllItemRows.push_back
 							(
 								std::make_pair(
@@ -2041,27 +2110,38 @@ static inline void MainUI()
 									)
 								)
 							);
+
 							LOG_INFO(LogDev, "Passed check 5.");
 						}
+
 						FCustomLootPoolItemRow ItemRow{};
+
 						for (int i = 0; i < AllItemRows.size(); i++)
 						{
 							auto& CurrentItemRow = AllItemRows[i];
+
 							LOG_INFO(LogDev, "Passed check 6.");
+
 							UFortItemDefinition* Definition = FindObject<UFortItemDefinition>(CurrentItemRow.first.first, nullptr, ANY_PACKAGE);
 							int DropCount = std::stoi(CurrentItemRow.first.second);
 							double Weight = std::stod(CurrentItemRow.second.first);
 							std::vector<std::string> LootTiers = CurrentItemRow.second.second;
+
 							LOG_INFO(LogDev, "Passed check 7.");
+
 							ItemRow.Definition = Definition;
 							ItemRow.DropCount = DropCount;
 							ItemRow.Weight = Weight;
+
 							LOG_INFO(LogDev, "Passed check 8.");
+
 							for (int i = 0; i < LootTiers.size(); i++)
 							{
 								auto& LootTierString = LootTiers.at(i);
+
 								CustomLootpoolMap[LootTierString].Add(ItemRow);
 							}
+
 							LOG_INFO(LogDev, "Passed check 9.");
 						}
 					}
@@ -2075,59 +2155,9 @@ static inline void MainUI()
 				{
 					CustomLootpoolMap.clear();
 				}
-
-/*
-[
-    {
-        "Definition": "WID_Assault_AutoDrum_Athena_R_Ore_T03",
-        "DropCount": "1",
-        "Weight": "0.2",
-        "LootTiers":
-        [
-            "Loot_AthenaFloorLoot_Warmup",
-            "Loot_AthenaFloorLoot",
-            "Loot_AthenaTreasure",
-	        "Loot_AthenaIceBox"
-        ]
-    },
-    {
-        "Definition": "WID_Shotgun_Standard_Athena_C_Ore_T03",
-        "DropCount": "1",
-        "Weight": "0.2",
-        "LootTiers":
-        [
-            "Loot_AthenaFloorLoot_Warmup",
-            "Loot_AthenaFloorLoot",
-            "Loot_AthenaTreasure"
-        ]
-    },
-    {
-        "Definition": "WID_ExplosiveBow_Athena_SR",
-        "DropCount": "1",
-        "Weight": "0.2",
-        "LootTiers":
-        [
-            "Loot_AthenaFloorLoot_Warmup",
-            "Loot_AthenaFloorLoot",
-            "Loot_AthenaTreasure",
-	        "Loot_AthenaIceBox"
-        ]
-    },
-    {
-        "Definition": "WID_Launcher_Rocket_Athena_SR_Ore_T03",
-        "DropCount": "1",
-        "Weight": "0.5",
-        "LootTiers":
-        [
-            "Loot_AthenaFloorLoot_Warmup",
-            "Loot_AthenaFloorLoot",
-            "Loot_AthenaTreasure"
-        ]
-    }
-]*/ // https://discord.com/channels/@me/1151954740578627644/1260380271824474142
-
-
 			}
+
+			if (ImGui::Checkbox("Auto Pause Zone", &Globals::bAutoPauseZone));
 		}
 	}
 	else if (PlayerTab != 2435892 && bLoaded)

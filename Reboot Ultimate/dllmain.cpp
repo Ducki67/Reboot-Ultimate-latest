@@ -49,6 +49,7 @@
 #include "FortAthenaAIBotController.h"
 #include "FortServerBotManagerAthena.h"
 #include "BuildingWeapons.h"
+#include "BuildingContainer.h"
 
 enum class EMeshNetworkNodeType : uint8_t
 {
@@ -889,6 +890,7 @@ DWORD WINAPI Main(LPVOID)
     static auto AthenaMarkerComponentDefault = FindObject<UAthenaMarkerComponent>(L"/Script/FortniteGame.Default__AthenaMarkerComponent");
     static auto FortWeaponDefault = FindObject<AFortWeapon>(L"/Script/FortniteGame.Default__FortWeapon");
     static auto FortOctopusVehicleDefault = FindObject<AFortOctopusVehicle>(L"/Script/FortniteGame.Default__FortOctopusVehicle");
+    static auto BuildingContainerDefault = FindObject<ABuildingContainer>(L"/Script/FortniteGame.Default__BuildingContainer");
 
     if (Fortnite_Version >= 20 || Fortnite_Version == 12.00)
         ApplyNullAndRetTrues();
@@ -1173,6 +1175,9 @@ DWORD WINAPI Main(LPVOID)
 
     Hooking::MinHook::Hook(FortPlayerControllerAthenaDefault, FindObject<UFunction>(L"/Script/Engine.PlayerController.ServerAcknowledgePossession"),
         AFortPlayerControllerAthena::ServerAcknowledgePossessionHook, nullptr, false);
+
+    // Hooking::MinHook::Hook(BuildingContainerDefault, FindObject<UFunction>(L"/Script/FortniteGame.BuildingContainer.BP_SpawnLoot"),
+        // ABuildingContainer::BP_SpawnLootHook);
 
     if (Engine_Version >= 424)
     {

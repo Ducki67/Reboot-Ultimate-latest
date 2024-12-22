@@ -16,7 +16,7 @@
 #include <string>
 #include <algorithm>
 
-std::map<std::string, FVector> Waypoints;
+std::map<std::string, std::vector<FVector>> Waypoints;
 
 enum class EMovementMode : uint8_t
 {
@@ -3556,7 +3556,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			std::wstring Message = L"Time of day set to " + ss.str() + L"!\n";
 			SendMessageToConsole(PlayerController, Message.c_str());
 		}
-		else if (Command == "pausetimeofday" || Command == "pausetime" || Command == "pausehour")
+		else if (Command == "pausetimeofday" || Command == "pausetime" || Command == "pausehour" || Command == "timepause")
 		{
 			static auto SetTimeOfDaySpeedFn = FindObject<UFunction>(L"/Script/FortniteGame.FortKismetLibrary.SetTimeOfDaySpeed");
 
@@ -3690,9 +3690,9 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			if (Waypoints.find(Phrase) != Waypoints.end())
 			{
-				if (NumArgs >= 2 && Arguments[2] == "override" || Arguments[2] == "o")
+				if (NumArgs >= 2 && (Arguments[2] == "override" || Arguments[2] == "o"))
 				{
-					Waypoints[Phrase] = PawnLocation;
+					Waypoints[Phrase].push_back(PawnLocation);
 					SendMessageToConsole(PlayerController, L"Waypoint overridden successfully!");
 				}
 				else
@@ -3702,50 +3702,87 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			}
 			else
 			{
-				Waypoints[Phrase] = PawnLocation;
+				Waypoints[Phrase] = { PawnLocation };
 				SendMessageToConsole(PlayerController, L"Waypoint saved! Use « cheat waypoint (phrase) » to teleport to that location!");
 			}
 		}
 		else if (Command == "waypoint" || Command == "w")
 		{
-			if (NumArgs < 1) 
+			if (NumArgs < 1)
 			{
 				SendMessageToConsole(PlayerController, L"Please provide a waypoint phrase to teleport to.");
 				return;
 			}
 
-			std::string phrase = Arguments[1];
+			std::string Phrase = Arguments[1];
 
-			if (Waypoints.find(phrase) == Waypoints.end()) 
+			if (Waypoints.find(Phrase) == Waypoints.end() || Waypoints[Phrase].empty())
 			{
 				SendMessageToConsole(PlayerController, L"A saved waypoint with this phrase was not found!");
 				return;
 			}
 
-			FVector Destination = Waypoints[phrase];
-
-			auto Pawn = ReceivingController->GetMyFortPawn();
-
-			if (Pawn) 
+			if (NumArgs >= 2 && Arguments[2] == "previous" || Arguments[2] == "p")
 			{
-				Pawn->TeleportTo(Destination, Pawn->GetActorRotation());
-				SendMessageToConsole(PlayerController, L"Teleported to waypoint!");
-
-				static auto LaunchCharacterFn = FindObject<UFunction>(L"/Script/Engine.Character.LaunchCharacter");
-
-				struct
+				if (Waypoints[Phrase].size() < 2)
 				{
-					FVector LaunchVelocity;
-					bool bXYOverride;
-					bool bZOverride;
-					bool bIgnoreFallDamage;
-				} ACharacter_LaunchCharacter_Params{ FVector(0.0f, 0.0f, -10000000.0f), false, false, true }; // sort of works to stop momentum
+					SendMessageToConsole(PlayerController, L"No previous waypoint available for this phrase!");
+					return;
+				}
 
-				Pawn->ProcessEvent(LaunchCharacterFn, &ACharacter_LaunchCharacter_Params);
+				FVector Destination = Waypoints[Phrase][Waypoints[Phrase].size() - 2];
+
+				auto Pawn = ReceivingController->GetMyFortPawn();
+
+				if (Pawn)
+				{
+					Pawn->TeleportTo(Destination, Pawn->GetActorRotation());
+					SendMessageToConsole(PlayerController, L"Teleported to the previous waypoint!");
+
+					static auto LaunchCharacterFn = FindObject<UFunction>(L"/Script/Engine.Character.LaunchCharacter");
+
+					struct
+					{
+						FVector LaunchVelocity;
+						bool bXYOverride;
+						bool bZOverride;
+						bool bIgnoreFallDamage;
+					} ACharacter_LaunchCharacter_Params{ FVector(0.0f, 0.0f, -10000000.0f), false, false, true }; // sort of works to stop momentum
+
+					Pawn->ProcessEvent(LaunchCharacterFn, &ACharacter_LaunchCharacter_Params);
+				}
+				else
+				{
+					SendMessageToConsole(PlayerController, L"No pawn to teleport!");
+				}
 			}
-			else 
+			else
 			{
-				SendMessageToConsole(PlayerController, L"No pawn to teleport!");
+				FVector Destination = Waypoints[Phrase].back();
+
+				auto Pawn = ReceivingController->GetMyFortPawn();
+
+				if (Pawn)
+				{
+					Pawn->TeleportTo(Destination, Pawn->GetActorRotation());
+					SendMessageToConsole(PlayerController, L"Teleported to waypoint!");
+
+					static auto LaunchCharacterFn = FindObject<UFunction>(L"/Script/Engine.Character.LaunchCharacter");
+
+					struct
+					{
+						FVector LaunchVelocity;
+						bool bXYOverride;
+						bool bZOverride;
+						bool bIgnoreFallDamage;
+					} ACharacter_LaunchCharacter_Params{ FVector(0.0f, 0.0f, -10000000.0f), false, false, true }; // sort of works to stop momentum
+
+					Pawn->ProcessEvent(LaunchCharacterFn, &ACharacter_LaunchCharacter_Params);
+				}
+				else
+				{
+					SendMessageToConsole(PlayerController, L"No pawn to teleport!");
+				}
 			}
 		}
 		else if (Command == "fly")
@@ -4044,6 +4081,12 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, L"Cleared!\n");
 		}
+		else if (Command == "destroybuilds" || Command == "builds" || Command == "destroyallplayerbuilds")
+		{
+			bShouldDestroyAllPlayerBuilds = true;
+
+			SendMessageToConsole(PlayerController, L"Destroyed all player builds!\n");
+		}
 		else if (Command == "destroytarget" || Command == "destroy")
 		{
 			UCheatManager*& CheatManager = ReceivingController->SpawnCheatManager(UCheatManager::StaticClass());
@@ -4088,43 +4131,63 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		}
 		else if (Command == "bugitgo" || Command == "b")
 		{
-			if (Arguments.size() <= 3)
+			if (Globals::bBugitgo == false)
 			{
-				SendMessageToConsole(PlayerController, L"Please provide X, Y, and Z!\n");
-				return;
+				SendMessageToConsole(PlayerController, L"cheat bugitgo has been disabled as of a recent patch.");
+				SendMessageToConsole(PlayerController, L"Please use cheat waypoint instead.");
 			}
-
-			float X{}, Y{}, Z{};
-
-			try { X = std::stof(Arguments[1]); }
-			catch (...) {}
-			try { Y = std::stof(Arguments[2]); }
-			catch (...) {}
-			try { Z = std::stof(Arguments[3]); }
-			catch (...) {}
-
-			auto Pawn = Cast<APawn>(ReceivingController->GetPawn());
-
-			if (!Pawn)
+			else
 			{
-				SendMessageToConsole(PlayerController, L"No pawn to teleport!");
-				return;
+				if (Arguments.size() <= 3)
+				{
+					SendMessageToConsole(PlayerController, L"Please provide X, Y, and Z!\n");
+					return;
+				}
+
+				float X{}, Y{}, Z{};
+
+				try { X = std::stof(Arguments[1]); }
+				catch (...) {}
+				try { Y = std::stof(Arguments[2]); }
+				catch (...) {}
+				try { Z = std::stof(Arguments[3]); }
+				catch (...) {}
+
+				auto Pawn = Cast<APawn>(ReceivingController->GetPawn());
+
+				if (!Pawn)
+				{
+					SendMessageToConsole(PlayerController, L"No pawn to teleport!");
+					return;
+				}
+
+				Pawn->TeleportTo(FVector(X, Y, Z), Pawn->GetActorRotation());
+				SendMessageToConsole(PlayerController, L"Teleported to Coordinates!");
+
+				static auto LaunchCharacterFn = FindObject<UFunction>(L"/Script/Engine.Character.LaunchCharacter");
+
+				struct
+				{
+					FVector LaunchVelocity;
+					bool bXYOverride;
+					bool bZOverride;
+					bool bIgnoreFallDamage;
+				} ACharacter_LaunchCharacter_Params{ FVector(0.0f, 0.0f, -10000000.0f), false, false, true }; // sort of works to stop momentum
+
+				Pawn->ProcessEvent(LaunchCharacterFn, &ACharacter_LaunchCharacter_Params);
 			}
-
-			Pawn->TeleportTo(FVector(X, Y, Z), Pawn->GetActorRotation());
-			SendMessageToConsole(PlayerController, L"Teleported to Coordinates!");
-
-			static auto LaunchCharacterFn = FindObject<UFunction>(L"/Script/Engine.Character.LaunchCharacter");
-
-			struct
+		}
+		else if (Command == "enablebugitgo")
+		{
+			if (Globals::bBugitgo == true)
 			{
-				FVector LaunchVelocity;
-				bool bXYOverride;
-				bool bZOverride;
-				bool bIgnoreFallDamage;
-			} ACharacter_LaunchCharacter_Params{ FVector(0.0f, 0.0f, -10000000.0f), false, false, true }; // sort of works to stop momentum
-
-			Pawn->ProcessEvent(LaunchCharacterFn, &ACharacter_LaunchCharacter_Params);
+				SendMessageToConsole(PlayerController, L"cheat bugitgo is already enabled!");
+			}
+			else
+			{
+				Globals::bBugitgo = true;
+				SendMessageToConsole(PlayerController, L"cheat bugitgo has been re-enabled!");
+			}
 		}
 		/*else if (Command == "tpto")
 		{
@@ -4702,11 +4765,11 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 - cheat ban - Permanently bans the player from the game. (IP Ban)
 - cheat bot {#} - Spawns a bot at the player (experimental).
 - cheat buildfree - Toggles Infinite Materials.
-- cheat bugitgo {X Y Z} - Teleport to a location.
 - cheat damagetarget {#} - Damages the Actor in front of you by the specified amount.
 - cheat demospeed - Speeds up/slows down the speed of the game.
 - cheat destroy - Destroys the actor that the player is looking at.
 - cheat destroyall {ClassPathName} - Destroys every actor of a given class. Useful for removing all floorloot for example.
+- cheat destroybuilds - Destroys all Player Builds.
 - cheat falldamage - Permanently turn off fall damage.
 - cheat fly - Toggles flight.
 - cheat ghost - Toggles flight and disables collision.

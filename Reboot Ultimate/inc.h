@@ -57,7 +57,7 @@ struct PlaceholderBitfield
 
 inline bool AreVehicleWeaponsEnabled()
 {
-	return Fortnite_Version > 6;
+	return Fortnite_Version > 6.31;
 }
 
 inline bool IsRestartingSupported()
