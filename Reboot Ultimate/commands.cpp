@@ -259,14 +259,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "WID_Shotgun_HighSemiAuto_Athena_SR_Ore_T03";
 			}
-			else if (weaponName == "doublebarrel_vr")
-			{
-				weaponName = "WID_Shotgun_BreakBarrel_Athena_VR_Ore_T03";
-			}
-			else if (weaponName == "doublebarrel_sr" || weaponName == "doublebarrel")
-			{
-				weaponName = "WID_Shotgun_BreakBarrel_Athena_SR_Ore_T03";
-			}
 			else if (weaponName == "flint_c")
 			{
 				weaponName = "WID_Pistol_Flintlock_Athena_C";
@@ -607,6 +599,14 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "TID_Floor_Player_Launch_Pad_Athena";
 			}
+			else if (weaponName == "upwards" || weaponName == "jumpad" || weaponName == "jumppad" || weaponName == "upward")
+			{
+				weaponName = "TID_Floor_Player_Jump_Pad_Athena";
+			}
+			else if (weaponName == "directional" || weaponName == "directionals")
+			{
+				weaponName = "TID_Floor_Player_Jump_Pad_Free_Direction_Athena";
+			}
 			else if (weaponName == "rocketammo" || weaponName == "rockets")
 			{
 				weaponName = "AmmoDataRockets";
@@ -744,6 +744,58 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else if (weaponName == "launchpad" || weaponName == "launch" || weaponName == "pad" || weaponName == "launches" || weaponName == "TID_Floor_Player_Launch_Pad_Athena")
 			{
 				count = 3;
+			}
+			else if (weaponName == "TID_Ceiling_BouncePad_Athena_R_T01")
+			{
+				count = 6;
+			}
+			else if (weaponName == "TID_Context_Freeze_Athena")
+			{
+				count = 6;
+			}
+			else if (weaponName == "TID_Floor_Player_Campfire_Athena")
+			{
+				count = 4;
+			}
+			else if (weaponName == "TID_Floor_MountedTurret_Athena")
+			{
+				count = 4;
+			}
+			else if (weaponName == "TID_ContextTrap_Athena")
+			{
+				count = 12;
+			}
+			else if (weaponName == "TID_PoisonDartTrap_Context")
+			{
+				count = 12;
+			}
+			else if (weaponName == "TID_Floor_Player_Jump_Pad_Free_Direction_Athena" || weaponName == "directional")
+			{
+				count = 4;
+			}
+			else if (weaponName == "TID_Floor_Player_Jump_Pad_Athena" || weaponName == "upwards" || weaponName == "jumpad" || weaponName == "jumppad" || weaponName == "upward")
+			{
+				count = 4;
+			}
+			else if (weaponName == "TID_Context_SpeedBoost")
+			{
+				count = 12;
+			}
+			else if (weaponName == "TID_ZippyTroutTrap_Context")
+			{
+				count = 3;
+			}
+			else if (weaponName == "TID_Context_Reinforced_Athena")
+			{
+				count = 15;
+			}
+			else if (weaponName == "TID_Ceiling_Goop_VR_T01")
+			{
+				count = 3;
+			}
+			else if (weaponName == "TID_Wall_Armor_WIP")
+			{
+				count = 15;
 			}
 
 			try
@@ -4619,8 +4671,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			SendMessageToConsole(PlayerController, L"tac_r || Rare Tactical Shotgun");
 			SendMessageToConsole(PlayerController, L"tac_vr || Epic Tactical Shotgun");
 			SendMessageToConsole(PlayerController, L"tac_sr/tac || Legendary Tactical Shotgun");
-			SendMessageToConsole(PlayerController, L"doublebarrel_vr || Epic Double Barrel Shotgun");
-			SendMessageToConsole(PlayerController, L"doublebarrel_sr/doublebarrel || Legendary Double Barrel Shotgun");
 			SendMessageToConsole(PlayerController, L"flint_c || Common Flint Knock Pistol");
 			SendMessageToConsole(PlayerController, L"flint_uc/flint || Uncommon Flint Knock Pistol");
 			SendMessageToConsole(PlayerController, L"deagle_vr || Epic Hand Cannon");
@@ -4713,6 +4763,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			SendMessageToConsole(PlayerController, L"harpoon || Rare Harpoon Gun");
 			SendMessageToConsole(PlayerController, L"bouncer/bouncers || Rare Bouncer");
 			SendMessageToConsole(PlayerController, L"launchpad/launch/pad/launches || Epic Launch Pad");
+			SendMessageToConsole(PlayerController, L"directional/directionals || Rare Directional Pad");
+			SendMessageToConsole(PlayerController, L"upwards/upward/jumppad/jumpad || Rare Upwards Pad");
 			SendMessageToConsole(PlayerController, L"rocketammo/rockets || Rocket Ammo");
 			SendMessageToConsole(PlayerController, L"heavyammo || Heavy Ammo");
 			SendMessageToConsole(PlayerController, L"shells || Shells");

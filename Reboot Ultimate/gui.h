@@ -69,8 +69,8 @@
 #define CREDITS_TAB 16
 
 #define MAIN_PLAYERTAB 1
-#define INVENTORY_PLAYERTAB 2
-#define LOADOUT_PLAYERTAB 4
+// #define INVENTORY_PLAYERTAB 2
+// #define LOADOUT_PLAYERTAB 4
 #define FUN_PLAYERTAB 5
 
 using json = nlohmann::json;
@@ -88,7 +88,7 @@ extern inline bool bHandleDeath = true;
 extern inline bool bUseCustomMap = false;
 extern inline std::string CustomMapName = "";
 extern inline int AmountToSubtractIndex = 1;
-extern inline int SecondsUntilTravel = 30;
+extern inline int SecondsUntilTravel = 20;
 extern inline bool bSwitchedInitialLevel = false;
 extern inline bool bIsInAutoRestart = false;
 extern inline float AutoBusStartSeconds = 60;
@@ -825,7 +825,7 @@ static inline void PlayerTabs()
 			ImGui::EndTabItem();
 		}
 
-		if (ImGui::BeginTabItem(("Inventory")))
+		/*if (ImGui::BeginTabItem(("Inventory")))
 		{
 			playerTabTab = INVENTORY_PLAYERTAB;
 			ImGui::EndTabItem();
@@ -835,9 +835,9 @@ static inline void PlayerTabs()
 		{
 			playerTabTab = LOADOUT_PLAYERTAB;
 			ImGui::EndTabItem();
-		}
+		}*/
 
-		if (ImGui::BeginTabItem(("Fun")))
+		if (ImGui::BeginTabItem(("Extra")))
 		{
 			playerTabTab = FUN_PLAYERTAB;
 			ImGui::EndTabItem();
@@ -1167,12 +1167,12 @@ static inline void MainUI()
 				ImGui::Text(std::format("Gamemode: {} {}", (isLateGame ? "Lategame" : "Full Map"), PlaylistShortName).c_str());
 				ImGui::Text(std::format("Players: {}", GameState->GetPlayersLeft()).c_str());
 
-				if (!Globals::bStartedListening) // hm
+				/*if (!Globals::bStartedListening) // hm
 				{
 					auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
 					GET_PLAYLIST(GameState);
 					ImGui::SliderInt("Players Required to Start", &WarmupRequiredPlayerCount, 1, CurrentPlaylist->GetMaxPlayers());
-				}
+				}*/
 
 				static std::string ConsoleCommand;
 
@@ -2157,7 +2157,7 @@ static inline void MainUI()
 				}
 			}
 
-			if (ImGui::Checkbox("Auto Pause Zone", &Globals::bAutoPauseZone));
+			// if (ImGui::Checkbox("Auto Pause Zone", &Globals::bAutoPauseZone));
 		}
 	}
 	else if (PlayerTab != 2435892 && bLoaded)
@@ -2365,9 +2365,8 @@ static inline void MainUI()
 							}
 							ImGui::NewLine();
 							static std::string ClassOfActorClass = "/Script/Engine.BlueprintGeneratedClass";
-							ImGui::InputText("Class of the ActorClass", &ClassOfActorClass);
 							static std::string ActorClassToSpawn;
-							ImGui::InputText("Actor to spawn at player", &ActorClassToSpawn);
+							ImGui::InputText("Actor to Spawn", &ActorClassToSpawn);
 							if (ImGui::Button("Spawn BlueprintClass"))
 							{
 								if (CurrentPawn)
