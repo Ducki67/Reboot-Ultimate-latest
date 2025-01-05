@@ -1963,8 +1963,8 @@ static inline void MainUI()
 			static std::string ItemToGrantEveryone;
 			static int AmountToGrantEveryone = 1;
 
-			ImGui::InputFloat("Starting Shield", &StartingShield);
-			ImGui::InputText("Item to Give", &ItemToGrantEveryone);
+			ImGui::SliderFloat("Starting Shield", &StartingShield, 1, 100);
+			ImGui::InputText("Item to Give to All Players", &ItemToGrantEveryone);
 			ImGui::InputInt("Amount to Give", &AmountToGrantEveryone);
 
 			if (ImGui::Button("Destroy All Player Builds"))
@@ -2012,7 +2012,7 @@ static inline void MainUI()
 
 			if (GameState)
 			{
-				static auto DefaultGliderRedeployCanRedeployOffset = FindOffsetStruct("/Script/FortniteGame.FortGameStateAthena", "DefaultGliderRedeployCanRedeploy", true);
+				static auto DefaultGliderRedeployCanRedeployOffset = FindOffsetStruct("/Script/FortniteGame.FortGameStateAthena", "DefaultGliderRedeployCanRedeploy", false);
 				static auto DefaultParachuteDeployTraceForGroundDistanceOffset = GameState->GetOffset("DefaultParachuteDeployTraceForGroundDistance", false);
 
 				/*if (Globals::bStartedListening) // it resets accordingly to ProHenis b4 this
@@ -2220,7 +2220,7 @@ static inline void MainUI()
 						static int stud = 0;
 						static std::string KickReason = "You have been kicked!";
 						ImGui::InputText("Kick Reason", &KickReason);
-						if (ImGui::Button("Kick"))
+						if (ImGui::Button("Kick Player"))
 						{
 							std::wstring wstr = std::wstring(KickReason.begin(), KickReason.end());
 							FString Reason;
@@ -2230,7 +2230,7 @@ static inline void MainUI()
 						}
 						static std::string BanReason = "You have been banned!";
 						ImGui::InputText("Ban Reason", &BanReason);
-						if (ImGui::Button("Ban"))
+						if (ImGui::Button("Ban Player"))
 						{
 							std::wstring wstr = std::wstring(BanReason.begin(), BanReason.end());
 							FString Reason;
@@ -2249,7 +2249,7 @@ static inline void MainUI()
 								};
 							Ban(CurrentController);
 						}
-						if (ImGui::Button("Kill"))
+						if (ImGui::Button("Kill Player"))
 						{
 							static auto ServerSuicideFn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerController.ServerSuicide");
 							CurrentController->ProcessEvent(ServerSuicideFn);
@@ -2272,41 +2272,6 @@ static inline void MainUI()
 									Inventory->AddItem(wid->GetItemEntry(), nullptr, wid2->GetClipSize());
 								else
 									LOG_WARN(LogGame, "Unable to find WID!");
-							}
-						}
-
-						ImGui::NewLine();
-
-						if (ImGui::Button("Spawn Llama"))
-						{
-							if (CurrentPawn)
-							{
-								static auto LlamaClass = FindObject<UClass>(L"/Game/Athena/SupplyDrops/Llama/AthenaSupplyDrop_Llama.AthenaSupplyDrop_Llama_C");
-
-								if (LlamaClass)
-								{
-									FTransform Transform;
-									Transform.Translation = CurrentPawn->GetActorLocation();
-									Transform.Scale3D = FVector{ 1, 1, 1 };
-									Transform.Rotation = FQuat();
-
-									auto Llama = GetWorld()->SpawnActor<AActor>(LlamaClass, Transform);
-								}
-							}
-						}
-						if (ImGui::Button("Spawn Supply Drop"))
-						{
-							if (CurrentPawn)
-							{
-								static auto SupplyClass = FindObject<UClass>(L"/Game/Athena/SupplyDrops/AthenaSupplyDrop.AthenaSupplyDrop_C");
-								if (SupplyClass)
-								{
-									FTransform Transform;
-									Transform.Translation = CurrentPawn->GetActorLocation();
-									Transform.Scale3D = FVector{ 1, 1, 1 };
-									Transform.Rotation = FQuat();
-									auto Supply = GetWorld()->SpawnActor<AActor>(SupplyClass, Transform);
-								}
 							}
 						}
 						/*if (ImGui::Button("Rift Player"))
@@ -2383,6 +2348,41 @@ static inline void MainUI()
 									else
 									{
 										LOG_WARN(LogGame, "Unable to find class of actor class!");
+									}
+								}
+							}
+
+							ImGui::NewLine();
+
+							if (ImGui::Button("Spawn Llama"))
+							{
+								if (CurrentPawn)
+								{
+									static auto LlamaClass = FindObject<UClass>(L"/Game/Athena/SupplyDrops/Llama/AthenaSupplyDrop_Llama.AthenaSupplyDrop_Llama_C");
+
+									if (LlamaClass)
+									{
+										FTransform Transform;
+										Transform.Translation = CurrentPawn->GetActorLocation();
+										Transform.Scale3D = FVector{ 1, 1, 1 };
+										Transform.Rotation = FQuat();
+
+										auto Llama = GetWorld()->SpawnActor<AActor>(LlamaClass, Transform);
+									}
+								}
+							}
+							if (ImGui::Button("Spawn Supply Drop"))
+							{
+								if (CurrentPawn)
+								{
+									static auto SupplyClass = FindObject<UClass>(L"/Game/Athena/SupplyDrops/AthenaSupplyDrop.AthenaSupplyDrop_C");
+									if (SupplyClass)
+									{
+										FTransform Transform;
+										Transform.Translation = CurrentPawn->GetActorLocation();
+										Transform.Scale3D = FVector{ 1, 1, 1 };
+										Transform.Rotation = FQuat();
+										auto Supply = GetWorld()->SpawnActor<AActor>(SupplyClass, Transform);
 									}
 								}
 							}
@@ -2573,7 +2573,6 @@ static inline void PregameUI()
 		static std::string BotStatusMessage = "";
 
 		static high_resolution_clock::time_point AddMessageTime;
-		static high_resolution_clock::time_point RemoveMessageTime;
 
 		if (Fortnite_Version < 9)
 		{
@@ -2586,6 +2585,8 @@ static inline void PregameUI()
 				ImGui::NewLine();
 
 				BotStatusMessage = "Set Bot's Pickaxe to " + Globals::BotPickaxeID + "!";
+
+				AddMessageTime = high_resolution_clock::now();
 			}
 
 			if (!BotStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
