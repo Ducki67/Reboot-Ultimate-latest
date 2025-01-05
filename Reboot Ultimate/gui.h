@@ -2157,9 +2157,29 @@ static inline void MainUI()
 				}
 			}
 
-			if (Fortnite_Version <= 7)
+			if (Fortnite_Version < 7)
 			{
-				if (ImGui::Checkbox("Use Unrealistic Siphon Animation", &Globals::bUseUnrealisticSiphon));
+				static std::string SiphonStatusMessage = "";
+				static high_resolution_clock::time_point AddMessageTime;
+
+				if (ImGui::Checkbox("Use Unrealistic Siphon Animation", &Globals::bUseUnrealisticSiphon))
+				{
+					SiphonStatusMessage = Globals::bUseUnrealisticSiphon
+						? "Unrealistic Siphon is on! Make sure to set your effects to medium or higher!"
+						: "Unrealistic Siphon is off.";
+
+					AddMessageTime = high_resolution_clock::now();
+				}
+
+				if (!SiphonStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
+				{
+					ImGui::NewLine();
+					ImGui::Text("%s", SiphonStatusMessage.c_str());
+				}
+				else if (duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() >= 5)
+				{
+					SiphonStatusMessage.clear();
+				}
 			}
 
 			// if (ImGui::Checkbox("Auto Pause Zone", &Globals::bAutoPauseZone));
@@ -2596,6 +2616,8 @@ static inline void PregameUI()
 
 			if (!BotStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
 			{
+				ImGui::NewLine();
+
 				ImGui::Text("%s", BotStatusMessage.c_str());
 			}
 			else
