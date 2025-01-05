@@ -31,6 +31,7 @@ namespace Globals
 	extern inline bool bBotNames = true;
 	extern inline int bBotHealth = 21;
 	extern inline int bBotShield = 21;
+	extern inline std::string BotPickaxeID = "WID_Harvest_HalloweenScythe_Athena_C_T01";
 
 	// extern inline std::map<int, std::string> CustomBotNames;
 	// extern inline int CurrentBotID = 1;

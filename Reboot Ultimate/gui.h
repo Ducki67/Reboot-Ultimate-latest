@@ -2567,6 +2567,27 @@ static inline void PregameUI()
 		}
 
 		if (ImGui::Checkbox("Set Bot Invincible", &Globals::bBotInvincible));
+
+		static char PickaxeInput[256] = "WID_Harvest_HalloweenScythe_Athena_C_T01";
+
+		static std::string BotStatusMessage = "";
+
+		static high_resolution_clock::time_point AddMessageTime;
+		static high_resolution_clock::time_point RemoveMessageTime;
+
+		if (Fortnite_Version < 9)
+		{
+			ImGui::InputText("Pickaxe ID", PickaxeInput, sizeof(PickaxeInput));
+
+			if (ImGui::Button("Set as Bot's Pickaxe"))
+			{
+				Globals::BotPickaxeID = PickaxeInput;
+
+				ImGui::NewLine();
+
+				BotStatusMessage = "Set Bot's Pickaxe to " + Globals::BotPickaxeID + "!";
+			}
+		}
 	}
 }
 

@@ -392,11 +392,36 @@ public:
 	{
 		auto CosmeticLoadout = GetCosmeticLoadout();
 		auto CosmeticLoadoutPickaxe = CosmeticLoadout ? CosmeticLoadout->GetPickaxe() : nullptr;
-	
+
 		static auto WeaponDefinitionOffset = FindOffsetStruct("/Script/FortniteGame.AthenaPickaxeItemDefinition", "WeaponDefinition");
 
 		auto PickaxeDefinition = /* WeaponDefinitionOffset != -1 && */ CosmeticLoadoutPickaxe ? CosmeticLoadoutPickaxe->Get<UFortItemDefinition*>(WeaponDefinitionOffset)
 			: FindObject<UFortItemDefinition>(L"/Game/Athena/Items/Weapons/WID_Harvest_HalloweenScythe_Athena_C_T01.WID_Harvest_HalloweenScythe_Athena_C_T01");
+
+		auto WorldInventory = GetWorldInventory();
+
+		if (!WorldInventory || WorldInventory->GetPickaxeInstance())
+			return nullptr;
+
+		auto NewAndModifiedInstances = WorldInventory->AddItem(PickaxeDefinition, nullptr);
+		WorldInventory->Update();
+
+		return NewAndModifiedInstances.first.size() > 0 ? NewAndModifiedInstances.first[0] : nullptr;
+	}
+
+	UFortItem* AddPickaxeToBotInventory()
+	{
+		auto CosmeticLoadout = GetCosmeticLoadout();
+		auto CosmeticLoadoutPickaxe = CosmeticLoadout ? CosmeticLoadout->GetPickaxe() : nullptr;
+
+		static auto WeaponDefinitionOffset = FindOffsetStruct("/Script/FortniteGame.AthenaPickaxeItemDefinition", "WeaponDefinition");
+
+		std::wstring BotPickaxePath = L"/Game/Athena/Items/Weapons/" +
+			std::wstring(Globals::BotPickaxeID.begin(), Globals::BotPickaxeID.end()) +
+			L"." +
+			std::wstring(Globals::BotPickaxeID.begin(), Globals::BotPickaxeID.end());
+
+		auto PickaxeDefinition = FindObject<UFortItemDefinition>(BotPickaxePath.c_str());
 
 		auto WorldInventory = GetWorldInventory();
 

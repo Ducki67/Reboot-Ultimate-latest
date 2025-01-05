@@ -3774,7 +3774,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				return;
 			}
 
-			if (NumArgs >= 2 && Arguments[2] == "previous" || Arguments[2] == "p")
+			if (NumArgs >= 2 && Arguments[2] == "previous" || NumArgs >= 2 && Arguments[2] == "p")
 			{
 				if (Waypoints[Phrase].size() < 2)
 				{

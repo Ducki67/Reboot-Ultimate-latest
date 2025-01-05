@@ -72,6 +72,9 @@ public:
 	{
 		if (!ShouldUseAIBotController())
 		{
+			auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
+			auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
+
 			AFortInventory** Inventory = nullptr;
 
 			if (auto FortPlayerController = Cast<AFortPlayerController>(Controller))
@@ -116,6 +119,33 @@ public:
 			{
 				static auto bHasInitializedWorldInventoryOffset = FortPlayerController->GetOffset("bHasInitializedWorldInventory");
 				FortPlayerController->Get<bool>(bHasInitializedWorldInventoryOffset) = true;
+			}
+
+			// if (false)
+			{
+				if (Inventory)
+				{
+					auto& StartingItems = GameMode->GetStartingItems();
+
+					for (int i = 0; i < StartingItems.Num(); ++i)
+					{
+						auto& StartingItem = StartingItems.at(i);
+
+						(*Inventory)->AddItem(StartingItem.GetItem(), nullptr, StartingItem.GetCount());
+					}
+
+					if (auto FortPlayerController = Cast<AFortPlayerController>(Controller))
+					{
+						UFortItem* PickaxeInstance = FortPlayerController->AddPickaxeToBotInventory();
+
+						if (PickaxeInstance)
+						{
+							FortPlayerController->ServerExecuteInventoryItemHook(FortPlayerController, PickaxeInstance->GetItemEntry()->GetItemGuid());
+						}
+					}
+
+					(*Inventory)->Update();
+				}
 			}
 		}
 	}
@@ -198,9 +228,13 @@ public:
 		{
 			if (!PawnClass)
 				PawnClass = FindObject<UClass>(L"/Game/Athena/PlayerPawn_Athena.PlayerPawn_Athena_C");
+			else
+				PawnClass = FindObject<UClass>(L"/Game/Athena/AI/Phoebe/BP_PlayerPawn_Athena_Phoebe.BP_PlayerPawn_Athena_Phoebe_C");
 
 			if (!ControllerClass)
 				ControllerClass = AFortPlayerControllerAthena::StaticClass();
+			else
+				ControllerClass = FindObject<UClass>(L"/Game/Athena/AI/Phoebe/BP_PhoebePlayerController.BP_PhoebePlayerController_C");
 
 			if (!ControllerClass || !PawnClass)
 			{
@@ -405,7 +439,7 @@ public:
 			KillerState->ClientReportKill(PlayerState);
 		}
 
-		/*if (KillerPawn && KillerPawn != Pawn && KillerController && KillerPlayerState && KillerPlayerState->GetAbilitySystemComponent() && Cast<AController>(KillerController) != Cast<AController>(AIBotController))
+		if (KillerPawn && KillerPawn != Pawn && KillerController && KillerPlayerState && KillerPlayerState->GetAbilitySystemComponent() && Cast<AController>(KillerController) != Cast<AController>(AIBotController))
 		{
 			if (Globals::AmountOfHealthSiphon != 0)
 			{
@@ -466,7 +500,7 @@ public:
 
 				if ((MaxShield - Shield) >= 0 && AmountGiven < Globals::AmountOfHealthSiphon)
 				{
-					KillerPlayerState->ApplySiphonEffect(); // why doesnt this work on chapter 2 adiubawuybdawbdab
+					// KillerPlayerState->ApplySiphonEffect(); // why doesnt this work on chapter 2 adiubawuybdawbdab
 
 					if (MaxShield - Shield > 0)
 					{
@@ -481,7 +515,7 @@ public:
 					}
 				}
 			}
-		}*/
+		}
 
 		GameState->GetPlayersLeft()--;
 		GameState->OnRep_PlayersLeft();
