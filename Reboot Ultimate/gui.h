@@ -2157,6 +2157,11 @@ static inline void MainUI()
 				}
 			}
 
+			if (Fortnite_Version <= 7)
+			{
+				if (ImGui::Checkbox("Use Unrealistic Siphon Animation", &Globals::bUseUnrealisticSiphon));
+			}
+
 			// if (ImGui::Checkbox("Auto Pause Zone", &Globals::bAutoPauseZone));
 		}
 	}

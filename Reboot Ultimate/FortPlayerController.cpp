@@ -1649,7 +1649,7 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 
 				if ((MaxShield - Shield) >= 0 && AmountGiven < Globals::AmountOfHealthSiphon)
 				{
-					if (Fortnite_Version >= 7)
+					if (Fortnite_Version >= 7 && !Globals::bUseUnrealisticSiphon)
 					{
 						KillerPlayerState->ApplySiphonEffect();
 					}
