@@ -2587,6 +2587,15 @@ static inline void PregameUI()
 
 				BotStatusMessage = "Set Bot's Pickaxe to " + Globals::BotPickaxeID + "!";
 			}
+
+			if (!BotStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
+			{
+				ImGui::Text("%s", BotStatusMessage.c_str());
+			}
+			else
+			{
+				BotStatusMessage.clear();
+			}
 		}
 	}
 }
