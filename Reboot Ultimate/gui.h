@@ -88,7 +88,7 @@ extern inline bool bHandleDeath = true;
 extern inline bool bUseCustomMap = false;
 extern inline std::string CustomMapName = "";
 extern inline int AmountToSubtractIndex = 1;
-extern inline int SecondsUntilTravel = 20;
+extern inline int SecondsUntilTravel = 25;
 extern inline bool bSwitchedInitialLevel = false;
 extern inline bool bIsInAutoRestart = false;
 extern inline float AutoBusStartSeconds = 60;
@@ -149,7 +149,7 @@ struct ActorSpawnStruct
 inline std::vector<std::pair<AFortPlayerControllerAthena*, UNetConnection*>> AllControllers;
 inline std::vector<ActorSpawnStruct> ActorsToSpawn;
 
-static inline void SetIsLategame(bool Value)
+static inline void SetIsLategame(bool Value) // if spawn island make this 0
 {
 	Globals::bLateGame.store(Value);
 	StartingShield = Value ? 100 : 0;
@@ -2570,22 +2570,6 @@ static inline void PregameUI()
 			ImGui::InputInt("Set Bot Shield", &Globals::bBotShield);
 		}
 
-		/*if (ImGui::Checkbox("Use Random Bot Names", &Globals::bBotNames));
-
-		static char NameBuffer[64] = "";
-
-		if (!Globals::bBotNames)
-		{
-			ImGui::InputText("Custom Name:", NameBuffer, sizeof(NameBuffer));
-
-			if (ImGui::Button("Save Name"))
-			{
-				Globals::CustomBotNames[Globals::CurrentBotID] = std::string(NameBuffer);
-
-				std::fill(std::begin(NameBuffer), std::end(NameBuffer), '\1');
-			}
-		}*/
-
 		if (Fortnite_Version >= 11 && Engine_Version < 500 && !Globals::bStartedListening)
 		{
 			if (ImGui::Checkbox("Toggle Bot PC", &Globals::bBotPC));
@@ -2593,11 +2577,36 @@ static inline void PregameUI()
 
 		if (ImGui::Checkbox("Set Bot Invincible", &Globals::bBotInvincible));
 
+		static char NameInput[256] = "";
+
+		static std::string BotNameStatusMessage = "";
+
+		static high_resolution_clock::time_point AddMessageTime;
+
+		if (ImGui::Checkbox("Use Custom Bot Name", &Globals::bBotNames));
+		{
+			if (Globals::bBotNames == true)
+			{
+				ImGui::InputText("Custom Bot Name", NameInput, sizeof(NameInput));
+
+				if (ImGui::Button("Set Name"))
+				{
+					Globals::BotName = NameInput;
+
+					ImGui::NewLine();
+
+					BotNameStatusMessage = "Set Bot's Name to " + Globals::BotName + "!";
+
+					AddMessageTime = high_resolution_clock::now();
+				}
+			}
+		}
+
+		ImGui::NewLine();
+
 		static char PickaxeInput[256] = "WID_Harvest_HalloweenScythe_Athena_C_T01";
 
 		static std::string BotStatusMessage = "";
-
-		static high_resolution_clock::time_point AddMessageTime;
 
 		if (Fortnite_Version < 9)
 		{
@@ -2624,6 +2633,17 @@ static inline void PregameUI()
 			{
 				BotStatusMessage.clear();
 			}
+		}
+
+		if (!BotNameStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
+		{
+			ImGui::NewLine();
+
+			ImGui::Text("%s", BotNameStatusMessage.c_str());
+		}
+		else
+		{
+			BotNameStatusMessage.clear();
 		}
 	}
 }

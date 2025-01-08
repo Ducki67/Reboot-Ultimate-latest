@@ -13,6 +13,9 @@
 
 #include "botnames.h"
 
+#include <string>
+#include <format>
+
 inline UFortServerBotManagerAthena* BotManager = nullptr;
 
 class PlayerBot
@@ -173,32 +176,38 @@ public:
 	FString GetRandomName()
 	{
 		int RandomNumber = 264 + (std::rand() % 101);
-
 		static int CurrentBotNum = 1;
 		std::wstring BotNumWStr;
 		FString NewName;
 
-		if (Fortnite_Version < 9)
+		std::string BotNames = Globals::BotName;
+
+		if (Globals::bBotNames && !Globals::BotName.empty())
 		{
-			std::wstring BotNumWStr = std::to_wstring(RandomNumber);
-			NewName = (std::format(L"Anonymous[{}]", BotNumWStr)).c_str();
+			NewName = std::format("{}", BotNames); // :3
 		}
 		else
 		{
-			if (Fortnite_Version < 11)
+			if (Fortnite_Version < 9)
 			{
-				std::wstring BotNumWStr = std::to_wstring(RandomNumber);
+				BotNumWStr = std::to_wstring(RandomNumber);
 				NewName = (std::format(L"Anonymous[{}]", BotNumWStr)).c_str();
 			}
 			else
 			{
-				if (!PlayerBotNames.empty())
+				if (Fortnite_Version < 11)
 				{
-					// std::shuffle(PlayerBotNames.begin(), PlayerBotNames.end(), std::default_random_engine((unsigned int)time(0)));
-
-					int RandomIndex = std::rand() % (PlayerBotNames.size() - 1);
-					NewName = PlayerBotNames[RandomIndex];
-					PlayerBotNames.erase(PlayerBotNames.begin() + RandomIndex);
+					BotNumWStr = std::to_wstring(RandomNumber);
+					NewName = (std::format(L"Anonymous[{}]", BotNumWStr)).c_str();
+				}
+				else
+				{
+					if (!PlayerBotNames.empty())
+					{
+						int RandomIndex = std::rand() % (PlayerBotNames.size() - 1);
+						NewName = PlayerBotNames[RandomIndex];
+						PlayerBotNames.erase(PlayerBotNames.begin() + RandomIndex);
+					}
 				}
 			}
 		}
@@ -208,7 +217,16 @@ public:
 
 	void ChangeName()
 	{
-		auto BotNewName = GetRandomName();
+		FString BotNewName;
+
+		if (Globals::bBotNames && !Globals::BotName.empty())
+		{
+			BotNewName = FString(Globals::BotName.c_str());
+		}
+		else
+		{
+			BotNewName = GetRandomName(); 
+		}
 
 		LOG_INFO(LogBots, "BotNewName: {}", BotNewName.ToString());
 		SetName(BotNewName);
