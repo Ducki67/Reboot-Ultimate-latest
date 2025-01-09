@@ -22,6 +22,7 @@
 #include <fstream>
 #include <olectl.h>
 #include <json.hpp>
+#include <windows.h> 
 
 #include "objectviewer.h"
 #include "FortAthenaMutator_Disco.h"
@@ -75,6 +76,7 @@
 
 using json = nlohmann::json;
 using namespace std::chrono;
+using namespace std;
 
 static inline float DefaultCannonMultiplier = 1.f;
 extern inline std::map<std::string, TArray<FCustomLootPoolItemRow>> CustomLootpoolMap{};
@@ -1967,11 +1969,6 @@ static inline void MainUI()
 			ImGui::InputText("Item to Give to All Players", &ItemToGrantEveryone);
 			ImGui::InputInt("Amount to Give", &AmountToGrantEveryone);
 
-			if (ImGui::Button("Destroy All Player Builds"))
-			{
-				bShouldDestroyAllPlayerBuilds = true;
-			}
-
 			if (ImGui::Button("Give Item to Everyone"))
 			{
 				auto ItemDefinition = FindObject<UFortItemDefinition>(ItemToGrantEveryone, nullptr, ANY_PACKAGE);
@@ -2006,6 +2003,16 @@ static inline void MainUI()
 					ItemToGrantEveryone = "";
 					LOG_WARN(LogUI, "Invalid Item Definition!");
 				}
+			}
+
+			if (ImGui::Button("Destroy All Player Builds"))
+			{
+				bShouldDestroyAllPlayerBuilds = true;
+			}
+
+			if (ImGui::Button("Open Reboot V3 Script"))
+			{
+				ShellExecute(0, 0, L"https://pastebin.com/4pmMgegz", 0, 0, SW_SHOW);
 			}
 
 			auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
@@ -2602,6 +2609,29 @@ static inline void PregameUI()
 			}
 		}
 
+		static char SkinInput[256] = "";
+
+		static std::string SkinStatusMessage = "";
+
+		if (ImGui::Checkbox("Use Random Skins", &Globals::bUseRandomSkins));
+		{
+			if (Globals::bUseRandomSkins == false)
+			{
+				ImGui::InputText("HID To Use", SkinInput, sizeof(SkinInput));
+
+				if (ImGui::Button("Set As Bot's Skin"))
+				{
+					Globals::BotSkin = SkinInput;
+
+					ImGui::NewLine();
+
+					SkinStatusMessage = "Set Bot's Skin to " + Globals::BotSkin + "!";
+
+					AddMessageTime = high_resolution_clock::now();
+				}
+			}
+		}
+
 		ImGui::NewLine();
 
 		static char PickaxeInput[256] = "WID_Harvest_HalloweenScythe_Athena_C_T01";
@@ -2622,17 +2652,28 @@ static inline void PregameUI()
 
 				AddMessageTime = high_resolution_clock::now();
 			}
+		}
 
-			if (!BotStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
-			{
-				ImGui::NewLine();
+		if (!SkinStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
+		{
+			ImGui::NewLine();
 
-				ImGui::Text("%s", BotStatusMessage.c_str());
-			}
-			else
-			{
-				BotStatusMessage.clear();
-			}
+			ImGui::Text("%s", SkinStatusMessage.c_str());
+		}
+		else
+		{
+			SkinStatusMessage.clear();
+		}
+
+		if (!BotStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
+		{
+			ImGui::NewLine();
+
+			ImGui::Text("%s", BotStatusMessage.c_str());
+		}
+		else
+		{
+			BotStatusMessage.clear();
 		}
 
 		if (!BotNameStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)

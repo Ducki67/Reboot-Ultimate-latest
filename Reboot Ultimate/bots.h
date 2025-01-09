@@ -35,6 +35,28 @@ public:
 
 	void PickRandomLoadout()
 	{
+		static auto HeroTypeOffset = PlayerState->GetOffset("HeroType");
+
+		if (!Globals::bUseRandomSkins && !Globals::BotSkin.empty())
+		{
+			std::wstring BotSkinPath = L"/Game/Athena/Heroes/" +
+				std::wstring(Globals::BotSkin.begin(), Globals::BotSkin.end()) +
+				L"." +
+				std::wstring(Globals::BotSkin.begin(), Globals::BotSkin.end());
+
+			auto HeroType = FindObject<UFortItemDefinition>(BotSkinPath.c_str());
+
+			if (HeroType)
+			{
+				PlayerState->Get(HeroTypeOffset) = HeroType;
+				return;
+			}
+			else
+			{
+				LOG_WARN(LogBots, "Failed to find HeroType for BotSkin: {}", Globals::BotSkin);
+			}
+		}
+
 		auto AllHeroTypes = GetAllObjectsOfClass(FindObject<UClass>(L"/Script/FortniteGame.FortHeroType"));
 		std::vector<UFortItemDefinition*> AthenaHeroTypes;
 
@@ -53,7 +75,6 @@ public:
 			HeroType = AthenaHeroTypes.at(UKismetMathLibrary::RandomIntegerInRange(0, AthenaHeroTypes.size() - 1));
 		}
 
-		static auto HeroTypeOffset = PlayerState->GetOffset("HeroType");
 		PlayerState->Get(HeroTypeOffset) = HeroType;
 	}
 
