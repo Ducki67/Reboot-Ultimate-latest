@@ -7,4 +7,7 @@ class UFortDecoItemDefinition : public UFortWeaponItemDefinition
 public:
 
 	static UClass* StaticClass();
+
+	TSubclassOf<class ABuildingActor> GetBlueprintClass();
 };
+

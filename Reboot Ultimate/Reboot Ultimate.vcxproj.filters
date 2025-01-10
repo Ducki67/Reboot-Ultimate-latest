@@ -346,6 +346,9 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Reboot\Private</Filter>
     </ClCompile>
+    <ClCompile Include="FortDecoTool.cpp">
+      <Filter>FortniteGame\Source\FortniteGame\Private\Weapons</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Array.h">
@@ -1094,6 +1097,9 @@
     </ClInclude>
     <ClInclude Include="UnrealNames.h">
       <Filter>Engine\Source\Runtime\Core\Public\UObject</Filter>
+    </ClInclude>
+    <ClInclude Include="FortDecoTool.h">
+      <Filter>FortniteGame\Source\FortniteGame\Public\Weapons</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

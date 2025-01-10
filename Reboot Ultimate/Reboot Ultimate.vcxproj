@@ -221,6 +221,7 @@
     <ClCompile Include="FortAthenaVehicle.cpp" />
     <ClCompile Include="FortAthenaVehicleSpawner.cpp" />
     <ClCompile Include="FortDecoItemDefinition.cpp" />
+    <ClCompile Include="FortDecoTool.cpp" />
     <ClCompile Include="FortGadgetItemDefinition.cpp" />
     <ClCompile Include="FortGameMode.cpp" />
     <ClCompile Include="FortGameModeAthena.cpp" />
@@ -390,6 +391,7 @@
     <ClInclude Include="FortBotNameSettings.h" />
     <ClInclude Include="FortDagwoodVehicle.h" />
     <ClInclude Include="FortDecoItemDefinition.h" />
+    <ClInclude Include="FortDecoTool.h" />
     <ClInclude Include="FortGadgetItemDefinition.h" />
     <ClInclude Include="FortGameMode.h" />
     <ClInclude Include="FortGameModeAthena.h" />
