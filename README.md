@@ -12,17 +12,17 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 - [x] Siphon (Animation, Health, and Materials)
 - [x] Spawning Quaternion
 - [x] Fixed Foundations (minus maybe some stuff on s17)
-- [x] Fixed Editing
 - [x] Fixed S18+ Win Screen
+- [x] Fixed S19 Traps (s/o sweefy)
 
 ## UI:
 
-- [x] Bot Rework - Toggle Between Reboot Bots, and Player Bots
 - [x] Recolored to be dark mode.
 - [x] You can now choose playlists in the Pre-Game tabs, instead of pasting the ID.
+- [x] New Pregame Bots Tab, with configurable settings, like changing the bot's name, cosmetics, and functionality.
 - [x] Added Players Tab
 - [x] Toggle Victory Crown Slomo
-- [x] Added more indicators (Started, Ended, Gamemode, Players)
+- [x] Added more indicators (Uptime, Started, Ended, Gamemode, Players)
 - [x] Zone Tab now shows a status message when you click to pause/skip zone.
 
 ## Commands (compared to old reboot ultimate):
@@ -42,14 +42,13 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 - [x] cheat pausetime - Pauses the current time of day cycle.
 - [x] cheat getscript - Fixed so that non-host players cannot run this command.
 - [x] cheat tutorial - Fixed so that non-host players cannot run this command.
-- [x] cheat spawn - Allows for spawning at a location (ex: cheat spawn quad -120397.375000, 4183.438477, 7969.918457)
+- [x] cheat spawn - Allows for spawning at a location (ex: cheat spawn quad -120397.375000, 4183.438477, 7969.918457), as well as quaternation spawning.
 - [x] cheat skin - Similar to cheat give, you can now type a phrase (ex: cheat skin renegaderaider) and it will put on Renegade Raider.
 - [x] cheat pickaxe - Similar to cheat give, you can now type a phrase (ex: cheat pickaxe raidersrevenge) and it will put on the Raider's Revenge pickaxe.
 
 ## To Do List:
 - [ ] Fix Whirlpools, Witch Brooms (Silver Surfer's Board)
 - [ ] Fix PC Bot Siphon Animation
-- [ ] cheat falldamage with cheat god
 
 # Installation
 
@@ -59,3 +58,10 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 4. Go to C:\Users\YourPCUser\Downloads\Reboot-Ultimate-main\x64\Release, there will be a "Reboot Ultimate.dll file there."
 5. Run the server using the Reboot Launcher/another launcher of choice.
 5 (extended/explained). If you are using Reboot Launcher, Go to settings, and find either "Reboot DLL", or "Gameserver DLL". Put the dll there. 
+
+# Links
+
+- [Original Project Reboot 3.0 Github](https://github.com/Milxnor/Project-Reboot-3.0)
+
+- [Reboot TS Discord Server](https://discord.gg/invite/rPc5t4usPe)
+

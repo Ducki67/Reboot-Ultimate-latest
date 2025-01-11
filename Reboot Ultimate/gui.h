@@ -1658,6 +1658,14 @@ static inline void MainUI()
 
 			static std::string FortniteVersionStr = std::format("Fortnite Version {}\n\n", std::to_string(Fortnite_Version));
 
+			static std::string ObjStatusMessage = "";
+			static std::string SkinStatusMessage = "";
+			static std::string FuncStatusMessage = "";
+			static std::string PlayStatusMessage = "";
+			static std::string WeapStatusMessage = "";
+
+			static high_resolution_clock::time_point AddMessageTime;
+
 			if (ImGui::Button("Dump Objects"))
 			{
 				auto ObjectNum = ChunkedObjects ? ChunkedObjects->Num() : UnchunkedObjects ? UnchunkedObjects->Num() : 0;
@@ -1675,6 +1683,12 @@ static inline void MainUI()
 
 					obj << CurrentObject->GetFullName() << '\n';
 				}
+
+				ImGui::NewLine();
+
+				ObjStatusMessage = "Dumped Objects!";
+
+				AddMessageTime = high_resolution_clock::now();
 			}
 
 			if (ImGui::Button("Dump Skins"))
@@ -1703,6 +1717,12 @@ static inline void MainUI()
 						SkinsFile << std::format("[{}] {}\n", DisplayNameFStr.ToString(), CurrentCID->GetPathName());
 					}
 				}
+
+				ImGui::NewLine();
+
+				SkinStatusMessage = "Dumped Skins!";
+
+				AddMessageTime = high_resolution_clock::now();
 			}
 			if (ImGui::Button("Dump Functions"))
 			{
@@ -1721,6 +1741,12 @@ static inline void MainUI()
 						FunctionsFile << CurrentFunction->GetFullName() << '\n';
 					}
 				}
+
+				ImGui::NewLine();
+
+				FuncStatusMessage = "Dumped Functions!";
+
+				AddMessageTime = high_resolution_clock::now();
 			}
 
 			if (ImGui::Button("Dump Playlists"))
@@ -1752,6 +1778,12 @@ static inline void MainUI()
 				}
 				else
 					std::cout << "Failed to open playlist file!\n";
+
+				ImGui::NewLine();
+
+				PlayStatusMessage = "Dumped Playlists!";
+
+				AddMessageTime = high_resolution_clock::now();
 			}
 
 			if (ImGui::Button("Dump Weapons"))
@@ -1789,6 +1821,59 @@ static inline void MainUI()
 				}
 				else
 					std::cout << "Failed to open playlist file!\n";
+
+				ImGui::NewLine();
+
+				WeapStatusMessage = "Dumped Weapons!";
+
+				AddMessageTime = high_resolution_clock::now();
+			}
+
+			ImGui::NewLine();
+
+			if (!ObjStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
+			{
+				ImGui::Text("%s", ObjStatusMessage.c_str());
+			}
+			else
+			{
+				ObjStatusMessage.clear();
+			}
+
+			if (!SkinStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
+			{
+				ImGui::Text("%s", SkinStatusMessage.c_str());
+			}
+			else
+			{
+				SkinStatusMessage.clear();
+			}
+
+			if (!FuncStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
+			{
+				ImGui::Text("%s", FuncStatusMessage.c_str());
+			}
+			else
+			{
+				FuncStatusMessage.clear();
+			}
+
+			if (!PlayStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
+			{
+				ImGui::Text("%s", PlayStatusMessage.c_str());
+			}
+			else
+			{
+				PlayStatusMessage.clear();
+			}
+
+			if (!WeapStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
+			{
+				ImGui::Text("%s", WeapStatusMessage.c_str());
+			}
+			else
+			{
+				WeapStatusMessage.clear();
 			}
 		}
 		else if (Tab == UNBAN_TAB)
@@ -2613,21 +2698,24 @@ static inline void PregameUI()
 
 		static std::string SkinStatusMessage = "";
 
-		if (ImGui::Checkbox("Use Random Skins", &Globals::bUseRandomSkins));
+		if (Engine_Version < 500 && Fortnite_Version != 6)
 		{
-			if (Globals::bUseRandomSkins == false)
+			if (ImGui::Checkbox("Use Random Skins", &Globals::bUseRandomSkins));
 			{
-				ImGui::InputText("HID To Use", SkinInput, sizeof(SkinInput));
-
-				if (ImGui::Button("Set As Bot's Skin"))
+				if (Globals::bUseRandomSkins == false)
 				{
-					Globals::BotSkin = SkinInput;
+					ImGui::InputText("HID To Use", SkinInput, sizeof(SkinInput));
 
-					ImGui::NewLine();
+					if (ImGui::Button("Set As Bot's Skin"))
+					{
+						Globals::BotSkin = SkinInput;
 
-					SkinStatusMessage = "Set Bot's Skin to " + Globals::BotSkin + "!";
+						ImGui::NewLine();
 
-					AddMessageTime = high_resolution_clock::now();
+						SkinStatusMessage = "Set Bot's Skin to " + Globals::BotSkin + "!";
+
+						AddMessageTime = high_resolution_clock::now();
+					}
 				}
 			}
 		}
@@ -2653,6 +2741,18 @@ static inline void PregameUI()
 				AddMessageTime = high_resolution_clock::now();
 			}
 		}
+
+		ImGui::NewLine();
+
+		if (Globals::bUseRandomSkins == false)
+		{
+			if (ImGui::Button("Open HID Script"))
+			{
+				ShellExecute(0, 0, L"https://pastebin.com/2Cbctp1S", 0, 0, SW_SHOW);
+			}
+		}
+
+		ImGui::NewLine();
 
 		if (!SkinStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
 		{
