@@ -23,6 +23,7 @@
 #include <olectl.h>
 #include <json.hpp>
 #include <windows.h> 
+#include <Shellapi.h>
 
 #include "objectviewer.h"
 #include "FortAthenaMutator_Disco.h"
