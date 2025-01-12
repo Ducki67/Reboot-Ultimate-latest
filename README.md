@@ -9,6 +9,7 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 
 ## In-Game:
 
+- [x] Customizable Lategame Loadouts (also now for one shot)
 - [x] Siphon (Animation, Health, and Materials)
 - [x] Spawning Quaternion
 - [x] Fixed Foundations (minus maybe some stuff on s17)
