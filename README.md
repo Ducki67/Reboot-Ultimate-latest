@@ -58,7 +58,7 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 3. At the top, click the green "▶ Local Windows Debugger" Button. This will start to compile the code into a suitable .dll file. If you get a popup/"error", it's just because it can't run it as a .dll (you need to inject it into your og build to run it)
 4. Go to C:\Users\YourPCUser\Downloads\Reboot-Ultimate-main\x64\Release, there will be a "Reboot Ultimate.dll file there."
 5. Run the server using the Reboot Launcher/another launcher of choice.
-5 (extended/explained). If you are using Reboot Launcher, Go to settings, and find either "Reboot DLL", or "Gameserver DLL". Put the dll there. 
+5. (extended/explained) If you are using Reboot Launcher, Go to settings, and find either "Reboot DLL", or "Gameserver DLL". Put the dll there. 
 
 # Links
 
