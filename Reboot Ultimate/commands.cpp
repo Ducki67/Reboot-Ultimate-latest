@@ -3652,11 +3652,23 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 				Pawn->SetHealth(Health);
 
-				std::wstringstream ss;
-				ss << std::fixed << std::setprecision(0) << Health;
+				auto NewHealth = Pawn->GetHealth();
 
-				std::wstring Message = L"Health set to " + ss.str() + L"!\n";
-				SendMessageToConsole(PlayerController, Message.c_str());
+				if (NewHealth <= 0)
+				{
+					static auto ServerSuicideFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerController.ServerSuicide");
+					ReceivingController->ProcessEvent(ServerSuicideFn);
+
+					SendMessageToConsole(PlayerController, L"Health was set to 0 or less, killing the player.");
+				}
+				else
+				{
+					std::wstringstream ss;
+					ss << std::fixed << std::setprecision(0) << Health;
+
+					std::wstring Message = L"Health set to " + ss.str() + L"!\n";
+					SendMessageToConsole(PlayerController, Message.c_str());
+				}
 			}
 		}
 		else if (Command == "setmaxhealth" || Command == "maxhealth")

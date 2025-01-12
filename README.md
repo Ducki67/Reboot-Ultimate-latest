@@ -14,7 +14,7 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 - [x] Spawning Quaternion
 - [x] Fixed Foundations (minus maybe some stuff on s17)
 - [x] Fixed S18+ Win Screen
-- [x] Fixed S19 Traps (s/o sweefy)
+- [x] Fixed Placing Traps on S19 (s/o sweefy)
 
 ## UI:
 
