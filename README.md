@@ -64,5 +64,7 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 
 - [Original Project Reboot 3.0 Github](https://github.com/Milxnor/Project-Reboot-3.0)
 
+- [Official Project Reboot Discord](https://discord.gg/wmkWhX9726)
+
 - [Reboot TS Discord Server](https://discord.gg/invite/rPc5t4usPe)
 
