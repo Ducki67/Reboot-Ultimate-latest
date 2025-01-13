@@ -1185,7 +1185,7 @@ AActor* AFortPlayerController::SpawnToyInstanceHook(UObject* Context, FFrame* St
 
 	static auto ActiveToyInstancesOffset = PlayerController->GetOffset("ActiveToyInstances");
 	auto& ActiveToyInstances = PlayerController->Get<TArray<AActor*>>(ActiveToyInstancesOffset);
-	
+
 	static auto ToySummonCountsOffset = PlayerController->GetOffset("ToySummonCounts");
 	auto& ToySummonCounts = PlayerController->Get<TMap<UClass*, int>>(ToySummonCountsOffset);
 
@@ -1297,14 +1297,13 @@ void AFortPlayerController::ServerPlayEmoteItemHook(AFortPlayerController* Playe
 		return;
 
 	UObject* AbilityToUse = nullptr;
-	bool bShouldBeAbilityToUse = false;
 
 	static auto AthenaSprayItemDefinitionClass = FindObject<UClass>(L"/Script/FortniteGame.AthenaSprayItemDefinition");
 	static auto AthenaToyItemDefinitionClass = FindObject<UClass>(L"/Script/FortniteGame.AthenaToyItemDefinition");
 
 	if (EmoteAsset->IsA(AthenaSprayItemDefinitionClass))
 	{
-		auto SprayGameplayAbilityDefault = FindObject(L"/Game/Abilities/Sprays/GAB_Spray_Generic.Default__GAB_Spray_Generic_C");
+		static auto SprayGameplayAbilityDefault = FindObject(L"/Game/Abilities/Sprays/GAB_Spray_Generic.Default__GAB_Spray_Generic_C");
 		AbilityToUse = SprayGameplayAbilityDefault;
 	}
 
@@ -1372,7 +1371,7 @@ void AFortPlayerController::ServerPlayEmoteItemHook(AFortPlayerController* Playe
 	if (!Spec)
 		return;
 
-	static unsigned int* (*GiveAbilityAndActivateOnce)(UAbilitySystemComponent* ASC, int* outHandle, __int64 Spec, FGameplayEventData* TriggerEventData) = decltype(GiveAbilityAndActivateOnce)(Addresses::GiveAbilityAndActivateOnce); // EventData is only on ue500?
+	static unsigned int* (*GiveAbilityAndActivateOnce)(UAbilitySystemComponent * ASC, int* outHandle, __int64 Spec, FGameplayEventData * TriggerEventData) = decltype(GiveAbilityAndActivateOnce)(Addresses::GiveAbilityAndActivateOnce); // EventData is only on ue500?
 
 	if (GiveAbilityAndActivateOnce)
 	{

@@ -15,6 +15,7 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 - [x] Fixed Foundations (minus maybe some stuff on s17)
 - [x] Fixed S18+ Win Screen
 - [x] Fixed Placing Traps on S19 (s/o sweefy)
+- [x] Added Back Toys & Emojis (water balloon still kinda broken)
 
 ## UI:
 
