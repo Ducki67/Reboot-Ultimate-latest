@@ -73,7 +73,7 @@ const std::vector<std::string> WhitelistedIPs = {
     "26.71.231.41", // axt
     "26.223.77.91", // say
     "26.82.40.174", // jacxs
-    "", // soon to be rit shadow
+    "26.125.46.26", // rit shadow
     "" // would be max but idk his radmin ip
 };
 
