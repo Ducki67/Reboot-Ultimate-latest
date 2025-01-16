@@ -1,5 +1,3 @@
-#define WIN32_LEAN_AND_MEAN
-
 #include <Windows.h>
 #include <iostream>
 
@@ -53,62 +51,6 @@
 #include "BuildingWeapons.h"
 #include "BuildingContainer.h"
 #include "FortDecoTool.h"
-
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <iphlpapi.h>
-#include <vector>
-#include <string>
-#include <algorithm>
-#include <iostream>
-#include <windows.h>
-
-#pragma comment(lib, "Ws2_32.lib")
-#pragma comment(lib, "Iphlpapi.lib")
-
-const std::vector<std::string> WhitelistedIPs = {
-    "26.95.73.26", // ralz
-    "26.153.21.74", // sweefy
-    "26.69.16.29", // rit main
-    "26.71.231.41", // axt
-    "26.223.77.91", // say
-    "26.82.40.174", // jacxs
-    "26.125.46.26", // rit shadow
-    "" // would be max but idk his radmin ip
-};
-
-std::string GetLocalIPAddress()
-{
-    char hostname[256];
-    if (gethostname(hostname, sizeof(hostname)) == SOCKET_ERROR)
-    {
-        return "Unknown";
-    }
-
-    struct addrinfo hints = { 0 };
-    hints.ai_family = AF_INET; // IPv4
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-
-    struct addrinfo* result = nullptr;
-    if (getaddrinfo(hostname, nullptr, &hints, &result) != 0)
-    {
-        return "Unknown";
-    }
-
-    for (struct addrinfo* ptr = result; ptr != nullptr; ptr = ptr->ai_next)
-    {
-        struct sockaddr_in* sockaddr_ipv4 = (struct sockaddr_in*)ptr->ai_addr;
-        char ipStr[INET_ADDRSTRLEN];
-        inet_ntop(AF_INET, &sockaddr_ipv4->sin_addr, ipStr, INET_ADDRSTRLEN);
-
-        freeaddrinfo(result);
-        return std::string(ipStr);
-    }
-
-    freeaddrinfo(result);
-    return "Unknown";
-}
 
 enum class EMeshNetworkNodeType : uint8_t
 {
@@ -924,16 +866,6 @@ DWORD WINAPI Main(LPVOID)
         return 0;
     }
 #endif
-
-    std::string localIP = GetLocalIPAddress();
-
-    bool isWhitelisted = std::find(WhitelistedIPs.begin(), WhitelistedIPs.end(), localIP) != WhitelistedIPs.end();
-
-    if (!isWhitelisted && Globals::bUseWhitelist)
-    {
-        MessageBoxA(0, "Access Denied: Your IP is not whitelisted.", "Reboot Ultimate", MB_ICONERROR);
-        return 0;
-    }
 
     CreateThread(0, 0, GuiThread, 0, 0, 0);
 

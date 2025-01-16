@@ -54,7 +54,6 @@ namespace Globals
 	extern inline bool bAutoRestart = false;
 	extern inline bool bFillVendingMachines = true;
 	extern inline bool bPrivateIPsAreOperator = true;
-	extern inline bool bUseWhitelist = true;
 	extern inline int AmountOfListens = 0;
 }
 
