@@ -4,11 +4,11 @@
 
 struct FGenericPlatformTime
 {
-	static FORCEINLINE uint32 Cycles()
-	{
-        struct timeval tv{};
+    static FORCEINLINE uint32 Cycles()
+    {
         FILETIME ft;
         ULARGE_INTEGER uli{};
+        uint64 seconds, microseconds;
 
         GetSystemTimeAsFileTime(&ft);  // Get current time
         uli.LowPart = ft.dwLowDateTime;
@@ -18,8 +18,9 @@ struct FGenericPlatformTime
         uli.QuadPart /= 10;
         uli.QuadPart -= 11644473600000000ULL;
 
-        tv.tv_sec = (long)(uli.QuadPart / 1000000);
-        tv.tv_usec = (long)(uli.QuadPart % 1000000);
-        return (uint32)((((uint64)tv.tv_sec) * 1000000ULL) + (((uint64)tv.tv_usec)));
-	}
+        seconds = uli.QuadPart / 1000000;
+        microseconds = uli.QuadPart % 1000000;
+
+        return (uint32)((seconds * 1000000ULL) + microseconds);
+    }
 };

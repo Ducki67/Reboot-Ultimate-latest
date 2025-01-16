@@ -10,20 +10,22 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 ## In-Game:
 
 - [x] Siphon (Animation, Health, and Materials)
-- [x] Spawning Quaternion
 - [x] Fixed Foundations (minus maybe some stuff on s17)
 - [x] Fixed Editing
 - [x] Fixed S18+ Win Screen
+- [x] Fixed Placing Traps on S19 (done by Heliato, equipping bug still exists)
+- [x] Added Swag Lines to S16+ (done by Heliato)
 
 ## UI:
 
-- [x] Bot Rework - Toggle Between Reboot Bots, and Player Bots
-- [x] Recolored to be dark mode.
+- [x] Pregame Bot Tab - Adds many new features to Bots that are configurable before the game starts. 
+- [x] Recolored UI to be dark mode.
 - [x] You can now choose playlists in the Pre-Game tabs, instead of pasting the ID.
 - [x] Added Players Tab
-- [x] Toggle Victory Crown Slomo
+- [x] Toggle Victory Crown Slomo on S19
 - [x] Added more indicators (Started, Ended, Gamemode, Players)
-- [x] Zone Tab now shows a status message when you click to pause/skip zone.
+- [x] Many tabs now show a status message when you interact with buttons.
+- [x] This DLL is currently locked behind a selected amount of IPs. Only specific people can host with it, however anyone can play.
 
 ## Commands (compared to old reboot ultimate):
 
@@ -47,9 +49,12 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 - [x] cheat pickaxe - Similar to cheat give, you can now type a phrase (ex: cheat pickaxe raidersrevenge) and it will put on the Raider's Revenge pickaxe.
 
 ## To Do List:
-- [ ] Fix Whirlpools, Witch Brooms (Silver Surfer's Board)
-- [ ] Fix PC Bot Siphon Animation
-- [ ] cheat falldamage with cheat god
+
+- [ ] Add XP
+- [ ] Hardware Ban
+- [ ] Update DLL Status Message & Button
+- [ ] Fix Bot PC Siphon
+- [ ] Fix Custom Lootpool
 
 # Installation
 

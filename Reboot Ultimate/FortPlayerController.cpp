@@ -353,7 +353,7 @@ void AFortPlayerController::ServerExecuteInventoryItemHook(AFortPlayerController
 	{
 		if (Pawn->GetCurrentWeapon() && Pawn->GetCurrentWeapon()->IsA(FortDecoTool_ContextTrapStaticClass))
 		{
-			LOG_INFO(LogDev, "Should unequip trap!");
+			LOG_INFO(LogDev, "Unequipping current trap.");
 
 			LOG_INFO(LogDev, "Pawn->GetCurrentWeapon()->GetItemEntryGuid(): {}", Pawn->GetCurrentWeapon()->GetItemEntryGuid().ToString());
 			LOG_INFO(LogDev, "ItemGuid: {}", ItemGuid.ToString());
@@ -362,6 +362,15 @@ void AFortPlayerController::ServerExecuteInventoryItemHook(AFortPlayerController
 
 			Pawn->GetCurrentWeapon()->GetItemEntryGuid() = ItemGuid;
 			Pawn->EquipWeaponDefinition((UFortWeaponItemDefinition*)ItemDefinition, ItemInstance->GetItemEntry()->GetItemGuid());
+
+			if (ItemDefinition->IsA(UFortWeaponItemDefinition::StaticClass()))
+			{
+				Pawn->EquipWeaponDefinition((UFortWeaponItemDefinition*)ItemDefinition, ItemGuid);
+			}
+			else
+			{
+				LOG_ERROR(LogDev, "Failed to equip: ItemDefinition is not a weapon!");
+			}
 
 			LOG_INFO(LogDev, "Pawn->GetCurrentWeapon()->GetItemEntryGuid(): {}", Pawn->GetCurrentWeapon()->GetItemEntryGuid().ToString());
 			LOG_INFO(LogDev, "Pawn->GetCurrentWeapon()->GetFullName(): {}", Pawn->GetCurrentWeapon()->GetFullName());
@@ -1649,7 +1658,7 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 
 				if ((MaxShield - Shield) >= 0 && AmountGiven < Globals::AmountOfHealthSiphon)
 				{
-					if (Fortnite_Version >= 7 && !Globals::bUseUnrealisticSiphon)
+					if (Globals::bUseSiphon)
 					{
 						KillerPlayerState->ApplySiphonEffect();
 					}

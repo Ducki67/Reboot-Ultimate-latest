@@ -23,6 +23,7 @@
 #include <olectl.h>
 #include <json.hpp>
 #include <windows.h> 
+#include <Shellapi.h>
 
 #include "objectviewer.h"
 #include "FortAthenaMutator_Disco.h"
@@ -634,7 +635,10 @@ static inline void StaticUI()
 		}
 	}
 
-	ImGui::InputInt("Shield/Health for Siphon", &Globals::AmountOfHealthSiphon);
+	if (Globals::bUseSiphon)
+	{
+		ImGui::InputInt("Siphon Effective Health", &Globals::AmountOfHealthSiphon);
+	}
 
 #ifndef PROD
 	ImGui::Checkbox("Log ProcessEvent", &Globals::bLogProcessEvent);
@@ -645,6 +649,8 @@ static inline void StaticUI()
 	ImGui::Checkbox("Infinite Materials", &Globals::bInfiniteMaterials);
 
 	ImGui::Checkbox("Radmin IP's are Operator", &Globals::bPrivateIPsAreOperator);
+
+	ImGui::Checkbox("Toggle Siphon on Kill", &Globals::bUseSiphon);
 
 	// ImGui::Checkbox("No MCP", &Globals::bNoMCP);
 
@@ -2164,31 +2170,6 @@ static inline void MainUI()
 				}
 			}
 
-			if (Fortnite_Version < 7)
-			{
-				static std::string SiphonStatusMessage = "";
-				static high_resolution_clock::time_point AddMessageTime;
-
-				if (ImGui::Checkbox("Use Unrealistic Siphon Animation", &Globals::bUseUnrealisticSiphon))
-				{
-					SiphonStatusMessage = Globals::bUseUnrealisticSiphon
-						? "Unrealistic Siphon is on! Make sure to set your effects to medium or higher!"
-						: "Unrealistic Siphon is off.";
-
-					AddMessageTime = high_resolution_clock::now();
-				}
-
-				if (!SiphonStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
-				{
-					ImGui::NewLine();
-					ImGui::Text("%s", SiphonStatusMessage.c_str());
-				}
-				else if (duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() >= 5)
-				{
-					SiphonStatusMessage.clear();
-				}
-			}
-
 			// if (ImGui::Checkbox("Auto Pause Zone", &Globals::bAutoPauseZone));
 		}
 	}
@@ -2579,7 +2560,8 @@ static inline void PregameUI()
 
 		if (Fortnite_Version >= 11 && Engine_Version < 500 && !Globals::bStartedListening)
 		{
-			if (ImGui::Checkbox("Toggle Bot PC", &Globals::bBotPC));
+			const char* botSimulationLabel = Globals::bBotPC ? "Bot Simulation - Maingame AIs" : "Bot Simulation - Reals";
+			if (ImGui::Checkbox(botSimulationLabel, &Globals::bBotPC));
 		}
 
 		if (ImGui::Checkbox("Set Bot Invincible", &Globals::bBotInvincible));
