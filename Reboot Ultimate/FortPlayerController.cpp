@@ -1840,6 +1840,17 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 						}
 					}
 
+					if (Fortnite_Version >= 16.00)
+					{
+						AFortPlayerControllerAthena* KillerPlayerControllerAthena = KillerPawn ? Cast<AFortPlayerControllerAthena>(KillerPawn->GetController()) : nullptr;
+
+						if (KillerPlayerControllerAthena)
+						{
+							KillerPlayerControllerAthena->ClientNotifyWon(KillerPawn, KillerWeaponDef, DeathCause);
+							KillerPlayerControllerAthena->ClientNotifyTeamWon(KillerPawn, KillerWeaponDef, DeathCause);
+						}
+					}
+
 					RemoveFromAlivePlayers(GameMode, PlayerController, KillerPlayerState == DeadPlayerState ? nullptr : KillerPlayerState, KillerPawn, KillerWeaponDef, DeathCause, 0);
 
 					/*
