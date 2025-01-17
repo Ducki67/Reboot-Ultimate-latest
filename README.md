@@ -54,7 +54,7 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 - [ ] Hardware Ban
 - [ ] Update DLL Status Message & Button
 - [ ] Fix Bot PC Siphon
-- [ ] Fix Custom Lootpool
+- [x] Fix Custom Lootpool
 
 # Installation
 
