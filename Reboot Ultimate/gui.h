@@ -2163,6 +2163,10 @@ static inline void MainUI()
 						LOG_ERROR(LogDev, "Failed to open lootpool.json, make sure it's located in Binaries/Win64");
 						Globals::bCustomLootpool = false;
 					}
+
+					ImGui::NewLine();
+
+					ImGui::Text("The lootpool file can be found in your current season's FortniteGame/Binaries/Win64 folder!");
 				}
 				else
 				{
@@ -2170,7 +2174,83 @@ static inline void MainUI()
 				}
 			}
 
-			// if (ImGui::Checkbox("Auto Pause Zone", &Globals::bAutoPauseZone));
+			static std::string WIDUnvault = "";
+			static int DropCount = 1;
+			static int Weight = 0.5;
+			static std::string LootTiers = "Loot_AthenaTreasure";
+
+			ImGui::InputText("WID to Unvault", &WIDUnvault);
+
+			ImGui::InputInt("Drop Count", &DropCount);
+
+			ImGui::SliderInt("Weight (0-1)", &Weight, 0, 1);
+
+			ImGui::InputText("Loot Tiers", &LootTiers);
+
+			if (ImGui::Button("Unvault Weapon"))
+			{
+				char Path[MAX_PATH];
+				GetModuleFileNameA(NULL, Path, MAX_PATH);
+				std::string::size_type Position = std::string(Path).find_last_of("\\/");
+				std::string Directory = std::string(Path).substr(0, Position);
+				std::string LootPoolFilePath = Directory + "\\lootpool.json";
+
+				json JsonData;
+				std::ifstream LootpoolFile(LootPoolFilePath);
+				if (LootpoolFile.is_open())
+				{
+					try
+					{
+						LootpoolFile >> JsonData;
+					}
+					catch (...)
+					{
+						LOG_ERROR(LogDev, "Failed to parse loot pool file!");
+					}
+					LootpoolFile.close();
+				}
+
+				json NewItem = {
+					{"Definition", WIDUnvault},
+					{"DropCount", std::to_string(DropCount)},
+					{"Weight", std::to_string(Weight)},
+					{"LootTiers", std::vector<std::string>{LootTiers}}
+				};
+
+				JsonData.push_back(NewItem);
+
+				std::ofstream OutFile(LootPoolFilePath, std::ios::trunc);
+				if (OutFile.is_open())
+				{
+					OutFile << std::setw(4) << JsonData;
+					OutFile.close();
+					LOG_INFO(LogDev, "Lootpool updated successfully!");
+				}
+				else
+				{
+					LOG_ERROR(LogDev, "Failed to open lootpool.json for writing!");
+				}
+			}
+
+			ImGui::NewLine();
+
+			if (ImGui::Button("Delete Lootpool File"))
+			{
+				char Path[MAX_PATH];
+				GetModuleFileNameA(NULL, Path, MAX_PATH);
+				std::string::size_type Position = std::string(Path).find_last_of("\\/");
+				std::string Directory = std::string(Path).substr(0, Position);
+				std::string LootPoolFilePath = Directory + "\\lootpool.json";
+
+				if (std::remove(LootPoolFilePath.c_str()) == 0)
+				{
+					LOG_INFO(LogDev, "Successfully deleted lootpool.json!");
+				}
+				else
+				{
+					LOG_ERROR(LogDev, "Failed to delete lootpool.json. File may not exist.");
+				}
+			}
 		}
 	}
 	else if (PlayerTab != 2435892 && bLoaded)

@@ -267,13 +267,9 @@ public:
 		{
 			if (!PawnClass)
 				PawnClass = FindObject<UClass>(L"/Game/Athena/PlayerPawn_Athena.PlayerPawn_Athena_C");
-			else
-				PawnClass = FindObject<UClass>(L"/Game/Athena/AI/Phoebe/BP_PlayerPawn_Athena_Phoebe.BP_PlayerPawn_Athena_Phoebe_C");
 
 			if (!ControllerClass)
 				ControllerClass = AFortPlayerControllerAthena::StaticClass();
-			else
-				ControllerClass = FindObject<UClass>(L"/Game/Athena/AI/Phoebe/BP_PhoebePlayerController.BP_PhoebePlayerController_C");
 
 			if (!ControllerClass || !PawnClass)
 			{
