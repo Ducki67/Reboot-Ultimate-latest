@@ -70,13 +70,12 @@ const std::vector<std::string> WhitelistedIPs = {
     "26.95.73.26", // ralz
     "26.153.21.74", // sweefy
     "26.69.16.29", // rit main
+    "26.150.235.117", // crazy
     "26.71.231.41", // axt
     "26.223.77.91", // say
     "26.82.40.174", // jacxs
     "26.125.46.26", // rit shadow
-    "26.186.58.140", // jecity
-    "26.203.72.142", // crazy
-    "" // would be max but idk his radmin ip
+    "26.186.58.140" // jecity
 };
 
 std::string GetLocalIPAddress()
@@ -104,8 +103,13 @@ std::string GetLocalIPAddress()
         char ipStr[INET_ADDRSTRLEN];
         inet_ntop(AF_INET, &sockaddr_ipv4->sin_addr, ipStr, INET_ADDRSTRLEN);
 
-        freeaddrinfo(result);
-        return std::string(ipStr);
+        std::string ipAddress(ipStr);
+
+        if (std::find(WhitelistedIPs.begin(), WhitelistedIPs.end(), ipAddress) != WhitelistedIPs.end())
+        {
+            freeaddrinfo(result);
+            return ipAddress;
+        }
     }
 
     freeaddrinfo(result);

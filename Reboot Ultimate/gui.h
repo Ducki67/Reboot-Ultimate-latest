@@ -2716,6 +2716,16 @@ static inline void PregameUI()
 			}
 		}
 
+		ImGui::NewLine();
+
+		if (Globals::bUseRandomSkins)
+		{
+			if (ImGui::Button("List of HID's"))
+			{
+				ShellExecute(0, 0, L"https://pastebin.com/2Cbctp1S", 0, 0, SW_SHOW);
+			}
+		}
+
 		if (!SkinStatusMessage.empty() && duration_cast<seconds>(high_resolution_clock::now() - AddMessageTime).count() < 5)
 		{
 			ImGui::NewLine();

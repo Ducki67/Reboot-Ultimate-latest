@@ -483,6 +483,10 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "Athena_SilverBlazer_V2";
 			}
+			else if (weaponName == "decoy" || weaponName == "decoys")
+			{
+				weaponName = "WID_Athena_DangerGrape";
+			}
 			else if (weaponName == "zaptrap")
 			{
 				weaponName = "Athena_ZippyTrout";
@@ -490,6 +494,10 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else if (weaponName == "batman")
 			{
 				weaponName = "WID_Badger_Grape_VR";
+			}
+			else if (weaponName == "batarangs")
+			{
+				weaponName = "WID_Athena_BadgerBangsNew";
 			}
 			else if (weaponName == "spiderman")
 			{
@@ -515,7 +523,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "WID_Athena_Flopper_Effective";
 			}
-			else if (weaponName == "zeropoint" || weaponName == "zeropointfish")
+			else if (weaponName == "zeropoint" || weaponName == "zeropointfish" || weaponName == "zero")
 			{
 				weaponName = "WID_Athena_Flopper_Zero";
 			}
@@ -526,10 +534,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else if (weaponName == "minis")
 			{
 				weaponName = "Athena_ShieldSmall";
-			}
-			else if (weaponName == "bandage" || weaponName == "bandages")
-			{
-				weaponName = "Athena_Bandage";
 			}
 			else if (weaponName == "portafort" || weaponName == "paf")
 			{
@@ -636,17 +640,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				else
 				{
 					weaponName = "WID_Hook_Gun_Slide";
-				}
-			}
-			else if (weaponName == "presents" || weaponName == "present")
-			{
-				if (Fortnite_Version < 15)
-				{
-					weaponName = "Athena_GiftBox";
-				}
-				else
-				{
-					weaponName = "Athena_HolidayGiftBox";
 				}
 			}
 			else if (weaponName == "balloons" || weaponName == "balloon")
@@ -4747,10 +4740,10 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			SendMessageToConsole(PlayerController, L"portafortress/fortress || Legendary Port-A-Fortress");
 			SendMessageToConsole(PlayerController, L"hopflop/hopflopper || Epic Hop Flopper");
 			SendMessageToConsole(PlayerController, L"slurpfish || Epic Slurpfish");
-			SendMessageToConsole(PlayerController, L"zeropoint/zeropointfish || Rare Zero Point Fish");
+			SendMessageToConsole(PlayerController, L"zeropoint/zeropointfish/zero || Rare Zero Point Fish");
 			SendMessageToConsole(PlayerController, L"chugsplash/chugs || Rare Chug Splash");
 			SendMessageToConsole(PlayerController, L"minis || Uncommon Small Shield Potions");
-			SendMessageToConsole(PlayerController, L"bandage/bandages || Common Bandages");
+			SendMessageToConsole(PlayerController, L"decoy/decoys || Rare Decoy Grenades");
 			SendMessageToConsole(PlayerController, L"portafort/paf || Rare Port-A-Forts");
 			SendMessageToConsole(PlayerController, L"c4 || Epic Remote Explosives");
 			SendMessageToConsole(PlayerController, L"firefly/fireflies || Rare Firefly Grenade");
@@ -4767,7 +4760,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			SendMessageToConsole(PlayerController, L"flare/flaregun || Rare Flare Gun");
 			SendMessageToConsole(PlayerController, L"grabitron || Epic Grab-itron");
 			SendMessageToConsole(PlayerController, L"grappler/grap/grapple || Epic Grappler");
-			SendMessageToConsole(PlayerController, L"presents/present || Legendary Presents!");
 			SendMessageToConsole(PlayerController, L"balloons/balloon || Rare/Epic Balloons");
 			SendMessageToConsole(PlayerController, L"snowman/snowmen || Common/Rare Sneaky Snowman");
 			SendMessageToConsole(PlayerController, L"ironman/iron-man || Mythic Iron-Man's Repulsor Gauntlets");
