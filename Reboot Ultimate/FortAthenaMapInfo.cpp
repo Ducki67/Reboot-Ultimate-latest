@@ -32,7 +32,7 @@ FVector AFortAthenaMapInfo::PickSupplyDropLocation(FVector Center, float Radius)
 	return Out;
 }
 
-void AFortAthenaMapInfo::SpawnLlamas() // should update with new llamas on s17
+void AFortAthenaMapInfo::SpawnLlamas()
 {
 	if (!GetLlamaClass())
 	{

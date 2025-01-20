@@ -121,29 +121,29 @@ APawn* AGameModeBase::SpawnDefaultPawnForHook(AGameModeBase* GameMode, AControll
 	static auto DefaultPawnClassOffset = GameMode->GetOffset("DefaultPawnClass");
 	GameMode->Get<UClass*>(DefaultPawnClassOffset) = PawnClass;
 
-	bool bUseSpawnActor = Fortnite_Version >= 20;
-
+#if 1
 	static auto SpawnDefaultPawnAtTransformFn = FindObject<UFunction>(L"/Script/Engine.GameModeBase.SpawnDefaultPawnAtTransform");
 
 	FTransform SpawnTransform = StartSpot->GetTransform();
-	APawn* NewPawn = nullptr;
 
-	if (bUseSpawnActor)
-	{
-		NewPawn = GetWorld()->SpawnActor<APawn>(PawnClass, SpawnTransform, CreateSpawnParameters(ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn));
-	}
-	else
-	{
-		struct { AController* NewPlayer; FTransform SpawnTransform; APawn* ReturnValue; }
-		AGameModeBase_SpawnDefaultPawnAtTransform_Params{ NewPlayer, SpawnTransform };
+	struct { AController* NewPlayer; FTransform SpawnTransform; APawn* ReturnValue; }
+	AGameModeBase_SpawnDefaultPawnAtTransform_Params{ NewPlayer, SpawnTransform };
 
-		GameMode->ProcessEvent(SpawnDefaultPawnAtTransformFn, &AGameModeBase_SpawnDefaultPawnAtTransform_Params);
+	LOG_INFO(LogDev, "Calling SpawnDefaultPawnAtTransformFn!");
 
-		NewPawn = AGameModeBase_SpawnDefaultPawnAtTransform_Params.ReturnValue;
-	}
+	GameMode->ProcessEvent(SpawnDefaultPawnAtTransformFn, &AGameModeBase_SpawnDefaultPawnAtTransform_Params);
+
+	LOG_INFO(LogDev, "Finished SpawnDefaultPawnAtTransformFn!");
+
+	auto NewPawn = AGameModeBase_SpawnDefaultPawnAtTransform_Params.ReturnValue;
+#else
+#endif
 
 	if (!NewPawn)
+	{
+		LOG_WARN(LogPlayer, "Failed to spawn pawn!");
 		return nullptr;
+	}
 
 	bool bIsRespawning = false; // reel
 
@@ -214,24 +214,24 @@ APawn* AGameModeBase::SpawnDefaultPawnForHook(AGameModeBase* GameMode, AControll
 				} */
 
 				auto AddInventoryOverrideTeamLoadouts = [&](AFortAthenaMutator* Mutator)
+				{
+					if (auto InventoryOverride = Cast<AFortAthenaMutator_InventoryOverride>(Mutator))
 					{
-						if (auto InventoryOverride = Cast<AFortAthenaMutator_InventoryOverride>(Mutator))
+						auto TeamIndex = PlayerStateAthena->GetTeamIndex();
+						auto LoadoutTeam = InventoryOverride->GetLoadoutTeamForTeamIndex(TeamIndex);
+
+						if (LoadoutTeam.UpdateOverrideType == EAthenaInventorySpawnOverride::Always)
 						{
-							auto TeamIndex = PlayerStateAthena->GetTeamIndex();
-							auto LoadoutTeam = InventoryOverride->GetLoadoutTeamForTeamIndex(TeamIndex);
+							auto LoadoutContainer = InventoryOverride->GetLoadoutContainerForTeamIndex(TeamIndex);
 
-							if (LoadoutTeam.UpdateOverrideType == EAthenaInventorySpawnOverride::Always)
+							for (int i = 0; i < LoadoutContainer.Loadout.Num(); ++i)
 							{
-								auto LoadoutContainer = InventoryOverride->GetLoadoutContainerForTeamIndex(TeamIndex);
-
-								for (int i = 0; i < LoadoutContainer.Loadout.Num(); ++i)
-								{
-									auto& ItemAndCount = LoadoutContainer.Loadout.at(i);
-									WorldInventory->AddItem(ItemAndCount.GetItem(), nullptr, ItemAndCount.GetCount());
-								}
+								auto& ItemAndCount = LoadoutContainer.Loadout.at(i);
+								WorldInventory->AddItem(ItemAndCount.GetItem(), nullptr, ItemAndCount.GetCount());
 							}
 						}
-					};
+					}
+				};
 
 				LoopMutators(AddInventoryOverrideTeamLoadouts);
 			}
@@ -291,14 +291,15 @@ APawn* AGameModeBase::SpawnDefaultPawnForHook(AGameModeBase* GameMode, AControll
 		// NewPlayerAsAthena->RespawnPlayerAfterDeath(true);
 	}
 
-	static bool bFirst = true;
+    static bool bFirst = false;
 
 	if (!bFirst && Calendar::HasSnowModification() && Fortnite_Version < 19.10)
 	{
-		bFirst = false;
+		bFirst = true;
 		Calendar::SetSnow(100);
 	}
-	// LOG_INFO(LogDev, "Finish SpawnDefaultPawnFor!");
+
+	LOG_INFO(LogDev, "Finish SpawnDefaultPawnFor!");
 
 	return NewPawn;
 }
