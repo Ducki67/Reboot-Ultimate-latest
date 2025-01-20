@@ -2718,7 +2718,7 @@ static inline void PregameUI()
 
 		ImGui::NewLine();
 
-		if (Globals::bUseRandomSkins)
+		if (!Globals::bUseRandomSkins)
 		{
 			if (ImGui::Button("List of HID's"))
 			{
