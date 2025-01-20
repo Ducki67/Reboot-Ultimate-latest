@@ -1312,7 +1312,7 @@ DWORD WINAPI Main(LPVOID)
     Hooking::MinHook::Hook(FortWeaponDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortWeapon.ServerReleaseWeaponAbility"),
         AFortWeapon::ServerReleaseWeaponAbilityHook, (PVOID*)&AFortWeapon::ServerReleaseWeaponAbilityOriginal, false, true);
     
-    if (Fortnite_Version == 19.10)
+    if (Fortnite_Version == 19)
     {
         static auto FortDecoToolDefault = FindObject(L"/Script/FortniteGame.Default__FortDecoTool");
 

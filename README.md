@@ -15,6 +15,7 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 - [x] Fixed S18+ Win Screen
 - [x] Fixed Placing Traps on S19 (done by Heliato, equipping bug still exists)
 - [x] Added Swag Lines to S16+ (done by Heliato)
+- [x] Fixed 19.01 Crash
 
 ## UI:
 
@@ -52,7 +53,7 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 
 - [ ] Add XP
 - [ ] Hardware Ban
-- [ ] Update DLL Status Message & Button
+- [ ] "Update DLL" Status Message & Button
 - [ ] Fix Bot PC Siphon
 - [x] Fix Custom Lootpool
 

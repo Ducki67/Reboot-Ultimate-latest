@@ -1061,7 +1061,7 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 
 		static UFortItemDefinition* Trap = nullptr;
 
-		if (Fortnite_Version < 19)
+		if (Fortnite_Version < 19.10)
 		{
 			do
 			{
