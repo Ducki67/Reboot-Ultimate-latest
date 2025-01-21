@@ -15,7 +15,7 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 - [x] Fixed S18+ Win Screen
 - [x] Fixed Placing Traps on S19 (done by Heliato, equipping bug still exists)
 - [x] Added Swag Lines to S16+ (done by Heliato)
-- [x] Fixed 19.01 Crash
+- [x] Customizable Lategame Loadouts (also now for one shot)
 
 ## UI:
 
@@ -55,7 +55,7 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 - [ ] Hardware Ban
 - [ ] "Update DLL" Status Message & Button
 - [ ] Fix Bot PC Siphon
-- [x] Fix Custom Lootpool
+- [ ] 19.01 Compromise
 
 # Installation
 
@@ -64,4 +64,11 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 3. At the top, click the green "▶ Local Windows Debugger" Button. This will start to compile the code into a suitable .dll file. If you get a popup/"error", it's just because it can't run it as a .dll (you need to inject it into your og build to run it)
 4. Go to C:\Users\YourPCUser\Downloads\Reboot-Ultimate-main\x64\Release, there will be a "Reboot Ultimate.dll file there."
 5. Run the server using the Reboot Launcher/another launcher of choice.
-5 (extended/explained). If you are using Reboot Launcher, Go to settings, and find either "Reboot DLL", or "Gameserver DLL". Put the dll there. 
+6. (extra) If you are using Reboot Launcher, Go to settings, and find either "Reboot DLL", or "Gameserver DLL". Put the dll there. 
+
+# Links
+
+- [Original Project Reboot 3.0 Github](https://github.com/Milxnor/Project-Reboot-3.0)
+
+- [Official Project Reboot Discord](https://discord.gg/wmkWhX9726)
+- [Reboot TS Discord Server](https://discord.gg/invite/rPc5t4usPe)
