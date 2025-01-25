@@ -2372,6 +2372,8 @@ static inline void MainUI()
 				}
 			}
 
+			ImGui::NewLine();
+
 			static std::string WIDUnvault = "";
 			static int DropCount = 1;
 			static int Weight = 0.5;

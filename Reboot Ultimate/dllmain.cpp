@@ -70,7 +70,9 @@ const std::vector<std::string> WhitelistedIPs = {
     "26.95.73.26", // ralz
     "26.153.21.74", // sweefy
     "26.69.16.29", // rit main
-    "26.150.235.117", // crazy
+    "26.61.188.132", // crazy
+    "26.0.11.135", // kye of norcal
+    "26.38.76.122", // bubble
     "26.71.231.41", // axt
     "26.223.77.91", // say
     "26.82.40.174", // jacxs
@@ -937,7 +939,7 @@ DWORD WINAPI Main(LPVOID)
 
     if (!isWhitelisted)
     {
-        MessageBoxA(0, "Access Denied: Your IP is not whitelisted.", "Reboot Ultimate", MB_ICONERROR);
+        MessageBoxA(0, "SAFEGUARD ENABLED: Your IP is not whitelisted.", "Reboot Ultimate", MB_ICONERROR);
         return 0;
     }
 
@@ -1322,6 +1324,9 @@ DWORD WINAPI Main(LPVOID)
                 AFortDecoTool::ServerSpawnDeco, nullptr, false, true);
         }
     }
+
+    /*Hooking::MinHook::Hook(FortWeaponDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortDecoTool.ServerCreateBuildingAndSpawnDeco"),
+        AFortDecoTool::ServerCreateBuildingAndSpawnDeco, nullptr, false, true);*/
 
     Hooking::MinHook::Hook(FindObject<UKismetSystemLibrary>(L"/Script/Engine.Default__KismetSystemLibrary"), FindObject<UFunction>(L"/Script/Engine.KismetSystemLibrary.PrintString"),
         UKismetSystemLibrary::PrintStringHook, (PVOID*)&UKismetSystemLibrary::PrintStringOriginal, false, true); // todo FortShippingLog

@@ -76,7 +76,7 @@ public:
 	void AddDigestedSkillSets();
 	void GiveItem(UFortItemDefinition* ItemDefinition, int Count);
 
-	static void OnPossesedPawnDiedHook(AFortAthenaAIBotController* PlayerController, AActor* DamagedActor, float Damage, AController* InstigatedBy, AActor* DamageCauser, FVector HitLocation, UObject* FHitComponent, FName BoneName, FVector Momentum);
+	static void OnPossesedPawnDiedHook(AFortAthenaAIBotController* PlayerController, AActor* DamagedActor, float Damage, AController* InstigatedBy, AActor* DamageCauser, FVector HitLocation, UObject* FHitComponent, FName BoneName, FVector Momentum, void* DeathReport);
 	static void OnPerceptionSensedHook(AFortAthenaAIBotController* PlayerController, AActor* SourceActor, FAIStimulus& Stim);
 	static void OnAlertLevelChangedHook(AFortAthenaAIBotController* PlayerController, EAlertLevel OldAlertLevel, EAlertLevel NewAlertLevel);
 

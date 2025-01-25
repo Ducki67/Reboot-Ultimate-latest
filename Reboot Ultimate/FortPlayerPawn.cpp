@@ -246,33 +246,67 @@ void AFortPlayerPawn::SiphonMats()
 		static auto StoneItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/StoneItemData.StoneItemData");
 		static auto MetalItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/MetalItemData.MetalItemData");
 
-		int MaxWood = WoodItemData->GetMaxStackSize();
-		int MaxStone = StoneItemData->GetMaxStackSize();
-		int MaxMetal = MetalItemData->GetMaxStackSize();
-
-		auto WoodInstance = WorldInventory->FindItemInstance(WoodItemData);
-		auto WoodCount = WoodInstance ? WoodInstance->GetItemEntry()->GetCount() : 0;
-
-		auto StoneInstance = WorldInventory->FindItemInstance(StoneItemData);
-		auto StoneCount = StoneInstance ? StoneInstance->GetItemEntry()->GetCount() : 0;
-
-		auto MetalInstance = WorldInventory->FindItemInstance(MetalItemData);
-		auto MetalCount = MetalInstance ? MetalInstance->GetItemEntry()->GetCount() : 0;
-
-		if (WoodCount < MaxWood)
+		if (PlaylistName.find("/Game/Athena/Playlists/Low") != std::string::npos)
 		{
-			int WoodToAdd = FMath::Min(50, MaxWood - WoodCount);
-			WorldInventory->AddItem(WoodItemData, nullptr, WoodToAdd);
+			int MaxWood = 70;
+			int MaxStone = 50;
+			int MaxMetal = 30;
+
+			auto WoodInstance = WorldInventory->FindItemInstance(WoodItemData);
+			auto WoodCount = WoodInstance ? WoodInstance->GetItemEntry()->GetCount() : 0;
+
+			auto StoneInstance = WorldInventory->FindItemInstance(StoneItemData);
+			auto StoneCount = StoneInstance ? StoneInstance->GetItemEntry()->GetCount() : 0;
+
+			auto MetalInstance = WorldInventory->FindItemInstance(MetalItemData);
+			auto MetalCount = MetalInstance ? MetalInstance->GetItemEntry()->GetCount() : 0;
+
+			if (WoodCount < MaxWood)
+			{
+				int WoodToAdd = FMath::Min(50, MaxWood - WoodCount);
+				WorldInventory->AddItem(WoodItemData, nullptr, WoodToAdd);
+			}
+			if (StoneCount < MaxStone)
+			{
+				int StoneToAdd = FMath::Min(50, MaxStone - StoneCount);
+				WorldInventory->AddItem(StoneItemData, nullptr, StoneToAdd);
+			}
+			if (MetalCount < MaxMetal)
+			{
+				int MetalToAdd = FMath::Min(50, MaxMetal - MetalCount);
+				WorldInventory->AddItem(MetalItemData, nullptr, MetalToAdd);
+			}
 		}
-		if (StoneCount < MaxStone)
+		else
 		{
-			int StoneToAdd = FMath::Min(50, MaxStone - StoneCount);
-			WorldInventory->AddItem(StoneItemData, nullptr, StoneToAdd);
-		}
-		if (MetalCount < MaxMetal)
-		{
-			int MetalToAdd = FMath::Min(50, MaxMetal - MetalCount);
-			WorldInventory->AddItem(MetalItemData, nullptr, MetalToAdd);
+			int MaxWood = WoodItemData->GetMaxStackSize();
+			int MaxStone = StoneItemData->GetMaxStackSize();
+			int MaxMetal = MetalItemData->GetMaxStackSize();
+
+			auto WoodInstance = WorldInventory->FindItemInstance(WoodItemData);
+			auto WoodCount = WoodInstance ? WoodInstance->GetItemEntry()->GetCount() : 0;
+
+			auto StoneInstance = WorldInventory->FindItemInstance(StoneItemData);
+			auto StoneCount = StoneInstance ? StoneInstance->GetItemEntry()->GetCount() : 0;
+
+			auto MetalInstance = WorldInventory->FindItemInstance(MetalItemData);
+			auto MetalCount = MetalInstance ? MetalInstance->GetItemEntry()->GetCount() : 0;
+
+			if (WoodCount < MaxWood)
+			{
+				int WoodToAdd = FMath::Min(50, MaxWood - WoodCount);
+				WorldInventory->AddItem(WoodItemData, nullptr, WoodToAdd);
+			}
+			if (StoneCount < MaxStone)
+			{
+				int StoneToAdd = FMath::Min(50, MaxStone - StoneCount);
+				WorldInventory->AddItem(StoneItemData, nullptr, StoneToAdd);
+			}
+			if (MetalCount < MaxMetal)
+			{
+				int MetalToAdd = FMath::Min(50, MaxMetal - MetalCount);
+				WorldInventory->AddItem(MetalItemData, nullptr, MetalToAdd);
+			}
 		}
 
 		WorldInventory->Update();

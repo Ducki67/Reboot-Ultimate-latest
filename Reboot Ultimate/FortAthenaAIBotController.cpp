@@ -64,7 +64,7 @@ void AFortAthenaAIBotController::GiveItem(UFortItemDefinition* ItemDefinition, i
 		// this->GetPlayerBotPawn()->EquipWeaponDefinition(WeaponDefinition, Item->GetItemEntry()->GetItemGuid());
 }
 
-void AFortAthenaAIBotController::OnPossesedPawnDiedHook(AFortAthenaAIBotController* PlayerController, AActor* DamagedActor, float Damage, AController* InstigatedBy, AActor* DamageCauser, FVector HitLocation, UObject* FHitComponent, FName BoneName, FVector Momentum)
+void AFortAthenaAIBotController::OnPossesedPawnDiedHook(AFortAthenaAIBotController* PlayerController, AActor* DamagedActor, float Damage, AController* InstigatedBy, AActor* DamageCauser, FVector HitLocation, UObject* FHitComponent, FName BoneName, FVector Momentum, void* DeathReport)
 {
 	LOG_INFO(LogDev, "OnPossesedPawnDiedHook!");
 
@@ -77,10 +77,27 @@ void AFortAthenaAIBotController::OnPossesedPawnDiedHook(AFortAthenaAIBotControll
 	AFortPlayerPawn* KillerPawn = nullptr;
 	AFortPlayerStateAthena* KillerPlayerState = nullptr;
 	AFortPlayerControllerAthena* KillerController = nullptr;
+	AFortPlayerControllerAthena* KillerPC = nullptr;
+
+	if (InstigatedBy)
+	{
+		KillerController = Cast<AFortPlayerControllerAthena>(InstigatedBy);
+
+		if (KillerController)
+		{
+			KillerPawn = Cast<AFortPlayerPawn>(KillerController->GetPawn());
+			KillerPlayerState = Cast<AFortPlayerStateAthena>(KillerController->GetPlayerState());
+
+			if (KillerPlayerState)
+			{
+				KillerPC = Cast<AFortPlayerControllerAthena>(KillerPlayerState->GetOwner());
+			}
+		}
+	}
 
 	if (Globals::AmountOfHealthSiphon != 0)
 	{
-		if (KillerPawn && KillerPawn != DeadPawn && KillerPlayerState && KillerPlayerState != DeadPlayerState)
+		if (KillerPawn && KillerPawn != DeadPawn && KillerPlayerState && KillerPlayerState != DeadPlayerState && KillerPC)
 		{
 			auto WorldInventory = KillerController->GetWorldInventory();
 
@@ -139,7 +156,10 @@ void AFortAthenaAIBotController::OnPossesedPawnDiedHook(AFortAthenaAIBotControll
 
 			if ((MaxShield - Shield) >= 0 && AmountGiven < Globals::AmountOfHealthSiphon)
 			{
-				KillerPlayerState->ApplySiphonEffect(); // why doesnt this work on chapter 2 adiubawuybdawbdab
+				if (DeathReport && Globals::bUseSiphon)
+				{
+					KillerPC->SiphonEffect(DeathReport, KillerPC);
+				}
 
 				if (MaxShield - Shield > 0)
 				{

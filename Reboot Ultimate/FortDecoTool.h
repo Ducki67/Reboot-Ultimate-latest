@@ -29,4 +29,5 @@ public:
     }
 
     static void ServerSpawnDeco(AFortDecoTool* DecoTool, FFrame& Stack, void* Ret);
+    static void ServerCreateBuildingAndSpawnDeco(AFortDecoTool* DecoTool, FFrame& Stack, void* Ret);
 };

@@ -13,6 +13,7 @@
 #include "FortGadgetItemDefinition.h"
 #include "gui.h"
 #include "FortAthenaMutator_GG.h"
+#include "Class.h"
 
 void AFortPlayerControllerAthena::StartGhostModeHook(UObject* Context, FFrame* Stack, void* Ret)
 {
@@ -131,6 +132,60 @@ void AFortPlayerControllerAthena::EndGhostModeHook(AFortPlayerControllerAthena* 
 	}
 
 	return EndGhostModeOriginal(PlayerController);
+}
+
+void AFortPlayerControllerAthena::SiphonEffect(void* DeathReport, AFortPlayerControllerAthena* PlayerController)
+{
+	if (!PlayerController->IsA(AFortPlayerControllerAthena::StaticClass()))
+		return;
+
+	auto PlayerState = (AFortPlayerStateAthena*)PlayerController->GetPlayerState();
+
+	auto ASC = PlayerState->GetAbilitySystemComponent();
+
+	if (ASC)
+	{
+		auto ActivatableAbilities = ASC->GetActivatableAbilities();
+
+		if (ActivatableAbilities)
+		{
+			for (size_t i = 0; i < ActivatableAbilities->GetItems().Num(); ++i)
+			{
+				auto& AbilitySpec = ActivatableAbilities->GetItems().At(i, FGameplayAbilitySpec::GetStructSize());
+
+				auto Ability = AbilitySpec.GetAbility();
+
+				if (Ability && Ability->ClassPrivate && Ability->ClassPrivate->GetName().contains("Siphon"))
+				{
+					FGameplayEffectContextHandle Handle = ASC->MakeEffectContext();
+
+					FGameplayTag Tag{};
+					Tag = FGameplayTag(UKismetStringLibrary::Conv_StringToName(L"GameplayCue.Shield.PotionConsumed"));
+
+					auto NetMulticast_InvokeGameplayCueAdded = FindObject<UFunction>(L"/Script/GameplayAbilities.AbilitySystemComponent.NetMulticast_InvokeGameplayCueAdded");
+					auto NetMulticast_InvokeGameplayCueExecuted = FindObject<UFunction>(L"/Script/GameplayAbilities.AbilitySystemComponent.NetMulticast_InvokeGameplayCueExecuted");
+
+					if (!NetMulticast_InvokeGameplayCueAdded || !NetMulticast_InvokeGameplayCueExecuted)
+						break;
+
+					static auto GameplayCueTagOffsetAdded = NetMulticast_InvokeGameplayCueAdded->GetOffsetFunc("GameplayCueTag");
+					static auto GameplayCueTagOffsetExecuted = NetMulticast_InvokeGameplayCueExecuted->GetOffsetFunc("GameplayCueTag");
+					static auto PredictionKeyOffsetAdded = NetMulticast_InvokeGameplayCueAdded->GetOffsetFunc("PredictionKey");
+
+					auto AddedParams = Alloc<void>(NetMulticast_InvokeGameplayCueAdded->GetPropertiesSize());
+					auto ExecutedParams = Alloc<void>(NetMulticast_InvokeGameplayCueExecuted->GetPropertiesSize());
+
+					*(FGameplayTag*)(int64(AddedParams) + GameplayCueTagOffsetAdded) = Tag, Handle;
+					*(FGameplayTag*)(int64(ExecutedParams) + GameplayCueTagOffsetExecuted) = Tag, Handle;
+
+					ASC->ProcessEvent(NetMulticast_InvokeGameplayCueAdded, AddedParams);
+					ASC->ProcessEvent(NetMulticast_InvokeGameplayCueExecuted, AddedParams);
+
+					break;
+				}
+			}
+		}
+	}
 }
 
 void AFortPlayerControllerAthena::ServerCreativeSetFlightSpeedIndexHook(UObject* Context, FFrame* Stack)

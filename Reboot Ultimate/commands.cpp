@@ -3458,7 +3458,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				return;
 			}
 		}
-		else if (Command == "spawnbot" || Command == "bot")
+		else if (Command == "spawnbot" || Command == "bot" || Command == "bots")
 		{
 			if (Fortnite_Version == 8.51 || Fortnite_Version == 7.40)
 			{
@@ -4466,109 +4466,207 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				static auto Gold = FindObject<UFortItemDefinition>(
 					L"/Game/Items/ResourcePickups/Athena_WadsItemData.Athena_WadsItemData");
 
-				static UFortItemDefinition* Primary = nullptr;
+		if (PlaylistName.find("/Game/Athena/Playlists/Low") != std::string::npos)
+		{
+			static UFortItemDefinition* OSLoot1 = nullptr;
 
+			do
+			{
+				OSLoot1 = FindObject<UFortItemDefinition>(GetRandomItem(OSL1, z), nullptr, ANY_PACKAGE);
+			} while (!OSLoot1);
+
+			static UFortItemDefinition* OSLoot2 = nullptr;
+
+			do
+			{
+				OSLoot2 = FindObject<UFortItemDefinition>(GetRandomItem(OSL2, z), nullptr, ANY_PACKAGE);
+			} while (!OSLoot2);
+
+			static UFortItemDefinition* OSLoot3 = nullptr;
+
+			do
+			{
+				OSLoot3 = FindObject<UFortItemDefinition>(GetRandomItem(OSL3, z), nullptr, ANY_PACKAGE);
+			} while (!OSLoot3);
+
+			static UFortItemDefinition* OSLoot4 = nullptr;
+
+			do
+			{
+				OSLoot4 = FindObject<UFortItemDefinition>(GetRandomItem(OSL4, z), nullptr, ANY_PACKAGE);
+			} while (!OSLoot4);
+
+			static UFortItemDefinition* OSLoot5 = nullptr;
+
+			do
+			{
+				OSLoot5 = FindObject<UFortItemDefinition>(GetRandomItem(OSL5, z), nullptr, ANY_PACKAGE);
+			} while (!OSLoot5);
+
+			static UFortItemDefinition* OSTraps = nullptr;
+
+			if (Fortnite_Version < 19)
+			{
 				do
 				{
-					Primary = FindObject<UFortItemDefinition>(GetRandomItem(Primaries, z), nullptr, ANY_PACKAGE);
-				} while (!Primary);
+					OSTraps = FindObject<UFortItemDefinition>(GetRandomItem(OSLTraps, z), nullptr, ANY_PACKAGE);
+				} while (!OSTraps);
+			}
 
-				static UFortItemDefinition* Secondary = nullptr;
+			static auto HeavyAmmo = FindObject<UFortItemDefinition>(
+				L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsHeavy.AthenaAmmoDataBulletsHeavy");
+			static auto ShellsAmmo = FindObject<UFortItemDefinition>(
+				L"/Game/Athena/Items/Ammo/AthenaAmmoDataShells.AthenaAmmoDataShells");
+			static auto MediumAmmo = FindObject<UFortItemDefinition>(
+				L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsMedium.AthenaAmmoDataBulletsMedium");
+			static auto LightAmmo = FindObject<UFortItemDefinition>(
+				L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsLight.AthenaAmmoDataBulletsLight");
+			static auto RocketAmmo = FindObject<UFortItemDefinition>(
+				L"/Game/Athena/Items/Ammo/AmmoDataRockets.AmmoDataRockets");
+			static auto ExplosiveAmmo = FindObject<UFortItemDefinition>(
+				L"/Game/Items/Ammo/AmmoDataExplosive.AmmoDataExplosive");
+			static auto EnergyCells = FindObject<UFortItemDefinition>(
+				L"/Game/Items/Ammo/AmmoDataEnergyCell.AmmoDataEnergyCell");
+			static auto Arrows = FindObject<UFortItemDefinition>(
+				L"/PrimalGameplay/Items/Ammo/AthenaAmmoDataArrows.AthenaAmmoDataArrows");
+			static auto ReconAmmo = FindObject<UFortItemDefinition>(
+				L"/MotherGameplay/Items/Scooter/Ammo_Athena_Mother_Scooter.Ammo_Athena_Mother_Scooter");
+			static auto STWHeavy = FindObject<UFortItemDefinition>(
+				L"/Game/Items/Ammo/AmmoDataBulletsHeavy.AmmoDataBulletsHeavy");
+			static auto STWMedium = FindObject<UFortItemDefinition>(
+				L"/Game/Items/Ammo/AmmoDataBulletsMedium.AmmoDataBulletsMedium");
+			static auto STWLight = FindObject<UFortItemDefinition>(
+				L"/Game/Items/Ammo/AmmoDataBulletsLight.AmmoDataBulletsLight");
+			static auto STWShells = FindObject<UFortItemDefinition>(
+				L"/Game/Items/Ammo/AmmoDataShells.AmmoDataShells");
 
-				do
-				{
-					Secondary = FindObject<UFortItemDefinition>(GetRandomItem(Secondaries, z), nullptr, ANY_PACKAGE);
-				} while (!Secondary);
+			WorldInventory->AddItem(WoodItemData, nullptr, 70);
+			WorldInventory->AddItem(StoneItemData, nullptr, 50);
+			WorldInventory->AddItem(MetalItemData, nullptr, 30);
+			WorldInventory->AddItem(Gold, nullptr, (std::rand() % 7500) + 1200);
+			WorldInventory->AddItem(OSLoot1, nullptr, 1);
+			WorldInventory->AddItem(OSLoot2, nullptr, 1);
+			WorldInventory->AddItem(OSLoot3, nullptr, 1);
+			WorldInventory->AddItem(OSLoot4, nullptr, OSLoot4->GetMaxStackSize());
+			WorldInventory->AddItem(OSLoot5, nullptr, OSLoot5->GetMaxStackSize());
+			WorldInventory->AddItem(ShellsAmmo, nullptr, (std::rand() % 576) + 87);
+			WorldInventory->AddItem(HeavyAmmo, nullptr, (std::rand() % 576) + 50);
+			WorldInventory->AddItem(MediumAmmo, nullptr, (std::rand() % 824) + 186);
+			WorldInventory->AddItem(LightAmmo, nullptr, (std::rand() % 824) + 124);
+			WorldInventory->AddItem(RocketAmmo, nullptr, (std::rand() % 12) + 3);
+			WorldInventory->AddItem(ExplosiveAmmo, nullptr, (std::rand() % 999) + 186);
+			WorldInventory->AddItem(EnergyCells, nullptr, (std::rand() % 999) + 186);
+			WorldInventory->AddItem(STWHeavy, nullptr, (std::rand() % 999) + 186);
+			WorldInventory->AddItem(STWMedium, nullptr, (std::rand() % 999) + 186);
+			WorldInventory->AddItem(STWLight, nullptr, (std::rand() % 999) + 186);
+			WorldInventory->AddItem(STWShells, nullptr, (std::rand() % 999) + 186);
+			WorldInventory->AddItem(Arrows, nullptr, (std::rand() % 30) + 12);
+			WorldInventory->AddItem(ReconAmmo, nullptr, 999);
+			WorldInventory->AddItem(OSTraps, nullptr, (std::rand() % 5) + 2);
 
-				static UFortItemDefinition* Tertiary = nullptr;
+			WorldInventory->Update();
+		}
+		else
+		{
+			static UFortItemDefinition* Primary = nullptr;
 
-				do
-				{
-					Tertiary = FindObject<UFortItemDefinition>(GetRandomItem(Tertiaries, z), nullptr, ANY_PACKAGE);
-				} while (!Tertiary);
+			do
+			{
+				Primary = FindObject<UFortItemDefinition>(GetRandomItem(Primaries, z), nullptr, ANY_PACKAGE);
+			} while (!Primary);
 
-				static UFortItemDefinition* Consumable1 = nullptr;
+			static UFortItemDefinition* Secondary = nullptr;
 
-				do
-				{
-					Consumable1 = FindObject<UFortItemDefinition>(GetRandomItem(Consumables1, z), nullptr, ANY_PACKAGE);
-				} while (!Consumable1);
+			do
+			{
+				Secondary = FindObject<UFortItemDefinition>(GetRandomItem(Secondaries, z), nullptr, ANY_PACKAGE);
+			} while (!Secondary);
 
-				static UFortItemDefinition* Consumable2 = nullptr;
+			static UFortItemDefinition* Tertiary = nullptr;
 
-				do
-				{
-					Consumable2 = FindObject<UFortItemDefinition>(GetRandomItem(Consumables2, z), nullptr, ANY_PACKAGE);
-				} while (!Consumable2);
+			do
+			{
+				Tertiary = FindObject<UFortItemDefinition>(GetRandomItem(Tertiaries, z), nullptr, ANY_PACKAGE);
+			} while (!Tertiary);
 
-				static UFortItemDefinition* Trap = nullptr;
+			static UFortItemDefinition* Consumable1 = nullptr;
 
+			do
+			{
+				Consumable1 = FindObject<UFortItemDefinition>(GetRandomItem(Consumables1, z), nullptr, ANY_PACKAGE);
+			} while (!Consumable1);
+
+			static UFortItemDefinition* Consumable2 = nullptr;
+
+			do
+			{
+				Consumable2 = FindObject<UFortItemDefinition>(GetRandomItem(Consumables2, z), nullptr, ANY_PACKAGE);
+			} while (!Consumable2);
+
+			static UFortItemDefinition* Trap = nullptr;
+
+			if (Fortnite_Version < 19)
+			{
 				do
 				{
 					Trap = FindObject<UFortItemDefinition>(GetRandomItem(Traps, z), nullptr, ANY_PACKAGE);
 				} while (!Trap);
-
-				static auto HeavyAmmo = FindObject<UFortItemDefinition>(
-					L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsHeavy.AthenaAmmoDataBulletsHeavy");
-				static auto ShellsAmmo = FindObject<UFortItemDefinition>(
-					L"/Game/Athena/Items/Ammo/AthenaAmmoDataShells.AthenaAmmoDataShells");
-				static auto MediumAmmo = FindObject<UFortItemDefinition>(
-					L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsMedium.AthenaAmmoDataBulletsMedium");
-				static auto LightAmmo = FindObject<UFortItemDefinition>(
-					L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsLight.AthenaAmmoDataBulletsLight");
-				static auto RocketAmmo = FindObject<UFortItemDefinition>(
-					L"/Game/Athena/Items/Ammo/AmmoDataRockets.AmmoDataRockets");
-				static auto ExplosiveAmmo = FindObject<UFortItemDefinition>(
-					L"/Game/Items/Ammo/AmmoDataExplosive.AmmoDataExplosive");
-				static auto EnergyCells = FindObject<UFortItemDefinition>(
-					L"/Game/Items/Ammo/AmmoDataEnergyCell.AmmoDataEnergyCell");
-				static auto Arrows = FindObject<UFortItemDefinition>(
-					L"/PrimalGameplay/Items/Ammo/AthenaAmmoDataArrows.AthenaAmmoDataArrows");
-				static auto ReconAmmo = FindObject<UFortItemDefinition>(
-					L"/MotherGameplay/Items/Scooter/Ammo_Athena_Mother_Scooter.Ammo_Athena_Mother_Scooter");
-				static auto STWHeavy = FindObject<UFortItemDefinition>(
-					L"/Game/Items/Ammo/AmmoDataBulletsHeavy.AmmoDataBulletsHeavy");
-				static auto STWMedium = FindObject<UFortItemDefinition>(
-					L"/Game/Items/Ammo/AmmoDataBulletsMedium.AmmoDataBulletsMedium");
-				static auto STWLight = FindObject<UFortItemDefinition>(
-					L"/Game/Items/Ammo/AmmoDataBulletsLight.AmmoDataBulletsLight");
-				static auto STWShells = FindObject<UFortItemDefinition>(
-					L"/Game/Items/Ammo/AmmoDataShells.AmmoDataShells");
-
-				WorldInventory->AddItem(WoodItemData, nullptr, (std::rand() % 646) + 186);
-				WorldInventory->AddItem(StoneItemData, nullptr, (std::rand() % 646) + 186);
-				WorldInventory->AddItem(MetalItemData, nullptr, (std::rand() % 646) + 186);
-
-				if (Fortnite_Version < 15)
-				{
-					WorldInventory->AddItem(Gold, nullptr, (std::rand() % 7500) + 1200);
-				}
-				else
-				{
-					WorldInventory->AddItem(Gold, nullptr, Gold->GetMaxStackSize());
-				}
-
-				WorldInventory->AddItem(Primary, nullptr, 1);
-				WorldInventory->AddItem(Secondary, nullptr, 1);
-				WorldInventory->AddItem(Tertiary, nullptr, 1);
-				WorldInventory->AddItem(Consumable1, nullptr, Consumable1->GetMaxStackSize());
-				WorldInventory->AddItem(Consumable2, nullptr, Consumable2->GetMaxStackSize());
-				WorldInventory->AddItem(ShellsAmmo, nullptr, (std::rand() % 576) + 87);
-				WorldInventory->AddItem(HeavyAmmo, nullptr, (std::rand() % 576) + 50);
-				WorldInventory->AddItem(MediumAmmo, nullptr, (std::rand() % 824) + 186);
-				WorldInventory->AddItem(LightAmmo, nullptr, (std::rand() % 824) + 124);
-				WorldInventory->AddItem(RocketAmmo, nullptr, (std::rand() % 12) + 3);
-				WorldInventory->AddItem(ExplosiveAmmo, nullptr, (std::rand() % 999) + 186);
-				WorldInventory->AddItem(EnergyCells, nullptr, (std::rand() % 999) + 186);
-				WorldInventory->AddItem(STWHeavy, nullptr, (std::rand() % 999) + 186);
-				WorldInventory->AddItem(STWMedium, nullptr, (std::rand() % 999) + 186);
-				WorldInventory->AddItem(STWLight, nullptr, (std::rand() % 999) + 186);
-				WorldInventory->AddItem(STWShells, nullptr, (std::rand() % 999) + 186);
-				WorldInventory->AddItem(Arrows, nullptr, (std::rand() % 30) + 12);
-				WorldInventory->AddItem(ReconAmmo, nullptr, 999);
-
-				WorldInventory->Update();
 			}
+
+			static auto HeavyAmmo = FindObject<UFortItemDefinition>(
+				L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsHeavy.AthenaAmmoDataBulletsHeavy");
+			static auto ShellsAmmo = FindObject<UFortItemDefinition>(
+				L"/Game/Athena/Items/Ammo/AthenaAmmoDataShells.AthenaAmmoDataShells");
+			static auto MediumAmmo = FindObject<UFortItemDefinition>(
+				L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsMedium.AthenaAmmoDataBulletsMedium");
+			static auto LightAmmo = FindObject<UFortItemDefinition>(
+				L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsLight.AthenaAmmoDataBulletsLight");
+			static auto RocketAmmo = FindObject<UFortItemDefinition>(
+				L"/Game/Athena/Items/Ammo/AmmoDataRockets.AmmoDataRockets");
+			static auto ExplosiveAmmo = FindObject<UFortItemDefinition>(
+				L"/Game/Items/Ammo/AmmoDataExplosive.AmmoDataExplosive");
+			static auto EnergyCells = FindObject<UFortItemDefinition>(
+				L"/Game/Items/Ammo/AmmoDataEnergyCell.AmmoDataEnergyCell");
+			static auto Arrows = FindObject<UFortItemDefinition>(
+				L"/PrimalGameplay/Items/Ammo/AthenaAmmoDataArrows.AthenaAmmoDataArrows");
+			static auto ReconAmmo = FindObject<UFortItemDefinition>(
+				L"/MotherGameplay/Items/Scooter/Ammo_Athena_Mother_Scooter.Ammo_Athena_Mother_Scooter");
+			static auto STWHeavy = FindObject<UFortItemDefinition>(
+				L"/Game/Items/Ammo/AmmoDataBulletsHeavy.AmmoDataBulletsHeavy");
+			static auto STWMedium = FindObject<UFortItemDefinition>(
+				L"/Game/Items/Ammo/AmmoDataBulletsMedium.AmmoDataBulletsMedium");
+			static auto STWLight = FindObject<UFortItemDefinition>(
+				L"/Game/Items/Ammo/AmmoDataBulletsLight.AmmoDataBulletsLight");
+			static auto STWShells = FindObject<UFortItemDefinition>(
+				L"/Game/Items/Ammo/AmmoDataShells.AmmoDataShells");
+
+			WorldInventory->AddItem(WoodItemData, nullptr, (std::rand() % 646) + 186);
+			WorldInventory->AddItem(StoneItemData, nullptr, (std::rand() % 646) + 186);
+			WorldInventory->AddItem(MetalItemData, nullptr, (std::rand() % 646) + 186);
+			WorldInventory->AddItem(Gold, nullptr, (std::rand() % 7500) + 1200);
+			WorldInventory->AddItem(Primary, nullptr, 1);
+			WorldInventory->AddItem(Secondary, nullptr, 1);
+			WorldInventory->AddItem(Tertiary, nullptr, 1);
+			WorldInventory->AddItem(Consumable1, nullptr, Consumable1->GetMaxStackSize());
+			WorldInventory->AddItem(Consumable2, nullptr, Consumable2->GetMaxStackSize());
+			WorldInventory->AddItem(ShellsAmmo, nullptr, (std::rand() % 576) + 87);
+			WorldInventory->AddItem(HeavyAmmo, nullptr, (std::rand() % 576) + 50);
+			WorldInventory->AddItem(MediumAmmo, nullptr, (std::rand() % 824) + 186);
+			WorldInventory->AddItem(LightAmmo, nullptr, (std::rand() % 824) + 124);
+			WorldInventory->AddItem(RocketAmmo, nullptr, (std::rand() % 12) + 3);
+			WorldInventory->AddItem(ExplosiveAmmo, nullptr, (std::rand() % 999) + 186);
+			WorldInventory->AddItem(EnergyCells, nullptr, (std::rand() % 999) + 186);
+			WorldInventory->AddItem(STWHeavy, nullptr, (std::rand() % 999) + 186);
+			WorldInventory->AddItem(STWMedium, nullptr, (std::rand() % 999) + 186);
+			WorldInventory->AddItem(STWLight, nullptr, (std::rand() % 999) + 186);
+			WorldInventory->AddItem(STWShells, nullptr, (std::rand() % 999) + 186);
+			WorldInventory->AddItem(Arrows, nullptr, (std::rand() % 30) + 12);
+			WorldInventory->AddItem(ReconAmmo, nullptr, 999);
+			WorldInventory->AddItem(Trap, nullptr, (std::rand() % 5) + 2);
+
+			WorldInventory->Update();
+		}
+	}
 
 			SendMessageToConsole(PlayerController, L"Randomized all player loadouts!\n");
 		}
