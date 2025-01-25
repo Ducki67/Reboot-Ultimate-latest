@@ -54,7 +54,7 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 - [ ] Add XP
 - [ ] Hardware Ban
 - [ ] "Update DLL" Status Message & Button
-- [ ] Fix Bot PC Siphon
+- [x] Fix Bot PC Siphon
 - [ ] 19.01 Compromise
 
 # Installation
