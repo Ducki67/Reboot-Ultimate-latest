@@ -165,7 +165,7 @@ static inline bool HasAnyCalendarModification()
 
 static inline bool TrickshotTabCheck()
 {
-	return std::floor(Fortnite_Version) == 8 || std::floor(Fortnite_Version) == 19;
+	return std::floor(Fortnite_Version) >= 8;
 }
 
 static inline void Restart() // todo move?
@@ -1622,7 +1622,7 @@ static inline void MainUI()
 
 		else if (Tab == TRICKSHOT_TAB)
 		{
-			if (std::floor(Fortnite_Version) == 8)
+			if (std::floor(Fortnite_Version) >= 8)
 			{
 				ImGui::Checkbox("Enable Cannon Animations", &bEnableCannonAnimations);
 
