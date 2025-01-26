@@ -535,8 +535,6 @@ public:
 
 				if ((MaxShield - Shield) >= 0 && AmountGiven < Globals::AmountOfHealthSiphon)
 				{
-					// KillerPlayerState->ApplySiphonEffect(); // why doesnt this work on chapter 2 adiubawuybdawbdab
-
 					if (MaxShield - Shield > 0)
 					{
 						float AmountToGive = MaxShield - Shield >= Globals::AmountOfHealthSiphon ? Globals::AmountOfHealthSiphon : MaxShield - Shield;

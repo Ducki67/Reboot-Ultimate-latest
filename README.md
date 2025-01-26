@@ -16,6 +16,7 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 - [x] Fixed Placing Traps on S19 (done by Heliato, equipping bug still exists)
 - [x] Added Swag Lines to S16+ (done by Heliato)
 - [x] Customizable Lategame Loadouts (also now for one shot)
+- [x] Fixed Boat Rockets (exxertz)
 
 ## UI:
 
@@ -53,9 +54,7 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 
 - [ ] Add XP
 - [ ] Hardware Ban
-- [ ] "Update DLL" Status Message & Button
-- [x] Fix Bot PC Siphon
-- [ ] 19.01 Compromise
+- [ ] Fix 19.01 (and then other things)
 
 # Installation
 

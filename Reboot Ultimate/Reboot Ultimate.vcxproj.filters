@@ -990,6 +990,9 @@
     <ClInclude Include="FortVehicleItemDefinition.h">
       <Filter>FortniteGame\Source\FortniteGame\Public\Athena\Vehicle</Filter>
     </ClInclude>
+    <ClInclude Include="FortVehicleWeapons.h">
+      <Filter>FortniteGame\Source\FortniteGame\Public\Athena\Vehicle</Filter>
+    </ClInclude>
     <ClInclude Include="FortDagwoodVehicle.h">
       <Filter>FortniteGame\Source\FortniteGame\Public\Athena\Vehicle</Filter>
     </ClInclude>

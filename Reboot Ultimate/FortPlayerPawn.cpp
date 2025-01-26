@@ -18,6 +18,14 @@ FFortAthenaLoadout* AFortPlayerPawn::GetCosmeticLoadout()
 	return GetPtr<FFortAthenaLoadout>(CosmeticLoadoutOffset);
 }
 
+uint8 AFortPlayerPawn::GetVehicleSeatIndex()
+{
+	static auto GetVehicleSeatIndexFn = FindObject<UFunction>("/Script/FortniteGame.FortPlayerPawn.GetVehicleSeatIndex");
+	uint8 ReturnValue;
+	this->ProcessEvent(GetVehicleSeatIndexFn, &ReturnValue);
+	return ReturnValue;
+}
+
 bool DBNOCheck(AFortPlayerPawn* Pawn, AController* EventInstigator)
 {
 	bool res = false;

@@ -25,6 +25,7 @@
 #include "FortAthenaMutator_InventoryOverride.h"
 #include "FortAthenaMutator_GG.h"
 #include "quests.h"
+#include "FortVehicleWeapons.h"
 
 void AFortPlayerController::ClientReportDamagedResourceBuilding(ABuildingSMActor* BuildingSMActor, EFortResourceType PotentialResourceType, int PotentialResourceCount, bool bDestroyed, bool bJustHitWeakspot)
 {
@@ -607,13 +608,13 @@ void AFortPlayerController::ServerAttemptInteractHook(UObject* Context, FFrame* 
 		if (!NewVehicleInstance)
 			return;
 
-		PlayerController->GetSwappingItemDefinition() = Pawn->GetCurrentWeapon()->GetWeaponData();
+		static auto FortItemEntrySize = FFortItemEntry::GetStructSize();
 
 		auto& ReplicatedEntries = WorldInventory->GetItemList().GetReplicatedEntries();
 
 		for (int i = 0; i < ReplicatedEntries.Num(); i++)
 		{
-			auto ReplicatedEntry = ReplicatedEntries.AtPtr(i, FFortItemEntry::GetStructSize());
+			auto ReplicatedEntry = ReplicatedEntries.AtPtr(i, FortItemEntrySize);
 
 			if (ReplicatedEntry->GetItemGuid() == NewVehicleInstance->GetItemEntry()->GetItemGuid())
 			{
@@ -622,6 +623,30 @@ void AFortPlayerController::ServerAttemptInteractHook(UObject* Context, FFrame* 
 				WorldInventory->HandleInventoryLocalUpdate();
 
 				Pawn->EquipWeaponDefinition(VehicleWeaponDefinition, ReplicatedEntry->GetItemGuid());
+
+				auto VehicleWeapon = Cast<AFortWeaponRangedForVehicle>(Pawn->GetCurrentWeapon());
+
+				if (!VehicleWeapon)
+					return;
+
+				FMountedWeaponInfo MountedWeaponInfo;
+				MountedWeaponInfo.bTargetSourceFromVehicleMuzzle = true;
+				MountedWeaponInfo.bNeedsVehicleAttachment = true;
+
+				auto SeatIndex = Pawn->GetVehicleSeatIndex();
+
+				FMountedWeaponInfoRepped MountedWeaponInfoRepped;
+				MountedWeaponInfoRepped.HostVehicleCachedActor = Vehicle;
+				MountedWeaponInfoRepped.HostVehicleSeatIndexCached = SeatIndex;
+
+				VehicleWeapon->GetMountedWeaponInfo() = MountedWeaponInfo;
+				VehicleWeapon->GetMountedWeaponInfoRepped() = MountedWeaponInfoRepped;
+
+				static auto OnRep_MountedWeaponInfoReppedFn = FindObject<UFunction>("/Script/FortniteGame.FortWeaponRangedForVehicle.OnRep_MountedWeaponInfoRepped");
+				VehicleWeapon->ProcessEvent(OnRep_MountedWeaponInfoReppedFn);
+
+				static auto OnHostVehicleSetupdFn = FindObject<UFunction>("/Script/FortniteGame.FortWeaponRangedForVehicle.OnHostVehicleSetup");
+				VehicleWeapon->ProcessEvent(OnHostVehicleSetupdFn);
 			}
 		}
 

@@ -427,6 +427,7 @@
     <ClInclude Include="FortScriptedAction.h" />
     <ClInclude Include="FortServerBotManagerAthena.h" />
     <ClInclude Include="FortVehicleItemDefinition.h" />
+    <ClInclude Include="FortVehicleWeapons.h" />
     <ClInclude Include="FortVolume.h" />
     <ClInclude Include="FortWeapon.h" />
     <ClInclude Include="FortWeaponItemDefinition.h" />
