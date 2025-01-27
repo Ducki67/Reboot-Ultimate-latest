@@ -110,6 +110,17 @@ extern inline bool bEngineDebugLogs = false;
 extern inline bool bStartedBus = false;
 extern inline bool bShouldDestroyAllPlayerBuilds = false;
 extern inline bool bEnableCannonAnimations = true;
+extern inline bool WarmupFloorLoot = true;
+extern inline bool FloorLoot = true;
+extern inline bool Treasure = true;
+extern inline bool TreasureXL = false;
+extern inline bool Ammo = false;
+extern inline bool AmmoXL = false;
+extern inline bool SupplyDrop = false;
+extern inline bool Llama = false;
+extern inline bool Present = false;
+extern inline bool Booty = false;
+extern inline bool IceBox = false;
 extern inline float* CannonXMultiplier = &DefaultCannonMultiplier;
 extern inline float* CannonYMultiplier = &DefaultCannonMultiplier;
 extern inline float* CannonZMultiplier = &DefaultCannonMultiplier;
@@ -654,8 +665,8 @@ static inline DWORD WINAPI tickTime(LPVOID)
 	}
 }
 
-static int Width = 640;
-static int Height = 480;
+static int Width = 768;
+static int Height = 576; // increased both by 1.2x
 
 static int Tab = 1;
 static int PregameTab = 1;
@@ -1406,6 +1417,9 @@ static inline void MainUI()
 						auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
 						auto& ClientConnections = WorldNetDriver->GetClientConnections();
 
+						static std::string ItemToGrantEveryone;
+						static int AmountToGrantEveryone = 1;
+
 						// if (ClientConnections)
 						{
 							for (int i = 0; i < ClientConnections.Num(); i++) {
@@ -1474,6 +1488,47 @@ static inline void MainUI()
 									if (ImGui::Button(RequestURLCStr))
 									{
 										PlayerTab = i;
+									}
+								}
+
+								ImGui::NewLine();
+
+								ImGui::InputText("Item to Give to All Players", &ItemToGrantEveryone);
+								ImGui::InputInt("Amount to Give", &AmountToGrantEveryone);
+
+								if (ImGui::Button("Give Item to Everyone"))
+								{
+									auto ItemDefinition = FindObject<UFortItemDefinition>(ItemToGrantEveryone, nullptr, ANY_PACKAGE);
+
+									if (ItemDefinition)
+									{
+										static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
+										auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
+										auto& ClientConnections = WorldNetDriver->GetClientConnections();
+
+										for (int i = 0; i < ClientConnections.Num(); i++)
+										{
+											auto PlayerController = Cast<AFortPlayerController>(ClientConnections.at(i)->GetPlayerController());
+
+											if (!PlayerController->IsValidLowLevel())
+												continue;
+
+											auto WorldInventory = PlayerController->GetWorldInventory();
+
+											if (!WorldInventory->IsValidLowLevel())
+												continue;
+
+											bool bShouldUpdate = false;
+											WorldInventory->AddItem(ItemDefinition, &bShouldUpdate, AmountToGrantEveryone);
+
+											if (bShouldUpdate)
+												WorldInventory->Update();
+										}
+									}
+									else
+									{
+										ItemToGrantEveryone = "";
+										LOG_WARN(LogUI, "Invalid Item Definition!");
 									}
 								}
 							}
@@ -2166,58 +2221,7 @@ static inline void MainUI()
 		}
 		else if (Tab == SETTINGS_TAB)
 		{
-			static std::string ItemToGrantEveryone;
-			static int AmountToGrantEveryone = 1;
-
 			ImGui::SliderFloat("Starting Shield", &StartingShield, 1, 100);
-			ImGui::InputText("Item to Give to All Players", &ItemToGrantEveryone);
-			ImGui::InputInt("Amount to Give", &AmountToGrantEveryone);
-
-			if (ImGui::Button("Give Item to Everyone"))
-			{
-				auto ItemDefinition = FindObject<UFortItemDefinition>(ItemToGrantEveryone, nullptr, ANY_PACKAGE);
-
-				if (ItemDefinition)
-				{
-					static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
-					auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
-					auto& ClientConnections = WorldNetDriver->GetClientConnections();
-
-					for (int i = 0; i < ClientConnections.Num(); i++)
-					{
-						auto PlayerController = Cast<AFortPlayerController>(ClientConnections.at(i)->GetPlayerController());
-
-						if (!PlayerController->IsValidLowLevel())
-							continue;
-
-						auto WorldInventory = PlayerController->GetWorldInventory();
-
-						if (!WorldInventory->IsValidLowLevel())
-							continue;
-
-						bool bShouldUpdate = false;
-						WorldInventory->AddItem(ItemDefinition, &bShouldUpdate, AmountToGrantEveryone);
-
-						if (bShouldUpdate)
-							WorldInventory->Update();
-					}
-				}
-				else
-				{
-					ItemToGrantEveryone = "";
-					LOG_WARN(LogUI, "Invalid Item Definition!");
-				}
-			}
-
-			if (ImGui::Button("Destroy All Player Builds"))
-			{
-				bShouldDestroyAllPlayerBuilds = true;
-			}
-
-			if (ImGui::Button("Open Reboot V3 Script"))
-			{
-				ShellExecute(0, 0, L"https://pastebin.com/4pmMgegz", 0, 0, SW_SHOW);
-			}
 
 			auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
 
@@ -2376,19 +2380,61 @@ static inline void MainUI()
 
 			static std::string WIDUnvault = "";
 			static int DropCount = 1;
-			static int Weight = 0.5;
-			static std::string LootTiers = "Loot_AthenaTreasure";
+			static float Weight = 0.5;
+			std::vector<std::string> SelectedLootTiers;
 
 			ImGui::InputText("WID to Unvault", &WIDUnvault);
 
 			ImGui::InputInt("Drop Count", &DropCount);
 
-			ImGui::SliderInt("Weight (0-1)", &Weight, 0, 1);
+			ImGui::InputFloat("Weight (0-1)", &Weight);
 
-			ImGui::InputText("Loot Tiers", &LootTiers);
+			ImGui::Text("Loot Tiers:");
+
+			ImGui::Checkbox("Spawn Island Floor Loot", &WarmupFloorLoot);
+			ImGui::Checkbox("Floor Loot", &FloorLoot);
+			ImGui::Checkbox("Chests - Normal", &Treasure);
+			ImGui::Checkbox("Chests - Rare", &TreasureXL);
+			ImGui::Checkbox("Ammo Crate - Small", &Ammo);
+			ImGui::Checkbox("Ammo Crate - Large", &AmmoXL);
+			ImGui::Checkbox("Supply Drops", &SupplyDrop);
+			ImGui::Checkbox("Llama", &Llama);
+			ImGui::Checkbox("Present", &Present);
+
+			if (Fortnite_Version >= 11)
+			{
+				ImGui::Checkbox("Ice Boxes", &IceBox);
+			}
+
+			if (Fortnite_Version == 8)
+			{
+				ImGui::Checkbox("Treasure", &Booty);
+			}
+
+			if (Weight < 0)
+			{
+				Weight = 0.00;
+			}
+			else if (Weight > 1)
+			{
+				Weight = 1.00;
+			}
 
 			if (ImGui::Button("Unvault Weapon"))
 			{
+				SelectedLootTiers.clear();
+				if (WarmupFloorLoot) SelectedLootTiers.push_back("Loot_AthenaFloorLoot_Warmup");
+				if (FloorLoot) SelectedLootTiers.push_back("Loot_AthenaFloorLoot");
+				if (Treasure) SelectedLootTiers.push_back("Loot_AthenaTreasure");
+				if (TreasureXL) SelectedLootTiers.push_back("Loot_ApolloTreasure_Rare");
+				if (Ammo) SelectedLootTiers.push_back("Loot_AthenaAmmoSmall");
+				if (AmmoXL) SelectedLootTiers.push_back("Loot_ApolloAmmoBox_Rare");
+				if (SupplyDrop) SelectedLootTiers.push_back("Loot_AthenaSupplyDrop");
+				if (Llama) SelectedLootTiers.push_back("Loot_AthenaLlama");
+				if (Present) SelectedLootTiers.push_back("Loot_AthenaGiftBox");
+				if (IceBox) SelectedLootTiers.push_back("Loot_AthenaIceBox");
+				if (Booty) SelectedLootTiers.push_back("Loot_AthenaBooty");
+
 				char Path[MAX_PATH];
 				GetModuleFileNameA(NULL, Path, MAX_PATH);
 				std::string::size_type Position = std::string(Path).find_last_of("\\/");
@@ -2414,7 +2460,7 @@ static inline void MainUI()
 					{"Definition", WIDUnvault},
 					{"DropCount", std::to_string(DropCount)},
 					{"Weight", std::to_string(Weight)},
-					{"LootTiers", std::vector<std::string>{LootTiers}}
+					{"LootTiers", SelectedLootTiers}
 				};
 
 				JsonData.push_back(NewItem);
@@ -2431,8 +2477,6 @@ static inline void MainUI()
 					LOG_ERROR(LogDev, "Failed to open lootpool.json for writing!");
 				}
 			}
-
-			ImGui::NewLine();
 
 			if (ImGui::Button("Delete Lootpool File"))
 			{
