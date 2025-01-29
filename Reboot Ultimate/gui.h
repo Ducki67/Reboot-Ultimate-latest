@@ -263,6 +263,7 @@ enum class Playlist : int
 	TeamRumbleSolo,
 	TeamRumbleDuo,
 	TeamRumbleSquad,
+	TeamRumble,
 	OneShotSolos,
 	OneShotDuos,
 	OneShotSquads,
@@ -2264,14 +2265,11 @@ static inline void MainUI()
 
 				GET_PLAYLIST(GameState);
 
-				if (CurrentPlaylist)
-				{
-					bool bRespawning = CurrentPlaylist->GetRespawnType() == EAthenaRespawnType::InfiniteRespawn || CurrentPlaylist->GetRespawnType() == EAthenaRespawnType::InfiniteRespawnExceptStorm;
+				bool bRespawning = CurrentPlaylist->GetRespawnType() == EAthenaRespawnType::InfiniteRespawn || CurrentPlaylist->GetRespawnType() == EAthenaRespawnType::InfiniteRespawnExceptStorm;
 
-					if (ImGui::Checkbox("Respawning", &bRespawning))
-					{
-						CurrentPlaylist->GetRespawnType() = (EAthenaRespawnType)bRespawning;
-					}
+				if (ImGui::Checkbox("Respawning", &bRespawning))
+				{
+					CurrentPlaylist->GetRespawnType() = (EAthenaRespawnType)bRespawning;
 				}
 			}
 
@@ -2795,7 +2793,8 @@ static inline void PregameUI()
 		ImGui::RadioButton("Slide Duos", &SelectedPlaylist, (int)Playlist::SlideDuos);
 		ImGui::RadioButton("Team Rumble Solos", &SelectedPlaylist, (int)Playlist::TeamRumbleSolo);
 		ImGui::RadioButton("Team Rumble Duos", &SelectedPlaylist, (int)Playlist::TeamRumbleDuo);
-		ImGui::RadioButton("Team Rumble Squads", &SelectedPlaylist, (int)Playlist::TeamRumbleSolo);
+		ImGui::RadioButton("Team Rumble Squads", &SelectedPlaylist, (int)Playlist::TeamRumbleSquad);
+		ImGui::RadioButton("Team Rumble", &SelectedPlaylist, (int)Playlist::TeamRumble);
 		ImGui::RadioButton("Custom", &SelectedPlaylist, (int)Playlist::Custom);
 
 		switch (SelectedPlaylist)
@@ -2868,6 +2867,11 @@ static inline void PregameUI()
 		case (int)Playlist::TeamRumbleSquad:
 		{
 			PlaylistName = "/Game/Athena/Playlists/Respawn/Playlist_Respawn_Squads.Playlist_Respawn_Squads";
+			break;
+		}
+		case (int)Playlist::TeamRumble:
+		{
+			PlaylistName = "/Game/Athena/Playlists/Respawn/Playlist_Respawn_24.Playlist_Respawn_24";
 			break;
 		}
 		case (int)Playlist::Custom:

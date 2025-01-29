@@ -2223,6 +2223,15 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				catch (...) {}
 			}
 
+			if (Siphon > 0)
+			{
+				Globals::bUseSiphon == true;
+			}
+			else if (Siphon == 0)
+			{
+				Globals::bUseSiphon == false;
+			}
+
 			Globals::AmountOfHealthSiphon = Siphon;
 
 			std::wstringstream ss;
