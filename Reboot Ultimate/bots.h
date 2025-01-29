@@ -502,17 +502,17 @@ public:
 
 				if (WoodCount < MaxWood)
 				{
-					int WoodToAdd = FMath::Min(50, MaxWood - WoodCount);
+					int WoodToAdd = FMath::Min(Globals::AmountOfHealthSiphon, MaxWood - WoodCount);
 					WorldInventory->AddItem(WoodItemData, nullptr, WoodToAdd);
 				}
 				if (StoneCount < MaxStone)
 				{
-					int StoneToAdd = FMath::Min(50, MaxStone - StoneCount);
+					int StoneToAdd = FMath::Min(Globals::AmountOfHealthSiphon, MaxStone - StoneCount);
 					WorldInventory->AddItem(StoneItemData, nullptr, StoneToAdd);
 				}
 				if (MetalCount < MaxMetal)
 				{
-					int MetalToAdd = FMath::Min(50, MaxMetal - MetalCount);
+					int MetalToAdd = FMath::Min(Globals::AmountOfHealthSiphon, MaxMetal - MetalCount);
 					WorldInventory->AddItem(MetalItemData, nullptr, MetalToAdd);
 				}
 

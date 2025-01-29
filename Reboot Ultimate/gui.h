@@ -694,7 +694,7 @@ static inline void StaticUI()
 
 	if (Globals::bUseSiphon)
 	{
-		ImGui::InputInt("Siphon Effective Health", &Globals::AmountOfHealthSiphon);
+		ImGui::InputInt("Effective Siphon", &Globals::AmountOfHealthSiphon);
 	}
 
 #ifndef PROD
