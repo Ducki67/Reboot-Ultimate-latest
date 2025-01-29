@@ -1314,12 +1314,6 @@ DWORD WINAPI Main(LPVOID)
     Hooking::MinHook::Hook(FortWeaponDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortWeapon.ServerReleaseWeaponAbility"),
         AFortWeapon::ServerReleaseWeaponAbilityHook, (PVOID*)&AFortWeapon::ServerReleaseWeaponAbilityOriginal, false, true);
 
-    if (Fortnite_Version > 12.41)
-    {
-        Hooking::MinHook::Hook(FortPlayerControllerAthenaDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerControllerAthena.ServerClientIsReadyToRespawn"),
-            (void*)AFortPlayerControllerAthena::ServerClientIsReadyToRespawn, nullptr, false); // E0171: invalid type conversion
-    }
-
     auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
 
     GET_PLAYLIST(GameState);

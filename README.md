@@ -60,6 +60,12 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 
 - [ ] Hardware Ban
 - [ ] Fix 19.01 (and then other things)
+- [ ] Redo Abilites
+- [ ] Llamas
+- [ ] Backpack, Glider, and Wrap Commands
+- [ ] ServerCreateBuildingAndSpawnDeco
+- [ ] Give Weapons from Gamemodes
+- [ ] Apparently Editing
 - [ ] Auto Pause Zone
 - [ ] Auto God?
 
