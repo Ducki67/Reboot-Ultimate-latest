@@ -582,6 +582,7 @@ public:
 	static void EnterAircraftHook(UObject* PC, AActor* Aircraft);
 	static void ServerRequestSeatChangeHook(AFortPlayerControllerAthena* PlayerController, int TargetSeatIndex); // actually in zone
 	static void ServerRestartPlayerHook(AFortPlayerControllerAthena* Controller);
+	static void ServerClientIsReadyToRespawn(AFortPlayerControllerAthena* PlayerControllerAthena);
 	static void ServerGiveCreativeItemHook(AFortPlayerControllerAthena* Controller, FFortItemEntry CreativeItem);
 	static void ServerTeleportToPlaygroundLobbyIslandHook(AFortPlayerControllerAthena* Controller);
 	static void ServerAcknowledgePossessionHook(APlayerController* Controller, APawn* Pawn);

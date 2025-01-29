@@ -11,6 +11,7 @@
 #include "AssertionMacros.h"
 #include "bots.h"
 #include "gui.h"
+#include "BuildingContainer.h"
 
 FNetworkObjectList& UNetDriver::GetNetworkObjectList()
 {
@@ -39,7 +40,8 @@ void UNetDriver::TickFlushHook(UNetDriver* NetDriver)
 		{
 			auto CurrentBuildingSMActor = (ABuildingSMActor*)AllBuildingSMActors.at(i);
 
-			if (CurrentBuildingSMActor->IsDestroyed() || CurrentBuildingSMActor->IsActorBeingDestroyed() || !CurrentBuildingSMActor->IsPlayerPlaced()) continue;
+			if (CurrentBuildingSMActor->IsDestroyed() || CurrentBuildingSMActor->IsActorBeingDestroyed() || !CurrentBuildingSMActor->IsPlayerPlaced())
+				continue;
 
 			CurrentBuildingSMActor->SilentDie();
 			// CurrentBuildingSMActor->K2_DestroyActor();
@@ -72,6 +74,20 @@ void UNetDriver::TickFlushHook(UNetDriver* NetDriver)
 			else
 			{
 				// LOG_INFO(LogDev, "ReplicationDriver is nul!!?1//33/221/4/124/123"); // 3.3 MOMENT
+			}
+		}
+
+		auto AllBuildingContainers = UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABuildingContainer::StaticClass());
+
+		for (int i = 0; i < AllBuildingContainers.Num(); i++)
+		{
+			auto BuildingContainer = Cast<ABuildingContainer>(AllBuildingContainers.at(i));
+
+			if (BuildingContainer->IsActorBeingDestroyed())
+			{
+				LOG_INFO(LogGame, "BuildingContainer is being destroyed!");
+
+				BuildingContainer->SpawnLoot();
 			}
 		}
 	}

@@ -3221,91 +3221,86 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		}
 		else if (Command == "spawnbot" || Command == "bot" || Command == "bots")
 		{
-			if (Fortnite_Version == 8.51 || Fortnite_Version == 7.40)
+			if (Fortnite_Version >= 7.40 && Fortnite_Version <= 8.51)
+				return;
+
+			auto Pawn = ReceivingController->GetPawn();
+
+			if (!Pawn)
 			{
-				SendMessageToConsole(PlayerController, L"You cannot spawn a bot on this version!");
-				SendMessageToConsole(PlayerController, L"Try restarting the server using « cheat restart » and using another account as a bot instead!");
+				SendMessageToConsole(PlayerController, L"No pawn to spawn bot at!");
+				return;
 			}
-			else
+
+			int Count = 1;
+
+			if (Arguments.size() >= 2)
 			{
-				auto Pawn = ReceivingController->GetPawn();
+				try { Count = std::stod(Arguments[1]); }
+				catch (...) {}
+			}
 
-				if (!Pawn)
+			auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
+
+			bool bShouldSpawnAtZoneCenter = false;
+
+			if (NumArgs >= 3 && Arguments[2] == "center")
+				bShouldSpawnAtZoneCenter = true;
+
+			if (bShouldSpawnAtZoneCenter && GameMode->GetGameStateAthena()->GetGamePhaseStep() <= EAthenaGamePhaseStep::BusFlying)
+				bShouldSpawnAtZoneCenter = false;
+
+			FRotator SpawnRotation = Pawn->GetActorRotation();
+
+			int SizeMultiplier = 1;
+
+			if (Arguments.size() >= 4)
+			{
+				try { SizeMultiplier = std::stod(Arguments[3]); }
+				catch (...) {}
+			}
+
+			constexpr int Max = 99;
+
+			if (Count > Max)
+			{
+				SendMessageToConsole(PlayerController, (std::wstring(L"You went over the limit! Only spawning ") + std::to_wstring(Max) + L".").c_str());
+				Count = Max;
+			}
+
+			int AmountSpawned = 0;
+
+			for (int i = 0; i < Count; i++)
+			{
+				FActorSpawnParameters SpawnParameters{};
+				// SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+				auto SafeZoneIndicator = GameMode->GetSafeZoneIndicator();
+
+				auto Loc = bShouldSpawnAtZoneCenter ? SafeZoneIndicator->GetSafeZoneCenter() : Pawn->GetActorLocation();
+				Loc.Z += bShouldSpawnAtZoneCenter ? 10000 : 1000;
+
+				FTransform Transform;
+				Transform.Translation = Loc;
+				Transform.Scale3D = FVector(1 * SizeMultiplier, 1 * SizeMultiplier, 1 * SizeMultiplier);
+				Transform.Rotation = SpawnRotation.Quaternion();
+
+				auto NewActor = Bots::SpawnBot(Transform, Pawn);
+
+				if (!NewActor)
 				{
-					SendMessageToConsole(PlayerController, L"No pawn to spawn bot at!");
-					return;
+					SendMessageToConsole(PlayerController, L"Failed to spawn an actor!");
 				}
-
-				int Count = 1;
-
-				if (Arguments.size() >= 2)
-				{
-					try { Count = std::stod(Arguments[1]); }
-					catch (...) {}
-				}
-
-				auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
-
-				bool bShouldSpawnAtZoneCenter = false;
-
-				if (NumArgs >= 3 && Arguments[2] == "center")
-					bShouldSpawnAtZoneCenter = true;
-
-				if (bShouldSpawnAtZoneCenter && GameMode->GetGameStateAthena()->GetGamePhaseStep() <= EAthenaGamePhaseStep::BusFlying)
-					bShouldSpawnAtZoneCenter = false;
-
-				FRotator SpawnRotation = Pawn->GetActorRotation();
-
-				int SizeMultiplier = 1;
-
-				if (Arguments.size() >= 4)
-				{
-					try { SizeMultiplier = std::stod(Arguments[3]); }
-					catch (...) {}
-				}
-
-				constexpr int Max = 99;
-
-				if (Count > Max)
-				{
-					SendMessageToConsole(PlayerController, (std::wstring(L"You went over the limit! Only spawning ") + std::to_wstring(Max) + L".").c_str());
-					Count = Max;
-				}
-
-				int AmountSpawned = 0;
-
-				for (int i = 0; i < Count; i++)
-				{
-					FActorSpawnParameters SpawnParameters{};
-					// SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-					auto SafeZoneIndicator = GameMode->GetSafeZoneIndicator();
-
-					auto Loc = bShouldSpawnAtZoneCenter ? SafeZoneIndicator->GetSafeZoneCenter() : Pawn->GetActorLocation();
-					Loc.Z += bShouldSpawnAtZoneCenter ? 10000 : 1000;
-
-					FTransform Transform;
-					Transform.Translation = Loc;
-					Transform.Scale3D = FVector(1 * SizeMultiplier, 1 * SizeMultiplier, 1 * SizeMultiplier);
-					Transform.Rotation = SpawnRotation.Quaternion();
-
-					auto NewActor = Bots::SpawnBot(Transform, Pawn);
-
-					if (!NewActor)
-					{
-						SendMessageToConsole(PlayerController, L"Failed to spawn an actor!");
-					}
-					else
-					{
-						AmountSpawned++;
-					}
-				}
-
-				if (!bShouldSpawnAtZoneCenter)
-					SendMessageToConsole(PlayerController, L"Summoned!");
 				else
-					SendMessageToConsole(PlayerController, L"Summoned at zone center!");
+				{
+					AmountSpawned++;
+				}
 			}
+
+			if (!bShouldSpawnAtZoneCenter)
+				SendMessageToConsole(PlayerController, L"Summoned!");
+			else
+				SendMessageToConsole(PlayerController, L"Summoned at zone center!");
 		}
 		else if (Command == "marktoteleport" || Command == "marktotp" || Command == "markertp" || Command == "marktp" || Command == "mark" || Command == "marker")
 		{

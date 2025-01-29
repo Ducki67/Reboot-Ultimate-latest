@@ -1,6 +1,10 @@
 #include "KismetMathLibrary.h"
 
 #include "reboot.h"
+#include "Transform.h"
+#include "Vector.h"
+#include "Rotator.h"
+#include "Class.h"
 
 float UKismetMathLibrary::RandomFloatInRange(float min, float max)
 {
@@ -45,6 +49,18 @@ FRotator UKismetMathLibrary::FindLookAtRotation(FVector start, FVector target)
 	struct { FVector start; FVector target; FRotator ret; } params{ start , target };
 
 	static auto DefaultObject = StaticClass();
+	DefaultObject->ProcessEvent(fn, &params);
+
+	return params.ret;
+}
+
+FTransform UKismetMathLibrary::MakeTransform(FVector location, FRotator rotation, FVector scale)
+{
+	static auto fn = FindObject<UFunction>("/Script/Engine.KismetMathLibrary.MakeTransform");
+
+	struct { FVector location; FRotator rotation; FVector scale; FTransform ret; } params{ location, rotation, scale };
+
+	static auto DefaultObject = UKismetMathLibrary::StaticClass();
 	DefaultObject->ProcessEvent(fn, &params);
 
 	return params.ret;

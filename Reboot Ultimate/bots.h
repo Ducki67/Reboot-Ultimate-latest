@@ -246,7 +246,7 @@ public:
 		}
 		else
 		{
-			BotNewName = GetRandomName(); 
+			BotNewName = GetRandomName();
 		}
 
 		LOG_INFO(LogBots, "BotNewName: {}", BotNewName.ToString());

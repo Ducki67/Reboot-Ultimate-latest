@@ -3,7 +3,6 @@
 # What is Reboot Ultimate?
 
 Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github.com/Milxnor/Project-Reboot-3.0). This version of Reboot strives for adding new things to Reboot, while keeping it all stable.
-Alot of these updates wouldn't be possible without [Max's](https://github.com/max8447) help. I will not take all of the credit for this.
 
 # What does this version have?
 
@@ -13,10 +12,11 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 - [x] Fixed Foundations (minus maybe some stuff on s17)
 - [x] Fixed Editing
 - [x] Fixed S18+ Win Screen
-- [x] Fixed Placing Traps on S19 (done by Heliato, equipping bug still exists)
-- [x] Added Swag Lines to S16+ (done by Heliato)
+- [x] Fixed Placing Traps on S19
+- [x] Added Swag Lines to S16+
 - [x] Customizable Lategame Loadouts (also now for one shot)
 - [x] Fixed Boat Rockets (exxertz)
+- [x] Fixed Respawning on 12.41+
 
 ## UI:
 
@@ -50,11 +50,18 @@ Alot of these updates wouldn't be possible without [Max's](https://github.com/ma
 - [x] cheat skin - Similar to cheat give, you can now type a phrase (ex: cheat skin renegaderaider) and it will put on Renegade Raider.
 - [x] cheat pickaxe - Similar to cheat give, you can now type a phrase (ex: cheat pickaxe raidersrevenge) and it will put on the Raider's Revenge pickaxe.
 
+## CREDIT:
+
+- [Milxnor](https://github.com/Milxnor): Original Creator of Project Reboot 3.0
+- [Max](https://github.com/max8447): Originally made at least 80% of the original Reboot Ultimate. A lot of this code is his.
+- [Heliato](https://github.com/Heliato): Helped fix Traps on 19.10, Win Lines/Swags on 16+, and Respawning on 16+.
+
 ## To Do List:
 
-- [ ] Add XP
 - [ ] Hardware Ban
 - [ ] Fix 19.01 (and then other things)
+- [ ] Auto Pause Zone
+- [ ] Auto God?
 
 # Installation
 

@@ -7,6 +7,12 @@
 
 struct FFortRespawnData
 {
+	FFortRespawnData* GetRespawnData()
+	{
+		static auto RespawnDataOffset = FindOffsetStruct("/Script/FortniteGame.AFortPlayerStateAthena", "RespawnData");
+		return (FFortRespawnData*)(__int64(this) + RespawnDataOffset);
+	}
+
 	static UStruct* GetStruct()
 	{
 		static auto Struct = FindObject<UStruct>(L"/Script/FortniteGame.FortRespawnData");
@@ -31,6 +37,18 @@ struct FFortRespawnData
 	{
 		static auto bServerIsReadyOffset = FindOffsetStruct("/Script/FortniteGame.FortRespawnData", "bServerIsReady");
 		return *(bool*)(__int64(this) + bServerIsReadyOffset);
+	}
+
+	FVector& RespawnLocation()
+	{
+		static auto RespawnLocationOffset = FindOffsetStruct("/Script/FortniteGame.FortRespawnData", "RespawnLocation");
+		return *(FVector*)(__int64(this) + RespawnLocationOffset);
+	}
+
+	FRotator& RespawnRotation()
+	{
+		static auto RespawnRotationOffset = FindOffsetStruct("/Script/FortniteGame.FortRespawnData", "RespawnRotation");
+		return *(FRotator*)(__int64(this) + RespawnRotationOffset);
 	}
 };
 

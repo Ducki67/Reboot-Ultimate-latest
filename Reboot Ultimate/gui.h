@@ -260,7 +260,9 @@ enum class Playlist : int
 	Duos,
 	Trios,
 	Squads,
-	TeamRumble,
+	TeamRumbleSolo,
+	TeamRumbleDuo,
+	TeamRumbleSquad,
 	OneShotSolos,
 	OneShotDuos,
 	OneShotSquads,
@@ -455,7 +457,9 @@ static std::vector OSL2 = {
 	"WID_Sniper_Suppressed_Scope_Athena_VR_Ore_T03",
 	"WID_Sniper_Suppressed_Scope_Athena_SR_Ore_T03",
 	"WID_Sniper_Standard_Scope_Athena_VR_Ore_T03",
-	"WID_Sniper_Standard_Scope_Athena_SR_Ore_T03"
+	"WID_Sniper_Standard_Scope_Athena_SR_Ore_T03",
+	"WID_Sniper_Weather_Athena_VR",
+	"WID_Sniper_Weather_Athena_SR"
 };
 static std::vector OSL3 = {
 	"WID_Hook_Gun_VR_Ore_T03"
@@ -1122,10 +1126,20 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 
 			static UFortItemDefinition* OSLoot3 = nullptr;
 
-			do
+			if (Fortnite_Version < 14)
 			{
-				OSLoot3 = FindObject<UFortItemDefinition>(GetRandomItem(OSL3, z), nullptr, ANY_PACKAGE);
-			} while (!OSLoot3);
+				do
+				{
+					OSLoot3 = FindObject<UFortItemDefinition>(GetRandomItem(OSL3, z), nullptr, ANY_PACKAGE);
+				} while (!OSLoot3);
+			}
+			else
+			{
+				do
+				{
+					OSLoot2 = FindObject<UFortItemDefinition>(GetRandomItem(OSL2, z), nullptr, ANY_PACKAGE);
+				} while (!OSLoot2);
+			}
 
 			static UFortItemDefinition* OSLoot4 = nullptr;
 
@@ -2779,7 +2793,9 @@ static inline void PregameUI()
 		ImGui::RadioButton("Siphon Squads", &SelectedPlaylist, (int)Playlist::SiphonSquads);
 		ImGui::RadioButton("Slide Solos", &SelectedPlaylist, (int)Playlist::SlideSolos);
 		ImGui::RadioButton("Slide Duos", &SelectedPlaylist, (int)Playlist::SlideDuos);
-		ImGui::RadioButton("Team Rumble", &SelectedPlaylist, (int)Playlist::TeamRumble);
+		ImGui::RadioButton("Team Rumble Solos", &SelectedPlaylist, (int)Playlist::TeamRumbleSolo);
+		ImGui::RadioButton("Team Rumble Duos", &SelectedPlaylist, (int)Playlist::TeamRumbleDuo);
+		ImGui::RadioButton("Team Rumble Squads", &SelectedPlaylist, (int)Playlist::TeamRumbleSolo);
 		ImGui::RadioButton("Custom", &SelectedPlaylist, (int)Playlist::Custom);
 
 		switch (SelectedPlaylist)
@@ -2839,9 +2855,19 @@ static inline void PregameUI()
 			PlaylistName = "/Game/Athena/Playlists/Slide/Playlist_Slide_Duos.Playlist_Slide_Duos";
 			break;
 		}
-		case (int)Playlist::TeamRumble:
+		case (int)Playlist::TeamRumbleSolo:
 		{
-			PlaylistName = "/Game/Athena/Playlists/Respawn/Playlist_Respawn_24.Playlist_Respawn_24";
+			PlaylistName = "/Game/Athena/Playlists/Respawn/Playlist_Respawn_Solo.Playlist_Respawn_Solo";
+			break;
+		}
+		case (int)Playlist::TeamRumbleDuo:
+		{
+			PlaylistName = "/Game/Athena/Playlists/Respawn/Playlist_Respawn_Duos.Playlist_Respawn_Duos";
+			break;
+		}
+		case (int)Playlist::TeamRumbleSquad:
+		{
+			PlaylistName = "/Game/Athena/Playlists/Respawn/Playlist_Respawn_Squads.Playlist_Respawn_Squads";
 			break;
 		}
 		case (int)Playlist::Custom:

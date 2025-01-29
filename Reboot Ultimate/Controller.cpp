@@ -44,3 +44,9 @@ void AController::SetControlRotation(FRotator NewRotation)
 	static auto SetControlRotationFn = FindObject<UFunction>(L"/Script/Engine.Controller.SetControlRotation");
 	this->ProcessEvent(SetControlRotationFn, &NewRotation);
 }
+
+void AController::OnRep_Pawn()
+{
+	static auto OnRep_PawnFn = FindObject<UFunction>(L"/Script/Engine.Controller.OnRep_Pawn");
+	this->ProcessEvent(OnRep_PawnFn);
+}
