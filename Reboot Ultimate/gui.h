@@ -53,6 +53,7 @@
 #define PREGAME_GAME_TAB 1
 #define PREGAME_PLAYLIST_TAB 2
 #define PREGAME_BOTS_TAB 3
+#define PREGAME_SETTINGS_TAB 4
 
 #define GAME_TAB 1
 #define PLAYERS_TAB 2
@@ -741,6 +742,14 @@ static inline void PregameTabs()
 		if (ImGui::BeginTabItem("Bots"))
 		{
 			PregameTab = PREGAME_BOTS_TAB;
+			PlayerTab = -1;
+			bInformationTab = false;
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Configure"))
+		{
+			PregameTab = PREGAME_SETTINGS_TAB;
 			PlayerTab = -1;
 			bInformationTab = false;
 			ImGui::EndTabItem();
@@ -3036,6 +3045,265 @@ static inline void PregameUI()
 		else
 		{
 			BotNameStatusMessage.clear();
+		}
+	}
+
+	else if (PregameTab == PREGAME_SETTINGS_TAB)
+	{
+		ImGui::Text("Alot of these options can be configured before the game initializes, but it's more proper to do it before.");
+
+		ImGui::NewLine();
+
+		static UObject* WL = FindObject("/Game/Athena/Apollo/Maps/Apollo_POI_Foundations.Apollo_POI_Foundations.PersistentLevel.Apollo_WaterSetup_2");
+
+		if (WL)
+		{
+			static auto MaxWaterLevelOffset = WL->GetOffset("MaxWaterLevel");
+
+			static int MaxWaterLevel = WL->Get<int>(MaxWaterLevelOffset);
+			static int WaterLevel = 0;
+
+			ImGui::SliderInt("WaterLevel", &WaterLevel, 0, MaxWaterLevel);
+
+			if (ImGui::Button("Set Water Level (Season 13 ONLY)"))
+			{
+				Calendar::SetWaterLevel(WaterLevel);
+			}
+		}
+
+		if (ImGui::Checkbox("Use Custom Lootpool (EXPERIMENTAL)", &Globals::bCustomLootpool))
+		{
+			if (Globals::bCustomLootpool)
+			{
+				char Path[MAX_PATH];
+				GetModuleFileNameA(NULL, Path, MAX_PATH);
+				std::string::size_type Position = std::string(Path).find_last_of("\\/");
+				std::string Directory = std::string(Path).substr(0, Position);
+				std::string LootPoolFilePath = Directory + "\\lootpool.json";
+
+				LOG_INFO(LogDev, "Passed check 1.");
+
+				std::ifstream LootpoolFile(LootPoolFilePath);
+
+				if (LootpoolFile.is_open())
+				{
+					json JsonData;
+
+					try
+					{
+						LootpoolFile >> JsonData;
+					}
+					catch (...)
+					{
+						LOG_ERROR(LogDev, "Failed to parse loot pool file!");
+					}
+
+					LOG_INFO(LogDev, "Passed check 2.");
+
+					std::vector<std::pair<std::pair<std::string, std::string>, std::pair<std::string, std::vector<std::string>>>> AllItemRows;
+
+					for (const auto& JsonItem : JsonData)
+					{
+						std::string Definition = JsonItem["Definition"].get<std::string>();
+						std::string DropCount = JsonItem["DropCount"].get<std::string>();
+						std::string Weight = JsonItem["Weight"].get<std::string>();
+						std::vector<std::string> LootTiers;
+
+						LOG_INFO(LogDev, "Passed check 3.");
+
+						for (const auto& LootTier : JsonItem)
+						{
+							if (LootTier.is_array())
+							{
+								for (const auto& String : LootTier)
+									LootTiers.push_back(String.get<std::string>());
+							}
+						}
+
+						LOG_INFO(LogDev, "Passed check 4.");
+
+						AllItemRows.push_back
+						(
+							std::make_pair(
+								std::make_pair(
+									Definition,
+									DropCount
+								),
+								std::make_pair(
+									Weight,
+									LootTiers
+								)
+							)
+						);
+
+						LOG_INFO(LogDev, "Passed check 5.");
+					}
+
+					FCustomLootPoolItemRow ItemRow{};
+
+					for (int i = 0; i < AllItemRows.size(); i++)
+					{
+						auto& CurrentItemRow = AllItemRows[i];
+
+						LOG_INFO(LogDev, "Passed check 6.");
+
+						UFortItemDefinition* Definition = FindObject<UFortItemDefinition>(CurrentItemRow.first.first, nullptr, ANY_PACKAGE);
+						int DropCount = std::stoi(CurrentItemRow.first.second);
+						double Weight = std::stod(CurrentItemRow.second.first);
+						std::vector<std::string> LootTiers = CurrentItemRow.second.second;
+
+						LOG_INFO(LogDev, "Passed check 7.");
+
+						ItemRow.Definition = Definition;
+						ItemRow.DropCount = DropCount;
+						ItemRow.Weight = Weight;
+
+						LOG_INFO(LogDev, "Passed check 8.");
+
+						for (int i = 0; i < LootTiers.size(); i++)
+						{
+							auto& LootTierString = LootTiers.at(i);
+
+							CustomLootpoolMap[LootTierString].Add(ItemRow);
+						}
+
+						LOG_INFO(LogDev, "Passed check 9.");
+					}
+				}
+				else
+				{
+					LOG_ERROR(LogDev, "Failed to open lootpool.json, make sure it's located in Binaries/Win64");
+					Globals::bCustomLootpool = false;
+				}
+
+				ImGui::NewLine();
+
+				ImGui::Text("The lootpool file can be found in your current season's FortniteGame/Binaries/Win64 folder!");
+			}
+			else
+			{
+				CustomLootpoolMap.clear();
+			}
+		}
+
+		ImGui::NewLine();
+
+		static std::string WIDUnvault = "";
+		static int DropCount = 1;
+		static float Weight = 0.5;
+		std::vector<std::string> SelectedLootTiers;
+
+		ImGui::InputText("WID to Unvault", &WIDUnvault);
+
+		ImGui::InputInt("Drop Count", &DropCount);
+
+		ImGui::InputFloat("Weight (0-1)", &Weight);
+
+		ImGui::Text("Loot Tiers:");
+
+		ImGui::Checkbox("Spawn Island Floor Loot", &WarmupFloorLoot);
+		ImGui::Checkbox("Floor Loot", &FloorLoot);
+		ImGui::Checkbox("Chests - Normal", &Treasure);
+		ImGui::Checkbox("Chests - Rare", &TreasureXL);
+		ImGui::Checkbox("Ammo Crate - Small", &Ammo);
+		ImGui::Checkbox("Ammo Crate - Large", &AmmoXL);
+		ImGui::Checkbox("Supply Drops", &SupplyDrop);
+		ImGui::Checkbox("Llama", &Llama);
+		ImGui::Checkbox("Present", &Present);
+
+		if (Fortnite_Version >= 11)
+		{
+			ImGui::Checkbox("Ice Boxes", &IceBox);
+		}
+
+		if (Fortnite_Version == 8)
+		{
+			ImGui::Checkbox("Treasure", &Booty);
+		}
+
+		if (Weight < 0)
+		{
+			Weight = 0.00;
+		}
+		else if (Weight > 1)
+		{
+			Weight = 1.00;
+		}
+
+		if (ImGui::Button("Unvault Weapon"))
+		{
+			SelectedLootTiers.clear();
+			if (WarmupFloorLoot) SelectedLootTiers.push_back("Loot_AthenaFloorLoot_Warmup");
+			if (FloorLoot) SelectedLootTiers.push_back("Loot_AthenaFloorLoot");
+			if (Treasure) SelectedLootTiers.push_back("Loot_AthenaTreasure");
+			if (TreasureXL) SelectedLootTiers.push_back("Loot_ApolloTreasure_Rare");
+			if (Ammo) SelectedLootTiers.push_back("Loot_AthenaAmmoSmall");
+			if (AmmoXL) SelectedLootTiers.push_back("Loot_ApolloAmmoBox_Rare");
+			if (SupplyDrop) SelectedLootTiers.push_back("Loot_AthenaSupplyDrop");
+			if (Llama) SelectedLootTiers.push_back("Loot_AthenaLlama");
+			if (Present) SelectedLootTiers.push_back("Loot_AthenaGiftBox");
+			if (IceBox) SelectedLootTiers.push_back("Loot_AthenaIceBox");
+			if (Booty) SelectedLootTiers.push_back("Loot_AthenaBooty");
+
+			char Path[MAX_PATH];
+			GetModuleFileNameA(NULL, Path, MAX_PATH);
+			std::string::size_type Position = std::string(Path).find_last_of("\\/");
+			std::string Directory = std::string(Path).substr(0, Position);
+			std::string LootPoolFilePath = Directory + "\\lootpool.json";
+
+			json JsonData;
+			std::ifstream LootpoolFile(LootPoolFilePath);
+			if (LootpoolFile.is_open())
+			{
+				try
+				{
+					LootpoolFile >> JsonData;
+				}
+				catch (...)
+				{
+					LOG_ERROR(LogDev, "Failed to parse loot pool file!");
+				}
+				LootpoolFile.close();
+			}
+
+			json NewItem = {
+				{"Definition", WIDUnvault},
+				{"DropCount", std::to_string(DropCount)},
+				{"Weight", std::to_string(Weight)},
+				{"LootTiers", SelectedLootTiers}
+			};
+
+			JsonData.push_back(NewItem);
+
+			std::ofstream OutFile(LootPoolFilePath, std::ios::trunc);
+			if (OutFile.is_open())
+			{
+				OutFile << std::setw(4) << JsonData;
+				OutFile.close();
+				LOG_INFO(LogDev, "Lootpool updated successfully!");
+			}
+			else
+			{
+				LOG_ERROR(LogDev, "Failed to open lootpool.json for writing!");
+			}
+		}
+
+		if (ImGui::Button("Delete Lootpool File"))
+		{
+			char Path[MAX_PATH];
+			GetModuleFileNameA(NULL, Path, MAX_PATH);
+			std::string::size_type Position = std::string(Path).find_last_of("\\/");
+			std::string Directory = std::string(Path).substr(0, Position);
+			std::string LootPoolFilePath = Directory + "\\lootpool.json";
+
+			if (std::remove(LootPoolFilePath.c_str()) == 0)
+			{
+				LOG_INFO(LogDev, "Successfully deleted lootpool.json!");
+			}
+			else
+			{
+				LOG_ERROR(LogDev, "Failed to delete lootpool.json. File may not exist.");
+			}
 		}
 	}
 }

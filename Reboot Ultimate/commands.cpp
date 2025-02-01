@@ -3607,6 +3607,40 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				}
 			}
 		}
+		else if (Command == "gravity" || Command == "setgravity")
+		{
+			float Gravity = 1.0f;
+
+			if (Arguments.size() > 1 && Arguments[1] != " ")
+			{
+				try { Gravity = std::stof(Arguments[1]); }
+				catch (...) {}
+			}
+
+			auto Pawn = Cast<APawn>(ReceivingController->GetPawn());
+
+			if (!Pawn)
+			{
+				SendMessageToConsole(PlayerController, L"No pawn to set speed!");
+				return;
+			}
+
+			static auto SetGravityFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPawn.SetGravityMultiplier") ? FindObject<UFunction>(L"/Script/FortniteGame.FortPawn.SetGravityMultiplier") : FindObject<UFunction>(L"/Script/FortniteGame.FortPawn.SetGravityJumpMultipliers");
+
+			if (!SetGravityFn)
+			{
+				SendMessageToConsole(PlayerController, L"GravityMultiplier not found!");
+				return;
+			}
+
+			Pawn->ProcessEvent(SetGravityFn, &Gravity);
+
+			std::wstringstream ss;
+			ss << std::fixed << std::setprecision(0) << Gravity;
+
+			std::wstring Message = L"Gravity Multiplier set to " + ss.str() + L"!\n";
+			SendMessageToConsole(PlayerController, Message.c_str());
+		}
 		else if (Command == "fly")
 		{
 			auto Pawn = Cast<APawn>(ReceivingController->GetPawn());
@@ -4697,6 +4731,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 - cheat giveitem {ID} - Gives a weapon to the executing player, if inventory is full drops a pickup on the player.
 - cheat givenames - Sends a message to the console of all of the names that work with the "cheat give" command.
 - cheat godall - Gods all players.
+- cheat gravity {#} - Applies a gravity *multiplier* to the player. (0.5 for low gravity, 2 for high gravity, etc.)
 - cheat health {#} - Sets executing player's health.
 - cheat healthall - Heals all players health.
 - cheat infammo - Toggles Infinite Ammo.

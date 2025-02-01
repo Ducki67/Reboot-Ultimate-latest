@@ -258,7 +258,7 @@ void AFortPlayerControllerAthena::EnterAircraftHook(UObject* PC, AActor* Aircraf
 		}
 	);
 
-	auto HandleGiveItemsAtGamePhaseStepMutator = [&](AFortAthenaMutator* Mutator) {
+	/*auto HandleGiveItemsAtGamePhaseStepMutator = [&](AFortAthenaMutator* Mutator) {
 		if (auto GiveItemsAtGamePhaseStepMutator = Cast<AFortAthenaMutator_GiveItemsAtGamePhaseStep>(Mutator))
 		{
 			auto PhaseToGive = GiveItemsAtGamePhaseStepMutator->GetPhaseToGiveItems();
@@ -282,17 +282,12 @@ void AFortPlayerControllerAthena::EnterAircraftHook(UObject* PC, AActor* Aircraf
 						Out2 = UDataTableFunctionLibrary::EvaluateCurveTableRow(ItemToGive->GetNumberToGive().GetCurve().CurveTable, ItemToGive->GetNumberToGive().GetCurve().RowName, 0.f);
 					}
 
-					if (!Out2)
-						Out2 = ItemToGive->GetNumberToGive().GetValue();
-
 					LOG_INFO(LogDev, "[{}] Out2: {} ItemToGive.ItemToDrop: {}", j, Out2, ItemToGive->GetItemToDrop()->IsValidLowLevel() ? ItemToGive->GetItemToDrop()->GetFullName() : "BadRead");
 
-					bool bShouldUpdate = false;
+					if (!Out2) // ?
+						Out2 = 0;
 
-					WorldInventory->AddItem(ItemToGive->GetItemToDrop(), &bShouldUpdate, Out2);
-
-					// if (bShouldUpdate)
-						// WorldInventory->Update();
+					WorldInventory->AddItem(ItemToGive->GetItemToDrop(), nullptr, Out2);
 				}
 			}
 		}
@@ -313,7 +308,7 @@ void AFortPlayerControllerAthena::EnterAircraftHook(UObject* PC, AActor* Aircraf
 		}
 	};
 
-	LoopMutators(HandleGGMutator);
+	LoopMutators(HandleGGMutator);*/
 
 	auto PlayerStateAthena = Cast<AFortPlayerStateAthena>(PlayerController->GetPlayerState());
 
