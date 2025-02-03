@@ -49,6 +49,7 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 - [x] cheat spawn - Allows for spawning at a location (ex: cheat spawn quad -120397.375000, 4183.438477, 7969.918457)
 - [x] cheat skin - Similar to cheat give, you can now type a phrase (ex: cheat skin renegaderaider) and it will put on Renegade Raider.
 - [x] cheat pickaxe - Similar to cheat give, you can now type a phrase (ex: cheat pickaxe raidersrevenge) and it will put on the Raider's Revenge pickaxe.
+- [x] cheat backbling - Apply a backbling using a CharacterPart ID.
 
 ## CREDIT:
 
@@ -62,9 +63,8 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 - [ ] Fix 19.01 (and then other things)
 - [ ] Redo Abilites
 - [ ] Llamas
-- [ ] Backpack, Glider, and Wrap Commands
 - [ ] ServerCreateBuildingAndSpawnDeco
-- [ ] Give Weapons from Gamemodes
+- [x] Give Weapons from Gamemodes
 - [ ] Apparently Editing
 - [ ] Auto Pause Zone
 - [ ] Auto God?
