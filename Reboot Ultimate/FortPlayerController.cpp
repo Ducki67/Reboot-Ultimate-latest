@@ -1410,41 +1410,6 @@ void AFortPlayerController::ServerPlaySprayItemHook(AFortPlayerController* Playe
 	PlayerController->ServerPlayEmoteItemHook(PlayerController, SprayAsset);
 }
 
-void VictoryCrownSlowmo()
-{
-	std::this_thread::sleep_for(std::chrono::milliseconds(65));
-
-	static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
-	auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
-	auto& ClientConnections = WorldNetDriver->GetClientConnections();
-
-	for (int z = 0; z < ClientConnections.Num(); z++)
-	{
-		auto ClientConnection = ClientConnections.at(z);
-		auto FortPC = Cast<AFortPlayerController>(ClientConnection->GetPlayerController());
-
-		if (!FortPC)
-			continue;
-
-		auto WorldInventory = FortPC->GetWorldInventory();
-
-		if (!WorldInventory)
-			continue;
-
-		static auto Crown = FindObject<UFortItemDefinition>(
-			L"/VictoryCrownsGameplay/Items/AGID_VictoryCrown.AGID_VictoryCrown");
-
-		auto CrownInstance = WorldInventory->FindItemInstance(Crown);
-		auto CrownCount = CrownInstance ? CrownInstance->GetItemEntry()->GetCount() : 0;
-
-		if (CrownCount < 1)
-		{
-			WorldInventory->AddItem(Crown, nullptr, 1);
-			WorldInventory->Update();
-		}
-	}
-}
-
 void DBNOToggleOnWin()
 {
 	static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
@@ -1477,13 +1442,6 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 		return ClientOnPawnDiedOriginal(PlayerController, DeathReport);
 
 	auto DeathLocation = DeadPawn->GetActorLocation();
-
-	if (Globals::bCrownSlowmo)
-	{
-		std::thread victory(VictoryCrownSlowmo);
-
-		victory.detach();
-	}
 
 	// std::thread victory(DBNOToggleOnWin);
 
@@ -1883,6 +1841,15 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 							KillerPlayerControllerAthena->ClientNotifyWon(KillerPawn, KillerWeaponDef, DeathCause);
 							KillerPlayerControllerAthena->ClientNotifyTeamWon(KillerPawn, KillerWeaponDef, DeathCause);
 						}
+					}
+
+					if (Fortnite_Version >= 19)
+					{
+						auto KillerPlayerController = Cast<AFortPlayerControllerAthena>(KillerPlayerState->GetOwner());
+						auto WorldInventory = KillerPlayerController->GetWorldInventory();
+						static auto VictoryCrown = FindObject<UFortItemDefinition>(L"/VictoryCrownsGameplay/Items/AGID_VictoryCrown.AGID_VictoryCrown");
+						WorldInventory->AddItem(VictoryCrown, nullptr, 1);
+						WorldInventory->Update();
 					}
 
 					RemoveFromAlivePlayers(GameMode, PlayerController, KillerPlayerState == DeadPlayerState ? nullptr : KillerPlayerState, KillerPawn, KillerWeaponDef, DeathCause, 0);

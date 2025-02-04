@@ -133,6 +133,9 @@
     <ClCompile Include="addresses.cpp">
       <Filter>Reboot\Private</Filter>
     </ClCompile>
+    <ClCompile Include="helper.cpp">
+      <Filter>Reboot\Private</Filter>
+    </ClCompile>
     <ClCompile Include="NetConnection.h">
       <Filter>Engine\Source\Runtime\Engine\Classes\Engine</Filter>
     </ClCompile>
@@ -1096,6 +1099,9 @@
       <Filter>Engine\Source\Runtime\Engine\Classes\Engine</Filter>
     </ClInclude>
     <ClInclude Include="finder.h">
+      <Filter>Reboot\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="helper.h">
       <Filter>Reboot\Public</Filter>
     </ClInclude>
     <ClInclude Include="UnrealNames.h">

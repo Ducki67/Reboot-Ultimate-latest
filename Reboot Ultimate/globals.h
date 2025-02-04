@@ -44,8 +44,6 @@ namespace Globals
 
 	extern inline bool bAutoPauseZone = false;
 
-	extern inline bool bCrownSlowmo = true;
-
 	extern inline bool bBugitgo = false;
 
 	extern inline bool bHitReadyToStartMatch = false;

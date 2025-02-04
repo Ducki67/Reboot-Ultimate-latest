@@ -924,12 +924,6 @@ static inline void PlayerTabs()
 
 static inline DWORD WINAPI LateGameThread(LPVOID)
 {
-	while (!AutoBusStartSecondsThatChanges == 0)
-	{
-		AutoBusStartSecondsThatChanges--;
-		Sleep(1000);
-	}
-
 	float MaxTickRate = 30;
 
 	auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
@@ -1053,16 +1047,6 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 	while (GameState->GetGamePhase() == EAthenaGamePhase::Aircraft)
 	{
 		Sleep(1000 / MaxTickRate);
-	}
-
-	if (Globals::bAutoPauseZone)
-	{
-		while (GameMode->GetGameStateAthena()->GetGamePhaseStep() == EAthenaGamePhaseStep::BusFlying)
-		{
-			std::this_thread::sleep_for(std::chrono::seconds(15));
-
-			UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"pausesafezone", nullptr);
-		}
 	}
 
 	static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
@@ -1374,7 +1358,6 @@ static inline void MainUI()
 							auto GameState = Cast<AFortGameStateAthena>(GameMode->GetGameState());
 
 							AmountOfPlayersWhenBusStart = GameState->GetPlayersLeft();
-							AutoBusStartSecondsThatChanges = 0;
 
 							if (Globals::bLateGame.load())
 							{
@@ -1714,11 +1697,6 @@ static inline void MainUI()
 					ImGui::InputFloat("Y", CannonYMultiplier);
 					ImGui::InputFloat("Z", CannonZMultiplier);
 				}
-			}
-
-			if (std::floor(Fortnite_Version) == 19)
-			{
-				ImGui::Checkbox("Toggle Victory Crown Slowmo", &Globals::bCrownSlowmo);
 			}
 		}
 
