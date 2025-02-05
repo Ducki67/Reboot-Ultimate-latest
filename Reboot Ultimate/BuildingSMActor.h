@@ -23,6 +23,7 @@ public:
 		this->ProcessEvent(fn, &Builds);
 		return Builds;
 	}
+
 	bool IsPlayerPlaced()
 	{
 		static auto bPlayerPlacedOffset = GetOffset("bPlayerPlaced");

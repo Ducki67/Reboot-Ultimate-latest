@@ -9,7 +9,6 @@
 #include "AIBlueprintHelperLibrary.h"
 #include "FortServerBotManagerAthena.h"
 #include "FortAthenaAIBotSpawnerData.h"
-#include "helper.h"
 
 #include <iomanip>
 #include <sstream>
@@ -1275,46 +1274,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		}
 		else if (Command == "glider" || Command == "setglider")
 		{
-			if (NumArgs < 1)
-			{
-				SendMessageToConsole(PlayerController, L"Please provide a backbling ID!");
-				return;
-			}
 
-			auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn());
-
-			if (!Pawn)
-			{
-				SendMessageToConsole(PlayerController, L"No pawn!");
-				return;
-			}
-
-			auto CosmeticLoadoutPC = Pawn->GetCosmeticLoadout();
-
-			static auto GliderOffset = FindOffsetStruct("/Script/FortniteGame.FortAthenaLoadout", "Glider");
-			auto actualGliderPtr = *(UObject**)((uint8_t*)CosmeticLoadoutPC + GliderOffset);
-
-			auto& GliderID = Arguments[1];
-			
-			std::string GliderPath = "/Game/Athena/Items/Cosmetics/Gliders/" + GliderID + "." + GliderID;
-
-			auto newGlider = FindObject<UObject>(GliderPath);
-
-			if (!newGlider)
-			{
-				SendMessageToConsole(PlayerController, L"Invalid Glider ID!");
-				return;
-			}
-
-			actualGliderPtr = newGlider;
-
-			auto CosmeticLoadoutPawn = Helper::GetCosmeticLoadoutForPawn(Pawn);
-
-			*(UObject**)((uint8_t*)CosmeticLoadoutPawn + GliderOffset) = actualGliderPtr;
-
-			ReceivingController->ApplyCosmeticLoadout();
-
-			SendMessageToConsole(PlayerController, L"Glider successfully applied!");
 		}
 		else if (Command == "pickaxeall")
 		{
@@ -3450,7 +3410,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				auto SafeZoneIndicator = GameMode->GetSafeZoneIndicator();
 
 				auto Loc = bShouldSpawnAtZoneCenter ? SafeZoneIndicator->GetSafeZoneCenter() : Pawn->GetActorLocation();
-				Loc.Z += bShouldSpawnAtZoneCenter ? 10000 : 0;
+				Loc.Z += bShouldSpawnAtZoneCenter ? 10000 : 1000;
 
 				FTransform Transform;
 				Transform.Translation = Loc;

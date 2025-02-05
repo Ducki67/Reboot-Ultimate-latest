@@ -20,6 +20,54 @@ void ABuildingActor::OnDamageServerHook(ABuildingActor* BuildingActor, float Dam
 		LOG_INFO(LogDev, "ABuildingActor::OnDamageServerHook!");
 
 	auto BuildingSMActor = Cast<ABuildingSMActor>(BuildingActor);
+
+	if (!BuildingSMActor)
+	{
+		return OnDamageServerOriginal(BuildingActor, Damage, DamageTags, Momentum, HitInfo, InstigatedBy, DamageCauser, EffectContext);
+	}
+
+	if (auto Container = Cast<ABuildingContainer>(BuildingActor))
+	{
+		if ((BuildingSMActor->GetHealth() <= 0 || BuildingActor->GetHealth() <= 0) && !Container->IsAlreadySearched())
+		{
+			Container->SpawnLoot();
+		}
+	}
+	auto AttachedBuildingActors = BuildingSMActor->GetAttachedBuildingActors();
+
+	if (AttachedBuildingActors.Num() == 0)
+	{
+		return;
+	}
+
+	for (int i = 0; i < AttachedBuildingActors.Num(); ++i)
+	{
+		auto CurrentBuildingActor = AttachedBuildingActors.at(i);
+
+		if (!CurrentBuildingActor)
+		{
+			continue;
+		}
+
+		auto CurrentActor = Cast<ABuildingActor>(CurrentBuildingActor);
+
+		if (!CurrentActor)
+		{
+			continue;
+		}
+
+		if (BuildingSMActor->GetHealth() <= 0 || BuildingActor->GetHealth() <= 0)
+		{
+			if (auto Container = Cast<ABuildingContainer>(CurrentActor))
+			{
+				if (!Container->IsAlreadySearched())
+				{
+					Container->SpawnLoot();
+				}
+			}
+		}
+	}
+
 	auto PlayerController = Cast<AFortPlayerControllerAthena>(InstigatedBy);
 	// auto Pawn = PlayerController ? PlayerController->GetMyFortPawn() : nullptr;
 	auto Weapon = Cast<AFortWeapon>(DamageCauser);
