@@ -1672,33 +1672,24 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 				float MaxHealth = KillerPawn->GetMaxHealth();
 				float MaxShield = KillerPawn->GetMaxShield();
 
-				float AmountGiven = 0;
+				float RemainingSiphon = Globals::AmountOfHealthSiphon;
 
-				if ((MaxHealth - Health) > 0)
+				if (Health < MaxHealth)
 				{
-					float AmountToGive = MaxHealth - Health >= Globals::AmountOfHealthSiphon ? Globals::AmountOfHealthSiphon : MaxHealth - Health;
-					KillerPawn->SetHealth(Health + AmountToGive);
-					AmountGiven += AmountToGive;
+					float HealthToGive = FMath::Min(RemainingSiphon, MaxHealth - Health);
+					KillerPawn->SetHealth(Health + HealthToGive);
+					RemainingSiphon -= HealthToGive;
 				}
 
-				if ((MaxShield - Shield) >= 0 && AmountGiven < Globals::AmountOfHealthSiphon)
+				if (RemainingSiphon > 0 && Shield < MaxShield)
 				{
 					if (Globals::bUseSiphon)
 					{
 						KillerPlayerState->ApplySiphonEffect();
 					}
 
-					if (MaxShield - Shield > 0)
-					{
-						float AmountToGive = MaxShield - Shield >= Globals::AmountOfHealthSiphon ? Globals::AmountOfHealthSiphon : MaxShield - Shield;
-						AmountToGive -= AmountGiven;
-
-						if (AmountToGive > 0)
-						{
-							KillerPawn->SetShield(Shield + AmountToGive);
-							AmountGiven += AmountToGive;
-						}
-					}
+					float ShieldToGive = FMath::Min(RemainingSiphon, MaxShield - Shield);
+					KillerPawn->SetShield(Shield + ShieldToGive);
 				}
 			}
 		}
