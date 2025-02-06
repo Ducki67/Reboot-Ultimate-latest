@@ -29,7 +29,14 @@ static void ApplyHID(AFortPlayerPawn* Pawn, UObject* HeroDefinition, bool bUseSe
 
 		if (Specialization)
 		{
-			Pawn->ServerChooseGender(CustomGender);
+			static auto GenderOffset = HeroDefinition->GetOffset("Gender");
+
+			EFortCustomGender Gender = EFortCustomGender::Invalid;
+
+			if (GenderOffset != -1)
+				Gender = HeroDefinition->Get<EFortCustomGender>(GenderOffset);
+
+			Pawn->ServerChooseGender(Gender);
 
 			static auto Specialization_CharacterPartsOffset = Specialization->GetOffset("CharacterParts");
 			auto& CharacterParts = Specialization->Get<TArray<TSoftObjectPtr<UObject>>>(Specialization_CharacterPartsOffset);
@@ -66,7 +73,7 @@ static void ApplyHID(AFortPlayerPawn* Pawn, UObject* HeroDefinition, bool bUseSe
 	}
 }
 
-static bool ApplyCID(AFortPlayerPawn* Pawn, UObject* CID, bool bUseServerChoosePart = false)
+static bool ApplyCID(AFortPlayerPawn* Pawn, UObject* CID, bool bUseServerChoosePart = false, EFortCustomGender CustomGender = EFortCustomGender::Invalid)
 {
 	if (!CID)
 		return false;
@@ -114,12 +121,14 @@ static bool ApplyCID(AFortPlayerPawn* Pawn, UObject* CID, bool bUseServerChooseP
 
 	static auto GenderOffset = CID->GetOffset("Gender");
 
-	EFortCustomGender Gender{};
+	EFortCustomGender Gender = EFortCustomGender::Invalid;
 
 	if (GenderOffset != -1)
 		Gender = CID->Get<EFortCustomGender>(GenderOffset);
 
 	ApplyHID(Pawn, HeroDefinition, bUseServerChoosePart, Gender);
+
+	Pawn->ServerChooseGender(Gender);
 
 	// static auto HeroTypeOffset = PlayerState->GetOffset("HeroType");
 	// PlayerState->Get(HeroTypeOffset) = HeroDefinition;

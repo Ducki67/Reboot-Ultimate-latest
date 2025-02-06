@@ -3034,8 +3034,6 @@ static inline void PregameUI()
 	{
 		ImGui::Text("Alot of these options can be configured before the game initializes, but it's more proper to do it before.");
 
-		ImGui::NewLine();
-
 		static UObject* WL = FindObject("/Game/Athena/Apollo/Maps/Apollo_POI_Foundations.Apollo_POI_Foundations.PersistentLevel.Apollo_WaterSetup_2");
 
 		if (WL)
@@ -3052,6 +3050,8 @@ static inline void PregameUI()
 				Calendar::SetWaterLevel(WaterLevel);
 			}
 		}
+
+		ImGui::Checkbox("VBucks on Kill/Win", &Globals::bVBucksOnKill);
 
 		if (ImGui::Checkbox("Use Custom Lootpool (EXPERIMENTAL)", &Globals::bCustomLootpool))
 		{
@@ -3157,18 +3157,12 @@ static inline void PregameUI()
 					LOG_ERROR(LogDev, "Failed to open lootpool.json, make sure it's located in Binaries/Win64");
 					Globals::bCustomLootpool = false;
 				}
-
-				ImGui::NewLine();
-
-				ImGui::Text("The lootpool file can be found in your current season's FortniteGame/Binaries/Win64 folder!");
 			}
 			else
 			{
 				CustomLootpoolMap.clear();
 			}
 		}
-
-		ImGui::NewLine();
 
 		static std::string WIDUnvault = "";
 		static int DropCount = 1;
@@ -3286,6 +3280,17 @@ static inline void PregameUI()
 			{
 				LOG_ERROR(LogDev, "Failed to delete lootpool.json. File may not exist.");
 			}
+		}
+
+		ImGui::NewLine();
+
+		if (Globals::bVBucksOnKill)
+		{
+			ImGui::Text("This only works if your backend supports VBucks on Kill/Win! Recommended to use Reload Backend.");
+
+			ImGui::InputText("Backend IP", &Globals::BackendIP);
+			ImGui::InputText("Backend Port", &Globals::BackendPort);
+			ImGui::InputText("Backend Name (name under mongodb localhost)", &Globals::BackendName);
 		}
 	}
 }

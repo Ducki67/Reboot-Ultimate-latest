@@ -37,6 +37,11 @@ namespace Globals
 	extern inline std::string BotName = "";
 	extern inline std::string BotSkin = "";
 
+	extern inline bool bVBucksOnKill = false;
+	extern inline std::string BackendIP = "127.0.0.1";
+	extern inline std::string BackendPort = "8080";
+	extern inline std::string BackendName = "Reload";
+
 	// extern inline std::map<int, std::string> CustomBotNames;
 	// extern inline int CurrentBotID = 1;
 
