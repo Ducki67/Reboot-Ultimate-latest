@@ -4,7 +4,6 @@
 #include "Rotator.h"
 #include "Transform.h"
 #include "Vector.h"
-#include "Class.h"
 
 class UKismetMathLibrary : public UObject
 {

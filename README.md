@@ -8,15 +8,14 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 
 ## In-Game:
 
-- [x] Siphon (Animation, Health, and Materials)
 - [x] Fixed Foundations (minus maybe some stuff on s17)
-- [x] Fixed Editing
 - [x] Fixed S18+ Win Screen
 - [x] Fixed Placing Traps on S19
 - [x] Added Swag Lines to S16+
 - [x] Customizable Lategame Loadouts (also now for one shot)
 - [x] Fixed Boat Rockets (exxertz)
 - [x] Fixed Respawning on 12.41+
+- [x] Fixed Attached Actor Chest Loot
 
 ## UI:
 

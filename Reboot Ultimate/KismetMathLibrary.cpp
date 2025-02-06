@@ -4,7 +4,6 @@
 #include "Transform.h"
 #include "Vector.h"
 #include "Rotator.h"
-#include "Class.h"
 
 float UKismetMathLibrary::RandomFloatInRange(float min, float max)
 {

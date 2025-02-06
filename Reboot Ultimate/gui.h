@@ -261,9 +261,6 @@ enum class Playlist : int
 	Duos,
 	Trios,
 	Squads,
-	TeamRumbleSolo,
-	TeamRumbleDuo,
-	TeamRumbleSquad,
 	TeamRumble,
 	OneShotSolos,
 	OneShotDuos,
@@ -2273,12 +2270,15 @@ static inline void MainUI()
 				}
 
 				GET_PLAYLIST(GameState);
-
-				bool bRespawning = CurrentPlaylist->GetRespawnType() == EAthenaRespawnType::InfiniteRespawn || CurrentPlaylist->GetRespawnType() == EAthenaRespawnType::InfiniteRespawnExceptStorm;
-
-				if (ImGui::Checkbox("Respawning", &bRespawning))
+				
+				if (CurrentPlaylist)
 				{
-					CurrentPlaylist->GetRespawnType() = (EAthenaRespawnType)bRespawning;
+					bool bRespawning = CurrentPlaylist->GetRespawnType() == EAthenaRespawnType::InfiniteRespawn || CurrentPlaylist->GetRespawnType() == EAthenaRespawnType::InfiniteRespawnExceptStorm;
+
+					if (ImGui::Checkbox("Respawning", &bRespawning))
+					{
+						CurrentPlaylist->GetRespawnType() = (EAthenaRespawnType)bRespawning;
+					}
 				}
 			}
 
@@ -2800,9 +2800,6 @@ static inline void PregameUI()
 		ImGui::RadioButton("Siphon Squads", &SelectedPlaylist, (int)Playlist::SiphonSquads);
 		ImGui::RadioButton("Slide Solos", &SelectedPlaylist, (int)Playlist::SlideSolos);
 		ImGui::RadioButton("Slide Duos", &SelectedPlaylist, (int)Playlist::SlideDuos);
-		ImGui::RadioButton("Team Rumble Solos", &SelectedPlaylist, (int)Playlist::TeamRumbleSolo);
-		ImGui::RadioButton("Team Rumble Duos", &SelectedPlaylist, (int)Playlist::TeamRumbleDuo);
-		ImGui::RadioButton("Team Rumble Squads", &SelectedPlaylist, (int)Playlist::TeamRumbleSquad);
 		ImGui::RadioButton("Team Rumble", &SelectedPlaylist, (int)Playlist::TeamRumble);
 		ImGui::RadioButton("Custom", &SelectedPlaylist, (int)Playlist::Custom);
 
@@ -2861,21 +2858,6 @@ static inline void PregameUI()
 		case (int)Playlist::SlideDuos:
 		{
 			PlaylistName = "/Game/Athena/Playlists/Slide/Playlist_Slide_Duos.Playlist_Slide_Duos";
-			break;
-		}
-		case (int)Playlist::TeamRumbleSolo:
-		{
-			PlaylistName = "/Game/Athena/Playlists/Respawn/Playlist_Respawn_Solo.Playlist_Respawn_Solo";
-			break;
-		}
-		case (int)Playlist::TeamRumbleDuo:
-		{
-			PlaylistName = "/Game/Athena/Playlists/Respawn/Playlist_Respawn_Duos.Playlist_Respawn_Duos";
-			break;
-		}
-		case (int)Playlist::TeamRumbleSquad:
-		{
-			PlaylistName = "/Game/Athena/Playlists/Respawn/Playlist_Respawn_Squads.Playlist_Respawn_Squads";
 			break;
 		}
 		case (int)Playlist::TeamRumble:
