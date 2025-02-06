@@ -114,7 +114,7 @@ static bool ApplyCID(AFortPlayerPawn* Pawn, UObject* CID, bool bUseServerChooseP
 
 	static auto GenderOffset = CID->GetOffset("Gender");
 
-	EFortCustomGender Gender;
+	EFortCustomGender Gender{};
 
 	if (GenderOffset != -1)
 		Gender = CID->Get<EFortCustomGender>(GenderOffset);

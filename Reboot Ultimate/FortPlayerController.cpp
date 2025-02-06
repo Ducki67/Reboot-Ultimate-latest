@@ -1485,12 +1485,6 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 		victory.detach();
 	}
 
-	if (DeadPawn)
-	{
-		static auto ServerSuicideFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerController.ServerSuicide");
-		DeadPawn->ProcessEvent(ServerSuicideFn);
-	}
-
 	// std::thread victory(DBNOToggleOnWin);
 
 	static auto FallDamageEnumValue = 1;

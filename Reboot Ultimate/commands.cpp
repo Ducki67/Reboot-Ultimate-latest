@@ -1173,7 +1173,11 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			auto& BackblingID = Arguments[1];
 
-			if (BackblingID == "blackknight")
+			if (BackblingID == "none" || BackblingID == "clear")
+			{
+				BackblingID = "NoBackpack";
+			}
+			else if (BackblingID == "blackknight")
 			{
 				BackblingID = "Male_Commando_BlackKnight";
 			}
