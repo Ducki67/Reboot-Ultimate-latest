@@ -1512,46 +1512,46 @@ static inline void MainUI()
 										PlayerTab = i;
 									}
 								}
+							}
 
-								ImGui::NewLine();
+							ImGui::NewLine();
 
-								ImGui::InputText("Item to Give to All Players", &ItemToGrantEveryone);
-								ImGui::InputInt("Amount to Give", &AmountToGrantEveryone);
+							ImGui::InputText("Item to Give to All Players", &ItemToGrantEveryone);
+							ImGui::InputInt("Amount to Give", &AmountToGrantEveryone);
 
-								if (ImGui::Button("Give Item to Everyone"))
+							if (ImGui::Button("Give Item to Everyone"))
+							{
+								auto ItemDefinition = FindObject<UFortItemDefinition>(ItemToGrantEveryone, nullptr, ANY_PACKAGE);
+
+								if (ItemDefinition)
 								{
-									auto ItemDefinition = FindObject<UFortItemDefinition>(ItemToGrantEveryone, nullptr, ANY_PACKAGE);
+									static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
+									auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
+									auto& ClientConnections = WorldNetDriver->GetClientConnections();
 
-									if (ItemDefinition)
+									for (int i = 0; i < ClientConnections.Num(); i++)
 									{
-										static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
-										auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
-										auto& ClientConnections = WorldNetDriver->GetClientConnections();
+										auto PlayerController = Cast<AFortPlayerController>(ClientConnections.at(i)->GetPlayerController());
 
-										for (int i = 0; i < ClientConnections.Num(); i++)
-										{
-											auto PlayerController = Cast<AFortPlayerController>(ClientConnections.at(i)->GetPlayerController());
+										if (!PlayerController->IsValidLowLevel())
+											continue;
 
-											if (!PlayerController->IsValidLowLevel())
-												continue;
+										auto WorldInventory = PlayerController->GetWorldInventory();
 
-											auto WorldInventory = PlayerController->GetWorldInventory();
+										if (!WorldInventory->IsValidLowLevel())
+											continue;
 
-											if (!WorldInventory->IsValidLowLevel())
-												continue;
+										bool bShouldUpdate = false;
+										WorldInventory->AddItem(ItemDefinition, &bShouldUpdate, AmountToGrantEveryone);
 
-											bool bShouldUpdate = false;
-											WorldInventory->AddItem(ItemDefinition, &bShouldUpdate, AmountToGrantEveryone);
-
-											if (bShouldUpdate)
-												WorldInventory->Update();
-										}
+										if (bShouldUpdate)
+											WorldInventory->Update();
 									}
-									else
-									{
-										ItemToGrantEveryone = "";
-										LOG_WARN(LogUI, "Invalid Item Definition!");
-									}
+								}
+								else
+								{
+									ItemToGrantEveryone = "";
+									LOG_WARN(LogUI, "Invalid Item Definition!");
 								}
 							}
 						}
@@ -3446,9 +3446,14 @@ static inline HICON LoadIconFromMemory(const char* bytes, int bytes_size, const 
 
 static inline DWORD WINAPI GuiThread(LPVOID)
 {
+	std::wstringstream ss;
+	ss << std::fixed << std::setprecision(2) << Fortnite_Version;
+
+	std::wstring title = L"Reboot Ultimate " + ss.str();
+
 	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, L"RebootClass", NULL };
 	::RegisterClassEx(&wc);
-	HWND hwnd = ::CreateWindowExW(0L, wc.lpszClassName, L"Reboot Ultimate", (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX), 100, 100, Width, Height, NULL, NULL, wc.hInstance, NULL);
+	HWND hwnd = ::CreateWindowExW(0L, wc.lpszClassName, title.c_str(), (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX), 100, 100, Width, Height, NULL, NULL, wc.hInstance, NULL);
 
 	if (hwnd == NULL)
 	{

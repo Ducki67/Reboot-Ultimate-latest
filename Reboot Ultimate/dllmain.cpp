@@ -1229,12 +1229,24 @@ DWORD WINAPI Main(LPVOID)
     // Hooking::MinHook::Hook(FindObject<UFortServerBotManagerAthena>(L"/Script/FortniteGame.Default__FortServerBotManagerAthena"), FindObject<UFunction>(L"/Script/FortniteGame.FortServerBotManagerAthena.SpawnBot"),
        // UFortServerBotManagerAthena::SpawnBotHook, (PVOID*)&UFortServerBotManagerAthena::SpawnBotOriginal, false);
 
-    Hooking::MinHook::Hook(GameModeDefault, FindObject<UFunction>(L"/Script/Engine.GameModeBase.SpawnDefaultPawnFor"),
-        AGameModeBase::SpawnDefaultPawnForHook, nullptr, false);
-    // Hooking::MinHook::Hook(GameModeDefault, FindObject<UFunction>(L"/Script/Engine.GameModeBase.PlayerCanRestart"),
-       // AGameModeBase::PlayerCanRestartHook, (PVOID*)&AGameModeBase::PlayerCanRestartOriginal, false, true);
-    Hooking::MinHook::Hook(GameModeDefault, FindObject<UFunction>(L"/Script/Engine.GameModeBase.HandleStartingNewPlayer"), AFortGameModeAthena::Athena_HandleStartingNewPlayerHook,
-        (PVOID*)&AFortGameModeAthena::Athena_HandleStartingNewPlayerOriginal, false);
+    if (Fortnite_Version != 19.01)
+    {
+        Hooking::MinHook::Hook(GameModeDefault, FindObject<UFunction>(L"/Script/Engine.GameModeBase.SpawnDefaultPawnFor"),
+            AGameModeBase::SpawnDefaultPawnForHook, nullptr, false);
+        // Hooking::MinHook::Hook(GameModeDefault, FindObject<UFunction>(L"/Script/Engine.GameModeBase.PlayerCanRestart"),
+           // AGameModeBase::PlayerCanRestartHook, (PVOID*)&AGameModeBase::PlayerCanRestartOriginal, false, true);
+        Hooking::MinHook::Hook(GameModeDefault, FindObject<UFunction>(L"/Script/Engine.GameModeBase.HandleStartingNewPlayer"), AFortGameModeAthena::Athena_HandleStartingNewPlayerHook,
+            (PVOID*)&AFortGameModeAthena::Athena_HandleStartingNewPlayerOriginal, false);
+    }
+    else
+    {
+        Hooking::MinHook::Hook(GameModeDefault, FindObject<UFunction>(L"/Script/Engine.GameModeBase.SpawnDefaultPawnFor"),
+            AGameModeBase::SpawnDefaultPawnForChapter3Hook, nullptr, false);
+        // Hooking::MinHook::Hook(GameModeDefault, FindObject<UFunction>(L"/Script/Engine.GameModeBase.PlayerCanRestart"),
+           // AGameModeBase::PlayerCanRestartHook, (PVOID*)&AGameModeBase::PlayerCanRestartOriginal, false, true);
+        Hooking::MinHook::Hook(GameModeDefault, FindObject<UFunction>(L"/Script/Engine.GameModeBase.HandleStartingNewPlayer"), AFortGameModeAthena::Athena_HandleStartingNewPlayerHook,
+            (PVOID*)&AFortGameModeAthena::Athena_HandleStartingNewPlayerOriginal, false);
+    }
 
     static auto ControllerServerAttemptInteractFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerController.ServerAttemptInteract");
 
@@ -1314,7 +1326,7 @@ DWORD WINAPI Main(LPVOID)
     Hooking::MinHook::Hook(FortWeaponDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortWeapon.ServerReleaseWeaponAbility"),
         AFortWeapon::ServerReleaseWeaponAbilityHook, (PVOID*)&AFortWeapon::ServerReleaseWeaponAbilityOriginal, false, true);
 
-    if (Fortnite_Version != 6.21)
+    if (Fortnite_Version > 12.41)
     {
         auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
 

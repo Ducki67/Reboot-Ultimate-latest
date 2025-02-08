@@ -303,3 +303,203 @@ APawn* AGameModeBase::SpawnDefaultPawnForHook(AGameModeBase* GameMode, AControll
 
 	return NewPawn;
 }
+
+APawn* AGameModeBase::SpawnDefaultPawnForChapter3Hook(AGameModeBase* GameMode, AController* NewPlayer, AActor* StartSpot)
+{
+	LOG_INFO(LogDev, "SpawnDefaultPawnForHook!");
+
+	auto NewPlayerAsAthena = Cast<AFortPlayerControllerAthena>(NewPlayer);
+
+	if (!NewPlayerAsAthena)
+		return nullptr; // return original?
+
+	auto PlayerStateAthena = NewPlayerAsAthena->GetPlayerStateAthena();
+
+	if (!PlayerStateAthena)
+		return nullptr; // return original?
+
+	static auto PawnClass = FindObject<UClass>(L"/Game/Athena/PlayerPawn_Athena.PlayerPawn_Athena_C");
+	static auto DefaultPawnClassOffset = GameMode->GetOffset("DefaultPawnClass");
+	GameMode->Get<UClass*>(DefaultPawnClassOffset) = PawnClass;
+
+	bool bUseSpawnActor = Fortnite_Version >= 20;
+
+	static auto SpawnDefaultPawnAtTransformFn = FindObject<UFunction>(L"/Script/Engine.GameModeBase.SpawnDefaultPawnAtTransform");
+
+	FTransform SpawnTransform = StartSpot->GetTransform();
+	APawn* NewPawn = nullptr;
+
+	if (bUseSpawnActor)
+	{
+		NewPawn = GetWorld()->SpawnActor<APawn>(PawnClass, SpawnTransform, CreateSpawnParameters(ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn));
+	}
+	else
+	{
+		struct { AController* NewPlayer; FTransform SpawnTransform; APawn* ReturnValue; }
+		AGameModeBase_SpawnDefaultPawnAtTransform_Params{ NewPlayer, SpawnTransform };
+
+		GameMode->ProcessEvent(SpawnDefaultPawnAtTransformFn, &AGameModeBase_SpawnDefaultPawnAtTransform_Params);
+
+		NewPawn = AGameModeBase_SpawnDefaultPawnAtTransform_Params.ReturnValue;
+	}
+
+	if (!NewPawn)
+		return nullptr;
+
+	bool bIsRespawning = false; // reel
+
+	auto ASC = PlayerStateAthena->GetAbilitySystemComponent();
+	auto GameState = ((AFortGameModeAthena*)GameMode)->GetGameStateAthena();
+
+	GET_PLAYLIST(GameState);
+
+	if (CurrentPlaylist) // Apply gameplay effects from playlist // We need to move this maybe?
+	{
+		CurrentPlaylist->ApplyModifiersToActor(PlayerStateAthena);
+	}
+
+	auto PlayerAbilitySet = GetPlayerAbilitySet(); // Apply default gameplay effects // We need to move maybe?
+
+	if (PlayerAbilitySet && ASC)
+	{
+		PlayerAbilitySet->ApplyGrantedGameplayAffectsToAbilitySystem(ASC);
+	}
+
+	if (!bIsRespawning)
+	{
+		auto WorldInventory = NewPlayerAsAthena->GetWorldInventory();
+
+		if (WorldInventory->IsValidLowLevel())
+		{
+			if (!WorldInventory->GetPickaxeInstance())
+			{
+				// TODO Check Playlist->bRequirePickaxeInStartingInventory
+
+				auto& StartingItems = ((AFortGameModeAthena*)GameMode)->GetStartingItems();
+
+				if (Globals::bGoingToPlayEvent && Fortnite_Version >= 16.00)
+				{
+					auto WID = Cast<UFortWorldItemDefinition>(FindObject("WID_EventMode_Activator", nullptr, ANY_PACKAGE)); // Empty Hands
+
+					bool bShouldUpdate = false;
+					WorldInventory->AddItem(WID, &bShouldUpdate, 1);
+
+					if (bShouldUpdate)
+						WorldInventory->Update();
+				}
+				else
+				{
+					NewPlayerAsAthena->AddPickaxeToInventory();
+				}
+
+				for (int i = 0; i < StartingItems.Num(); ++i)
+				{
+					auto& StartingItem = StartingItems.at(i);
+
+					WorldInventory->AddItem(StartingItem.GetItem(), nullptr, StartingItem.GetCount());
+				}
+
+				/* if (Globals::bLateGame)
+				{
+					auto SpawnIslandTierGroup = UKismetStringLibrary::Conv_StringToName(L"Loot_AthenaFloorLoot_Warmup");
+
+					for (int i = 0; i < 5; ++i)
+					{
+						auto LootDrops = PickLootDrops(SpawnIslandTierGroup);
+
+						for (auto& LootDrop : LootDrops)
+						{
+							WorldInventory->AddItem(LootDrop.ItemDefinition, nullptr, LootDrop.Count, LootDrop.LoadedAmmo);
+						}
+					}
+				} */
+
+				auto AddInventoryOverrideTeamLoadouts = [&](AFortAthenaMutator* Mutator)
+					{
+						if (auto InventoryOverride = Cast<AFortAthenaMutator_InventoryOverride>(Mutator))
+						{
+							auto TeamIndex = PlayerStateAthena->GetTeamIndex();
+							auto LoadoutTeam = InventoryOverride->GetLoadoutTeamForTeamIndex(TeamIndex);
+
+							if (LoadoutTeam.UpdateOverrideType == EAthenaInventorySpawnOverride::Always)
+							{
+								auto LoadoutContainer = InventoryOverride->GetLoadoutContainerForTeamIndex(TeamIndex);
+
+								for (int i = 0; i < LoadoutContainer.Loadout.Num(); ++i)
+								{
+									auto& ItemAndCount = LoadoutContainer.Loadout.at(i);
+									WorldInventory->AddItem(ItemAndCount.GetItem(), nullptr, ItemAndCount.GetCount());
+								}
+							}
+						}
+					};
+
+				LoopMutators(AddInventoryOverrideTeamLoadouts);
+			}
+
+			const auto& ItemInstances = WorldInventory->GetItemList().GetItemInstances();
+			const auto& ReplicatedEntries = WorldInventory->GetItemList().GetReplicatedEntries();
+
+			for (int i = 0; i < ItemInstances.Num(); ++i)
+			{
+				auto ItemInstance = ItemInstances.at(i);
+
+				if (!ItemInstance) continue;
+
+				auto WeaponItemDefinition = Cast<UFortWeaponItemDefinition>(ItemInstance->GetItemEntry()->GetItemDefinition());
+
+				if (!WeaponItemDefinition) continue;
+
+				ItemInstance->GetItemEntry()->GetLoadedAmmo() = WeaponItemDefinition->GetClipSize();
+				WorldInventory->GetItemList().MarkItemDirty(ItemInstance->GetItemEntry());
+			}
+
+			for (int i = 0; i < ReplicatedEntries.Num(); ++i)
+			{
+				auto ReplicatedEntry = ReplicatedEntries.AtPtr(i, FFortItemEntry::GetStructSize());
+
+				auto WeaponItemDefinition = Cast<UFortWeaponItemDefinition>(ReplicatedEntry->GetItemDefinition());
+
+				if (!WeaponItemDefinition) continue;
+
+				ReplicatedEntry->GetLoadedAmmo() = WeaponItemDefinition->GetClipSize();
+				WorldInventory->GetItemList().MarkItemDirty(ReplicatedEntry);
+			}
+
+			WorldInventory->Update();
+		}
+	}
+	else
+	{
+		// TODO I DONT KNOW WHEN TO DO THIS
+
+		/*
+
+		static auto DeathInfoStruct = FindObject<UStruct>(L"/Script/FortniteGame.DeathInfo");
+		static auto DeathInfoStructSize = DeathInfoStruct->GetPropertiesSize();
+		RtlSecureZeroMemory(DeathInfo, DeathInfoStructSize); // TODO FREE THE DEATHTAGS
+
+		static auto OnRep_DeathInfoFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerStateAthena.OnRep_DeathInfo");
+
+		if (OnRep_DeathInfoFn)
+		{
+			PlayerStateAthena->ProcessEvent(OnRep_DeathInfoFn);
+		}
+
+		*/
+
+		// NewPlayerAsAthena->ClientClearDeathNotification();
+		// NewPlayerAsAthena->RespawnPlayerAfterDeath(true);
+	}
+
+	static bool bFirst = true;
+
+	if (!bFirst && Calendar::HasSnowModification() && Fortnite_Version < 19.10)
+	{
+		bFirst = false;
+		Calendar::SetSnow(100);
+	}
+	// LOG_INFO(LogDev, "Finish SpawnDefaultPawnFor!");
+
+	return NewPawn;
+}

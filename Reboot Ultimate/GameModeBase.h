@@ -21,4 +21,5 @@ public:
 
 	static bool PlayerCanRestartHook(UObject* Context, FFrame& Stack, bool* Ret);
 	static APawn* SpawnDefaultPawnForHook(AGameModeBase* GameMode, AController* NewPlayer, AActor* StartSpot);
+	static APawn* SpawnDefaultPawnForChapter3Hook(AGameModeBase* GameMode, AController* NewPlayer, AActor* StartSpot);
 };
