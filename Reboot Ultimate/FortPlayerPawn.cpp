@@ -226,6 +226,8 @@ AActor* AFortPlayerPawn::ServerOnExitVehicle(ETryExitVehicleBehavior ExitForceBe
 	this->ProcessEvent(ServerOnExitVehicleFn, &AFortPlayerPawn_ServerOnExitVehicle_Params);
 
 	return AFortPlayerPawn_ServerOnExitVehicle_Params.ReturnValue;
+
+	LOG_INFO(LogDev, "ExitVehicleFunction: {}", ExitVehicleFunction ? "Found!" : "Not Found!");
 }
 
 AFortAthenaVehicle* AFortPlayerPawn::GetVehicle() // hm should we call the reflecterd function?
@@ -323,6 +325,8 @@ void AFortPlayerPawn::SiphonMats()
 
 void AFortPlayerPawn::UnEquipVehicleWeaponDefinition(UFortWeaponItemDefinition* VehicleWeaponDefinition)
 {
+	LOG_INFO(LogDev, "UnEquipVehicleWeaponDefinition called!");
+
 	if (!VehicleWeaponDefinition)
 		return;
 
@@ -341,27 +345,38 @@ void AFortPlayerPawn::UnEquipVehicleWeaponDefinition(UFortWeaponItemDefinition* 
 	if (!VehicleInstance)
 		return;
 
+	LOG_INFO(LogDev, "Removing VehicleWeaponDefinition: {}", VehicleWeaponDefinition->GetFullName());
+
 	bool bShouldUpdate = false;
 	WorldInventory->RemoveItem(VehicleInstance->GetItemEntry()->GetItemGuid(), &bShouldUpdate, VehicleInstance->GetItemEntry()->GetCount(), true);
 
-	if (bShouldUpdate)
-		WorldInventory->Update();
+	WorldInventory->Update();
 
 	LOG_INFO(LogVehicles, "Removed VehicleWeaponDefinition: {}", VehicleWeaponDefinition->GetFullName());
 
 	auto SwappingDefinition = Cast<AFortPlayerControllerAthena>(PlayerController)->GetSwappingItemDefinition();
-	auto SwappingInstance = WorldInventory->FindItemInstance(SwappingDefinition);
+	LOG_INFO(LogDev, "SwappingDefinition: {}", SwappingDefinition ? SwappingDefinition->GetFullName() : "None");
+
+	auto SwappingInstance = SwappingDefinition ? WorldInventory->FindItemInstance(SwappingDefinition) : nullptr;
 
 	if (!SwappingInstance)
+	{
+		LOG_INFO(LogDev, "SwappingInstance not found, using pickaxe instead.");
 		SwappingInstance = WorldInventory->GetPickaxeInstance();
+	}
 
 	if (!SwappingInstance)
+	{
+		LOG_INFO(LogDev, "Pickaxe instance not found either, aborting equip!");
 		return;
+	}
 
-	LOG_INFO(LogVehicles, "Equipping SwappingDefinition: {}", SwappingDefinition->GetFullName());
+	LOG_INFO(LogVehicles, "Equipping {}", SwappingInstance->GetItemDefinition()->GetFullName());
 
 	PlayerController->ServerExecuteInventoryItemHook(PlayerController, SwappingInstance->GetItemEntry()->GetItemGuid());
 	PlayerController->ClientEquipItem(SwappingInstance->GetItemEntry()->GetItemGuid(), true);
+
+	PlayerController->ForceNetUpdate();
 }
 
 void AFortPlayerPawn::StartGhostModeExitHook(UObject* Context, FFrame* Stack, void* Ret)
@@ -396,8 +411,11 @@ void AFortPlayerPawn::StartGhostModeExitHook(UObject* Context, FFrame* Stack, vo
 
 AActor* AFortPlayerPawn::ServerOnExitVehicleHook(AFortPlayerPawn* PlayerPawn, ETryExitVehicleBehavior ExitForceBehavior)
 {
+	LOG_INFO(LogDev, "ServerOnExitVehicleHook triggered!");
+
 	auto VehicleWeaponDefinition = PlayerPawn->GetVehicleWeaponDefinition(PlayerPawn->GetVehicle());
 	LOG_INFO(LogDev, "VehicleWeaponDefinition: {}", VehicleWeaponDefinition ? VehicleWeaponDefinition->GetFullName() : "BadRead");
+
 	PlayerPawn->UnEquipVehicleWeaponDefinition(VehicleWeaponDefinition);
 
 	return ServerOnExitVehicleOriginal(PlayerPawn, ExitForceBehavior);

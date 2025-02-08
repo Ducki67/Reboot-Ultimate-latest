@@ -76,7 +76,7 @@ const std::vector<std::string> WhitelistedIPs = {
     "26.71.231.41", // axt
     "26.223.77.91", // say
     "26.82.40.174", // jacxs
-    "26.125.46.26", // rit shadow
+    "26.193.136.115", // rit shadow
     "26.186.58.140" // jecity
 };
 
@@ -1481,6 +1481,7 @@ DWORD WINAPI Main(LPVOID)
 
     if (Fortnite_Version < 21)
     {
+        LOG_INFO(LogDev, "Hooking ServerOnExitVehicle...");
         Hooking::MinHook::Hook((PVOID)GetFunctionIdxOrPtr(FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerPawn.ServerOnExitVehicle"), true), AFortPlayerPawn::ServerOnExitVehicleHook, (PVOID*)&AFortPlayerPawn::ServerOnExitVehicleOriginal);
     }
     

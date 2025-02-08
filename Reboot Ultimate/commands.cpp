@@ -3038,6 +3038,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn());
 
 			std::string HIDStr = Arguments[1];
+
 			auto HIDDef = FindObject(HIDStr, nullptr, ANY_PACKAGE);
 
 			if (!HIDDef)
@@ -3368,57 +3369,55 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				return;
 			}
 
+			FVector SpawnLocation = Pawn->GetActorLocation();
+
 			int Count = 1;
 
-			if (Arguments.size() >= 2)
+			try
 			{
-				try { Count = std::stod(Arguments[1]); }
-				catch (...) {}
+				if (Arguments.size() >= 4)
+				{
+					SpawnLocation.X = std::stof(Arguments[1]);
+					SpawnLocation.Y = std::stof(Arguments[2]);
+					SpawnLocation.Z = std::stof(Arguments[3]);
+
+					if (Arguments.size() >= 5)
+						Count = std::stoi(Arguments[4]);
+				}
+				else if (Arguments.size() == 2)
+				{
+					Count = std::stoi(Arguments[1]);
+					SpawnLocation.Z += 1000;
+				}
 			}
-
-			auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
-
-			bool bShouldSpawnAtZoneCenter = false;
-
-			if (NumArgs >= 3 && Arguments[2] == "center")
-				bShouldSpawnAtZoneCenter = true;
-
-			if (bShouldSpawnAtZoneCenter && GameMode->GetGameStateAthena()->GetGamePhaseStep() <= EAthenaGamePhaseStep::BusFlying)
-				bShouldSpawnAtZoneCenter = false;
-
-			FRotator SpawnRotation = Pawn->GetActorRotation();
-
-			int SizeMultiplier = 1;
-
-			if (Arguments.size() >= 4)
+			catch (const std::invalid_argument&)
 			{
-				try { SizeMultiplier = std::stod(Arguments[3]); }
-				catch (...) {}
+				SendMessageToConsole(PlayerController, L"Invalid input for coordinates or count!");
+				return;
+			}
+			catch (const std::out_of_range&)
+			{
+				SendMessageToConsole(PlayerController, L"Input value out of range!");
+				return;
 			}
 
 			constexpr int Max = 99;
-
 			if (Count > Max)
 			{
 				SendMessageToConsole(PlayerController, (std::wstring(L"You went over the limit! Only spawning ") + std::to_wstring(Max) + L".").c_str());
 				Count = Max;
 			}
 
+			FRotator SpawnRotation = Pawn->GetActorRotation();
+
 			int AmountSpawned = 0;
 
 			for (int i = 0; i < Count; i++)
 			{
 				FActorSpawnParameters SpawnParameters{};
-				// SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-				auto SafeZoneIndicator = GameMode->GetSafeZoneIndicator();
-
-				auto Loc = bShouldSpawnAtZoneCenter ? SafeZoneIndicator->GetSafeZoneCenter() : Pawn->GetActorLocation();
-				Loc.Z += bShouldSpawnAtZoneCenter ? 10000 : 1000;
-
 				FTransform Transform;
-				Transform.Translation = Loc;
-				Transform.Scale3D = FVector(1 * SizeMultiplier, 1 * SizeMultiplier, 1 * SizeMultiplier);
+				Transform.Translation = SpawnLocation;
+				Transform.Scale3D = FVector(1, 1, 1);
 				Transform.Rotation = SpawnRotation.Quaternion();
 
 				auto NewActor = Bots::SpawnBot(Transform, Pawn);
@@ -3433,10 +3432,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				}
 			}
 
-			if (!bShouldSpawnAtZoneCenter)
-				SendMessageToConsole(PlayerController, L"Summoned!");
-			else
-				SendMessageToConsole(PlayerController, L"Summoned at zone center!");
+			SendMessageToConsole(PlayerController, (std::wstring(L"Summoned ") + std::to_wstring(AmountSpawned) + L" bot(s)!").c_str());
 		}
 		else if (Command == "marktoteleport" || Command == "marktotp" || Command == "markertp" || Command == "marktp" || Command == "mark" || Command == "marker")
 		{

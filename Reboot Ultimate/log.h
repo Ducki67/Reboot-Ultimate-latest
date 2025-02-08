@@ -66,8 +66,6 @@ inline void InitLogger()
 
     SetConsoleTitleA("Reboot Ultimate");
 
-#ifdef ENABLE_SPD_LOG
-
     std::string logName = "reboot.log"; // GenerateLogFileName();
 
     sinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>())->set_pattern("[%D-%T] %n: %^%v%$");
@@ -102,7 +100,6 @@ inline void InitLogger()
     MakeLogger("LogRebooting");
     MakeLogger("LogObjectViewer");
     MakeLogger("LogLateGame");
-#endif
 }
 
 #ifdef ENABLE_SPD_LOG

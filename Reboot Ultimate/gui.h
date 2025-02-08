@@ -1293,6 +1293,7 @@ static inline void MainUI()
 			auto GameState = Cast<AFortGameStateAthena>(GameMode->GetGameState());
 
 			bool isLateGame = Globals::bLateGame;
+			bool bGameStarted = bStartedBus || GameState->GetGamePhase() > EAthenaGamePhase::Warmup;
 
 			if (bLoaded)
 			{
@@ -1319,7 +1320,7 @@ static inline void MainUI()
 
 				ImGui::Text(std::format("UPTIME: {}", convertToHMS(Globals::UPTime)).c_str());
 				ImGui::NewLine();
-				ImGui::Text(std::format("Joinable: {}", Globals::bStartedListening).c_str());
+				ImGui::Text(std::format("Joinable: {}", Globals::bStartedListening && !bGameStarted).c_str());
 				ImGui::Text(std::format("Started: {}", bStartedBus).c_str());
 				ImGui::Text(std::format("Ended: {}", GameState->GetGamePhase() > EAthenaGamePhase::Warmup && !GameMode->IsMatchInProgress()).c_str());
 				ImGui::Text(std::format("Gamemode: {} {}", (isLateGame ? "Lategame" : "Full Map"), PlaylistShortName).c_str());
