@@ -2801,7 +2801,7 @@ static inline void PregameUI()
 		ImGui::RadioButton("Siphon Squads", &SelectedPlaylist, (int)Playlist::SiphonSquads);
 		ImGui::RadioButton("Slide Solos", &SelectedPlaylist, (int)Playlist::SlideSolos);
 		ImGui::RadioButton("Slide Duos", &SelectedPlaylist, (int)Playlist::SlideDuos);
-		ImGui::RadioButton("Team Rumble", &SelectedPlaylist, (int)Playlist::TeamRumble);
+		ImGui::RadioButton("Respawn Squads", &SelectedPlaylist, (int)Playlist::TeamRumble);
 		ImGui::RadioButton("Custom", &SelectedPlaylist, (int)Playlist::Custom);
 
 		switch (SelectedPlaylist)
@@ -2863,7 +2863,7 @@ static inline void PregameUI()
 		}
 		case (int)Playlist::TeamRumble:
 		{
-			PlaylistName = "/Game/Athena/Playlists/Respawn/Playlist_Respawn_24.Playlist_Respawn_24";
+			PlaylistName = "/Game/Athena/Playlists/Respawn/Playlist_Respawn_20_Sif.Playlist_Respawn_20_Sif";
 			break;
 		}
 		case (int)Playlist::Custom:
