@@ -31,7 +31,8 @@ std::string BackendIP = Globals::BackendIP;
 std::string BackendPort = Globals::BackendPort;
 std::string BackendName = Globals::BackendName;
 
-static size_t write_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
+static size_t write_callback(char* ptr, size_t size, size_t nmemb, void* userdata) 
+{
 	((std::string*)userdata)->append(ptr, size * nmemb);
 	return size * nmemb;
 }
@@ -1769,6 +1770,11 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 		{
 			KillerPawn->SiphonMats();
 
+			if (Globals::bUseSiphon)
+			{
+				KillerPlayerState->ApplySiphonEffect();
+			}
+
 			if (Globals::AmountOfHealthSiphon > 0)
 			{
 				float Health = KillerPawn->GetHealth();
@@ -1788,11 +1794,6 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 
 				if (RemainingSiphon > 0 && Shield < MaxShield)
 				{
-					if (Globals::bUseSiphon)
-					{
-						KillerPlayerState->ApplySiphonEffect();
-					}
-
 					float ShieldToGive = FMath::Min(RemainingSiphon, MaxShield - Shield);
 					KillerPawn->SetShield(Shield + ShieldToGive);
 				}

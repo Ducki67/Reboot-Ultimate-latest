@@ -33,11 +33,12 @@ void ABuildingActor::OnDamageServerHook(ABuildingActor* BuildingActor, float Dam
 			Container->SpawnLoot();
 		}
 	}
+
 	auto AttachedBuildingActors = BuildingSMActor->GetAttachedBuildingActors();
 
 	if (AttachedBuildingActors.Num() == 0)
 	{
-		return;
+		goto HarvestResources;
 	}
 
 	for (int i = 0; i < AttachedBuildingActors.Num(); ++i)
@@ -67,6 +68,8 @@ void ABuildingActor::OnDamageServerHook(ABuildingActor* BuildingActor, float Dam
 			}
 		}
 	}
+
+	HarvestResources:
 
 	auto PlayerController = Cast<AFortPlayerControllerAthena>(InstigatedBy);
 	// auto Pawn = PlayerController ? PlayerController->GetMyFortPawn() : nullptr;

@@ -1326,21 +1326,6 @@ DWORD WINAPI Main(LPVOID)
 
     Hooking::MinHook::Hook(FortWeaponDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortWeapon.ServerReleaseWeaponAbility"),
         AFortWeapon::ServerReleaseWeaponAbilityHook, (PVOID*)&AFortWeapon::ServerReleaseWeaponAbilityOriginal, false, true);
-
-    if (Fortnite_Version > 12.41)
-    {
-        auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
-
-        GET_PLAYLIST(GameState);
-
-        bool bRespawning = CurrentPlaylist->GetRespawnType() == EAthenaRespawnType::InfiniteRespawn || CurrentPlaylist->GetRespawnType() == EAthenaRespawnType::InfiniteRespawnExceptStorm;
-
-        if (Fortnite_Version > 12.41 && bRespawning)
-        {
-            Hooking::MinHook::Hook(FortPlayerControllerAthenaDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerControllerAthena.ServerClientIsReadyToRespawn"),
-                (void*)AFortPlayerControllerAthena::ServerClientIsReadyToRespawn, nullptr, false);
-        }
-    }
     
     if (Fortnite_Version == 19.10)
     {
