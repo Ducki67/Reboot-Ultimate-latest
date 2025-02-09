@@ -69,6 +69,7 @@
 const std::vector<std::string> WhitelistedIPs = {
     "26.95.73.26", // ralz
     "26.153.21.74", // sweefy
+    "26.198.115.19", // Heliato
     "26.69.16.29", // rit main
     "26.61.188.132", // crazy
     "26.0.11.135", // kye of norcal

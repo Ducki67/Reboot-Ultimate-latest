@@ -1336,6 +1336,42 @@ void AFortPlayerController::ServerAttemptInventoryDropHook(AFortPlayerController
 	if (!ItemDefinition || !ItemDefinition->CanBeDropped())
 		return;
 
+	static auto WID_Launcher_Petrol = FindObject<UFortWorldItemDefinition>(L"/Game/Athena/Items/Weapons/Prototype/WID_Launcher_Petrol.WID_Launcher_Petrol");
+
+	if (ItemDefinition == WID_Launcher_Petrol)
+	{
+		const FVector& SpawnLocation = Pawn->GetActorLocation();
+
+		static auto BGA_Petrol_PickupClass = FindObject<UClass>(L"/Game/Athena/Items/Weapons/Prototype/PetrolPump/BGA_Petrol_Pickup.BGA_Petrol_Pickup_C");
+		AActor* PetrolPickup = GetWorld()->SpawnActor<AActor>(BGA_Petrol_PickupClass, SpawnLocation);
+
+		if (PetrolPickup)
+		{
+			static auto FortItemEntryOffset = PetrolPickup->GetOffset("FortItemEntry");
+			UObject* FortItemEntry = *(UObject**)(__int64(PetrolPickup) + FortItemEntryOffset);
+			if (!FortItemEntry) return;
+
+			// To Fix
+			/*struct
+			{ 
+				FFortItemEntry Item;
+			} FortItemEntryComponent_SetOwnedItem{ *ReplicatedEntry };
+
+			static auto SetOwnedItemFn = FindObject<UFunction>(L"/Script/FortniteGame.FortItemEntryComponent.SetOwnedItem");
+			FortItemEntry->ProcessEvent(SetOwnedItemFn, &FortItemEntryComponent_SetOwnedItem);*/
+		}
+
+		bool bShouldUpdate = false;
+
+		if (!WorldInventory->RemoveItem(ItemGuid, &bShouldUpdate, Count, true))
+			return;
+
+		if (bShouldUpdate)
+			WorldInventory->Update();
+
+		return;
+	}
+
 	static auto DropBehaviorOffset = ItemDefinition->GetOffset("DropBehavior", false);
 
 	EWorldItemDropBehavior DropBehavior = DropBehaviorOffset != -1 ? ItemDefinition->GetDropBehavior() : EWorldItemDropBehavior::EWorldItemDropBehavior_MAX;
