@@ -1230,7 +1230,7 @@ DWORD WINAPI Main(LPVOID)
     // Hooking::MinHook::Hook(FindObject<UFortServerBotManagerAthena>(L"/Script/FortniteGame.Default__FortServerBotManagerAthena"), FindObject<UFunction>(L"/Script/FortniteGame.FortServerBotManagerAthena.SpawnBot"),
        // UFortServerBotManagerAthena::SpawnBotHook, (PVOID*)&UFortServerBotManagerAthena::SpawnBotOriginal, false);
 
-    if (Fortnite_Version != 19.01)
+    if (Fortnite_Version != 19.01 || Fortnite_Version != 18.40)
     {
         Hooking::MinHook::Hook(GameModeDefault, FindObject<UFunction>(L"/Script/Engine.GameModeBase.SpawnDefaultPawnFor"),
             AGameModeBase::SpawnDefaultPawnForHook, nullptr, false);
@@ -1690,12 +1690,15 @@ DWORD WINAPI Main(LPVOID)
             UAthenaMarkerComponent::ServerRemoveMapMarkerHook, nullptr, false);
     }
 
-    Hooking::MinHook::Hook(FindObject<AFortAthenaAIBotController>(L"/Script/FortniteGame.Default__FortAthenaAIBotController"), FindObject<UFunction>(L"/Script/FortniteGame.FortAthenaAIBotController.OnPossesedPawnDied"),
-        AFortAthenaAIBotController::OnPossesedPawnDiedHook, (PVOID*)&AFortAthenaAIBotController::OnPossesedPawnDiedOriginal, false);
-    Hooking::MinHook::Hook(FindObject<AFortAthenaAIBotController>(L"/Script/FortniteGame.Default__FortAthenaAIBotController"), FindObject<UFunction>(L"/Script/FortniteGame.FortAthenaAIBotController.OnPerceptionSensed"),
-        AFortAthenaAIBotController::OnPerceptionSensedHook, (PVOID*)&AFortAthenaAIBotController::OnPerceptionSensedOriginal, false);
-    Hooking::MinHook::Hook(FindObject<AFortAthenaAIBotController>(L"/Script/FortniteGame.Default__FortAthenaAIBotController"), FindObject<UFunction>(L"/Script/FortniteGame.FortAthenaAIBotController.OnAlertLevelChanged"),
-        AFortAthenaAIBotController::OnAlertLevelChangedHook, (PVOID*)&AFortAthenaAIBotController::OnAlertLevelChangedOriginal, false);
+    if (Fortnite_Version != 18.40)
+    {
+        Hooking::MinHook::Hook(FindObject<AFortAthenaAIBotController>(L"/Script/FortniteGame.Default__FortAthenaAIBotController"), FindObject<UFunction>(L"/Script/FortniteGame.FortAthenaAIBotController.OnPossesedPawnDied"),
+            AFortAthenaAIBotController::OnPossesedPawnDiedHook, (PVOID*)&AFortAthenaAIBotController::OnPossesedPawnDiedOriginal, false);
+        Hooking::MinHook::Hook(FindObject<AFortAthenaAIBotController>(L"/Script/FortniteGame.Default__FortAthenaAIBotController"), FindObject<UFunction>(L"/Script/FortniteGame.FortAthenaAIBotController.OnPerceptionSensed"),
+            AFortAthenaAIBotController::OnPerceptionSensedHook, (PVOID*)&AFortAthenaAIBotController::OnPerceptionSensedOriginal, false);
+        Hooking::MinHook::Hook(FindObject<AFortAthenaAIBotController>(L"/Script/FortniteGame.Default__FortAthenaAIBotController"), FindObject<UFunction>(L"/Script/FortniteGame.FortAthenaAIBotController.OnAlertLevelChanged"),
+            AFortAthenaAIBotController::OnAlertLevelChangedHook, (PVOID*)&AFortAthenaAIBotController::OnAlertLevelChangedOriginal, false);
+    }
 
     Hooking::MinHook::Hook((PVOID)Addresses::GetPlayerViewpoint, (PVOID)AFortPlayerControllerAthena::GetPlayerViewPointHook, (PVOID*)&AFortPlayerControllerAthena::GetPlayerViewPointOriginal);
 

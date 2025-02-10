@@ -71,8 +71,8 @@ void AFortAthenaAIBotController::OnPossesedPawnDiedHook(AFortAthenaAIBotControll
 	auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
 	auto GameState = Cast<AFortGameStateAthena>(((AFortGameMode*)GetWorld()->GetGameMode())->GetGameState());
 
-	auto DeadPawn = Cast<AFortPlayerPawn>(PlayerController->GetPawn());
-	auto DeadPlayerState = Cast<AFortPlayerStateAthena>(PlayerController->GetPlayerState());
+	AFortPlayerPawn* DeadPawn = Cast<AFortPlayerPawn>(PlayerController->GetPawn());
+	AFortPlayerStateAthena* DeadPlayerState = Cast<AFortPlayerStateAthena>(PlayerController->GetPlayerState());
 
 	AFortPlayerPawn* KillerPawn = nullptr;
 	AFortPlayerStateAthena* KillerPlayerState = nullptr;

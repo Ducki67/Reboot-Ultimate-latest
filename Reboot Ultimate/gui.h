@@ -2904,7 +2904,7 @@ static inline void PregameUI()
 			ImGui::InputInt("Set Bot Shield", &Globals::bBotShield);
 		}
 
-		if (Fortnite_Version >= 11 && Engine_Version < 500 && !Globals::bStartedListening)
+		if (Fortnite_Version < 18 && Engine_Version >= 424 && !Globals::bStartedListening)
 		{
 			const char* botSimulationLabel = Globals::bBotPC ? "Bot Simulation - Maingame AIs" : "Bot Simulation - Reals";
 			if (ImGui::Checkbox(botSimulationLabel, &Globals::bBotPC));

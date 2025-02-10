@@ -10,11 +10,11 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 
 - [x] Fixed Foundations (minus maybe some stuff on s17)
 - [x] Fixed S18+ Win Screen
-- [x] Fixed Placing Traps on S19
+- [x] Fixed Placing Traps on 19.10
 - [x] Added Swag Lines to S16+
 - [x] Customizable Lategame Loadouts (also now for one shot)
 - [x] Fixed Boat Rockets (exxertz)
-- [x] Fixed Respawning on 12.41+ (currently unhooked, causes too many problems but if you want it all the code is still there)
+- [x] Fixed Respawning on 12.41+
 - [x] Fixed Attached Actor Chest Loot
 
 ## UI:
@@ -68,6 +68,7 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 - [ ] Apparently Editing
 - [ ] Auto Pause Zone
 - [ ] Auto God?
+- [ ] AI Lobbies???
 
 # Installation
 
