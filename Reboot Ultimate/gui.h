@@ -2606,7 +2606,7 @@ static inline void MainUI()
 										FString BannedPlayerName = ReceivingController->GetPlayerState()->GetPlayerName();
 									}
 								};
-							BanByHWID(CurrentController);
+							Ban(CurrentController);
 						}
 						if (ImGui::Button("Kill Player"))
 						{
