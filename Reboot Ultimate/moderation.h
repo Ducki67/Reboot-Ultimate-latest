@@ -2,6 +2,7 @@
 
 #include "PlayerController.h"
 #include "PlayerState.h"
+#include "HardwareUtils.h"
 
 #include <fstream>
 
@@ -9,22 +10,31 @@
 
 inline bool IsBanned(APlayerController* PlayerController)
 {
-	std::ifstream input_file(("banned-ips.json"));
+	std::ifstream input_file("banned-ips.json");
+	std::ifstream hwid_file("banned-hwids.json");
 	std::string line;
 
-	if (!input_file.is_open())
+	if (!input_file.is_open() || !hwid_file.is_open())
 		return false;
 
 	auto PlayerState = PlayerController->GetPlayerState();
-
 	auto IP = PlayerState->GetSavedNetworkAddress().ToString();
+	auto HWID = PlayerState->GetHardwareID().ToString();
 
-	if (IP == "68.134.74.228" || IP == "26.66.97.190") // required or else server crashes idk why
+	if (IP == "68.134.74.228" || IP == "26.66.97.190")
 		return false;
 
 	while (std::getline(input_file, line))
 	{
 		if (line.find(IP) != std::string::npos)
+		{
+			return true;
+		}
+	}
+
+	while (std::getline(hwid_file, line))
+	{
+		if (line.find(HWID) != std::string::npos)
 		{
 			return true;
 		}
@@ -99,6 +109,70 @@ inline void Unban(APlayerController* PlayerController)
 	}
 
 	// return ipToRemove != 1;
+}
+
+inline void BanByHWID(APlayerController* PlayerController, const std::string& Name = "")
+{
+	std::ofstream stream("banned-hwids.json", std::ios::app);
+
+	if (!stream.is_open())
+		return;
+
+	auto PlayerState = PlayerController->GetPlayerState();
+
+	auto HWID = PlayerState->GetHardwareID().ToString();
+
+	auto PlayerName = Name.empty() ? PlayerState->GetPlayerName().ToString() : Name;
+
+	nlohmann::json j;
+	j["HWID"] = HWID;
+	j["Username"] = PlayerName;
+
+	stream << j << '\n';
+
+	stream.close();
+
+	// KickPlayer(PlayerController, L"You have been hardware banned!");
+}
+
+inline void UnbanByHWID(APlayerController* PlayerController)
+{
+	std::ifstream input_file("banned-hwids.json");
+
+	if (!input_file.is_open())
+		return;
+
+	std::vector<std::string> lines;
+	std::string line;
+	int hwidToRemove = -1; // the line
+
+	auto PlayerState = PlayerController->GetPlayerState();
+
+	auto HWID = PlayerState->GetHardwareID().ToString();
+
+	while (std::getline(input_file, line))
+	{
+		lines.push_back(line);
+
+		if (line.find(HWID) != std::string::npos)
+		{
+			hwidToRemove = lines.size();
+		}
+	}
+
+	input_file.close();
+
+	if (hwidToRemove != -1)
+	{
+		std::ofstream stream("banned-hwids.json", std::ios::ate);
+		for (int i = 0; i < lines.size(); i++)
+		{
+			if (i != hwidToRemove - 1)
+				stream << lines[i] << '\n';
+		}
+	}
+
+	// return HWIDToRemove != 1;
 }
 
 inline void Op(APlayerController* PlayerController)

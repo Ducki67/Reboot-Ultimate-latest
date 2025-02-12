@@ -880,15 +880,35 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		}
 		else if (Command == "ban")
 		{
+			if (NumArgs < 1)
+			{
+				SendMessageToConsole(PlayerController, L"Please provide whether to ban by IP, or HWID.");
+				return;
+			}
+
+			std::string banType = Arguments[1];
+
 			if (ReceivingController == PlayerController)
 			{
 				SendMessageToConsole(PlayerController, L"You can't ban yourself!");
 				return;
 			}
 
-			Ban(ReceivingController);
+			if (banType == "IP" || banType == "ip")
+			{
+				Ban(ReceivingController);
+			}
+			else if (banType == "HWID" || banType == "hwid")
+			{
+				BanByHWID(ReceivingController);
+			}
+			else
+			{
+				SendMessageToConsole(PlayerController, L"Provided arguement is not a valid type. Please provide either IP or HWID.");
+				return;
+			}
 
-			FString Reason = L"You have been banned.";
+			FString Reason = L"You have been permanently banned.";
 
 			static auto ClientReturnToMainMenu = FindObject<UFunction>(L"/Script/Engine.PlayerController.ClientReturnToMainMenu");
 			ReceivingController->ProcessEvent(ClientReturnToMainMenu, &Reason);

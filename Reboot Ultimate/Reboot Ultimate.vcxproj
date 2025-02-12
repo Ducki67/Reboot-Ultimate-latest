@@ -259,6 +259,7 @@
     <ClCompile Include="GameplayStatics.cpp" />
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="GenericPlatformMath.cpp" />
+    <ClCompile Include="HardwareUtils.cpp" />
     <ClCompile Include="inc.cpp" />
     <ClCompile Include="InventoryManagementLibrary.cpp" />
     <ClCompile Include="KismetMathLibrary.cpp" />
@@ -450,6 +451,7 @@
     <ClInclude Include="GenericPlatformTime.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="gui.h" />
+    <ClInclude Include="HardwareUtils.h" />
     <ClInclude Include="hooking.h" />
     <ClInclude Include="IdentityFunctor.h" />
     <ClInclude Include="inc.h" />

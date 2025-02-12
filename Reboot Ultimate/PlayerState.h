@@ -18,6 +18,7 @@ public:
 class APlayerState : public AActor
 {
 public:
+	FString GetHardwareID();
 	FString& GetSavedNetworkAddress();
 	FString GetPlayerName();
 	int& GetPlayerID(); // for future me to deal with (this is a short on some versions).

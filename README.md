@@ -33,6 +33,7 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 
 - [x] cheat savewaypoint {phrase} - Will get the players current location, and save the coordinates based on the phrase.
 - [x] cheat waypoint {phrase} - (based on the last command) Will teleport the player to a waypoint using the specified phrase.
+- [x] cheat ban {IP/HWID} - Added support for HWID banning a user.
 - [x] cheat rift - Rifts the player.
 - [x] cheat infammo - Toggles Infinite Ammo.
 - [x] cheat buildfree - Toggles Infinite Materials.
@@ -59,7 +60,7 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 
 ## To Do List:
 
-- [ ] Hardware Ban
+- [x] Hardware Ban
 - [x] Fix 19.01
 - [ ] Redo Abilites
 - [ ] Llamas

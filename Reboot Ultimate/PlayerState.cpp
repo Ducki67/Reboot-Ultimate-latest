@@ -1,6 +1,12 @@
 #include "PlayerState.h"
 
 #include "reboot.h"
+#include "HardwareUtils.h"
+
+FString APlayerState::GetHardwareID()
+{
+	return FString(HardwareUtils::GetHardwareID().c_str());
+}
 
 FString& APlayerState::GetSavedNetworkAddress()
 {

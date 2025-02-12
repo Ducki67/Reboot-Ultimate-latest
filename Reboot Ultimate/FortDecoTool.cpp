@@ -57,7 +57,8 @@ void AFortDecoTool::ServerCreateBuildingAndSpawnDeco(AFortDecoTool* DecoTool, FF
     Stack.StepCompiledIn(&bSpawnDecoOnExtraPiece);
     Stack.StepCompiledIn(&BuildingExtraPieceLocation);
 
-    Stack.Code += Stack.Code != nullptr;
+    if (!Stack.Code)
+        return;
 
     LOG_INFO(LogDev, "ServerCreateBuildingAndSpawnDeco called - DecoTool: {}", DecoTool->GetFullName().c_str());
 

@@ -2587,7 +2587,7 @@ static inline void MainUI()
 							static auto ClientReturnToMainMenu = FindObject<UFunction>(L"/Script/Engine.PlayerController.ClientReturnToMainMenu");
 							CurrentController->ProcessEvent(ClientReturnToMainMenu, &Reason);
 						}
-						static std::string BanReason = "You have been banned!";
+						static std::string BanReason = "You have been permanently banned.";
 						ImGui::InputText("Ban Reason", &BanReason);
 						if (ImGui::Button("Ban Player"))
 						{
@@ -2606,7 +2606,7 @@ static inline void MainUI()
 										FString BannedPlayerName = ReceivingController->GetPlayerState()->GetPlayerName();
 									}
 								};
-							Ban(CurrentController);
+							BanByHWID(CurrentController);
 						}
 						if (ImGui::Button("Kill Player"))
 						{
