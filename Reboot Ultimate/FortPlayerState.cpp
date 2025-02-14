@@ -52,6 +52,12 @@ void AFortPlayerState::ApplySiphonEffect()
 	GetAbilitySystemComponent()->NetMulticast_InvokeGameplayCueExecuted(GameplayCueTag);
 }
 
+void AFortPlayerState::OnRep_CharacterGender()
+{
+	static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerState.OnRep_CharacterGender");
+	this->ProcessEvent(fn);
+}
+
 void AFortPlayerState::DisableFallDamage()
 {
 	if (!GetAbilitySystemComponent())

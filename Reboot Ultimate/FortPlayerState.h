@@ -35,6 +35,7 @@ public:
 	void UpdateScoreStatChanged();
 	void EndDBNOAbilities();
 	void ApplySiphonEffect();
+	void OnRep_CharacterGender();
 	void ApplyHealthEffect();
 	void DisableFallDamage();
 	// void CheckAndTeleportPlayer();

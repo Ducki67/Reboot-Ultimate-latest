@@ -73,7 +73,7 @@ UFortWeaponItemDefinition* AFortAthenaVehicle::GetVehicleWeaponForSeat(int SeatI
 			VehicleWeaponDefinition = TurretWeaponItemDefinition;
 		}
 
-		else if (ReceivingActorName.contains("Ostrich" || "TestMechVehicle")) // can't remember which one its asking for
+		else if (ReceivingActorName.contains("Ostrich") || ReceivingActorName.contains("TestMechVehicle")) // can't remember which one its asking for
 		{
 			VehicleWeaponDefinition = OstrichWeaponItemDefinition;
 		}

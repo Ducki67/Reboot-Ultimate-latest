@@ -168,28 +168,5 @@ static inline void ProcessEventHook(UObject* Object, UFunction* Function, void* 
 		}
 	}
 
-	if (ObjectName.contains("FortVolumeActor_PrefabGrenades_C") && FunctionFullName.contains("OnDeathServer"))
-	{
-		LOG_INFO(LogCreative, "Spawning Playset!");
-
-		AFortVolume* Volume = (AFortVolume*)Object;
-
-		if (Volume)
-		{
-			LOG_INFO(LogCreative, "Volume: {}", Volume->GetFullName());
-
-			auto Playset = Volume->GetCurrentPlayset();
-
-			if (Playset)
-			{
-				LOG_INFO(LogCreative, "Playset: {}", Playset->GetFullName());
-
-				UFortPlaysetItemDefinition::ShowPlayset(Playset, Volume);
-
-				return;
-			}
-		}
-	}
-
 	return Object->ProcessEvent(Function, Parameters);
 }

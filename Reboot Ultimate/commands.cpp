@@ -922,6 +922,26 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, Msg.c_str());
 		}
+		else if (Command == "unban")
+		{
+			if (ReceivingController == PlayerController)
+			{
+				SendMessageToConsole(PlayerController, L"You're not banned, silly.");
+				return;
+			}
+
+			Unban(ReceivingController);
+			UnbanByHWID(ReceivingController);
+
+			std::string UnbannedPlayerName;
+			UnbannedPlayerName = ReceivingController->GetPlayerState()->GetPlayerName().ToString();
+
+			std::wstringstream MsgStream;
+			MsgStream << L"Successfully unbanned " << std::wstring(UnbannedPlayerName.begin(), UnbannedPlayerName.end()) << L".";
+			std::wstring Msg = MsgStream.str();
+
+			SendMessageToConsole(PlayerController, Msg.c_str());
+		}
 		else if (Command == "givegameplayeffect" || Command == "givege")
 		{
 			auto PlayerState = ReceivingController->GetPlayerStateAthena();
@@ -1829,10 +1849,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else if (weaponName == "shieldbubble")
 			{
 				weaponName = "Athena_SilverBlazer_V2";
-			}
-			else if (weaponName == "zaptrap")
-			{
-				weaponName = "Athena_ZippyTrout";
 			}
 			else if (weaponName == "batman")
 			{
@@ -4100,6 +4116,20 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			CheatManager = nullptr;
 			SendMessageToConsole(PlayerController, L"Destroyed target!");
 		}
+		else if (Command == "slomo")
+		{
+			UCheatManager*& CheatManager = ReceivingController->SpawnCheatManager(UCheatManager::StaticClass());
+
+			if (!CheatManager)
+			{
+				SendMessageToConsole(PlayerController, L"Failed to spawn player's cheat manager!");
+				return;
+			}
+
+			CheatManager->Slomo();
+			CheatManager = nullptr;
+			SendMessageToConsole(PlayerController, L"Toggled slomo!");
+		}
 		else if (Command == "buildfree" || Command == "infmats")
 		{
 			Globals::bInfiniteMaterials = !Globals::bInfiniteMaterials;
@@ -4127,6 +4157,37 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				SendMessageToConsole(PlayerController, L"Infinite Ammo disabled.");
 			}
+		}
+		else if (Command == "teleportto" || Command == "tpto")
+		{
+			if (firstBackslash == std::string::npos || lastBackslash == std::string::npos || firstBackslash == lastBackslash)
+			{
+				SendMessageToConsole(PlayerController, L"Please input a player's name using backslashes, like \\PlayerName\\");
+				return;
+			}
+
+			if (!ReceivingController || !ReceivingPlayerState)
+			{
+				SendMessageToConsole(PlayerController, L"Unable to find player!");
+				return;
+			}
+
+			auto ReceivingPawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn());
+			auto ExecutingPawn = Cast<AFortPlayerPawn>(PlayerController->GetMyFortPawn());
+
+			if (!ReceivingPawn || !ExecutingPawn)
+			{
+				SendMessageToConsole(PlayerController, L"Could not retrieve player locations!");
+				return;
+			}
+
+			FVector TargetLocation = ReceivingPawn->GetActorLocation();
+
+			TargetLocation.Z += 50.0f;
+
+			ExecutingPawn->TeleportTo(TargetLocation, ExecutingPawn->GetActorRotation());
+
+			SendMessageToConsole(PlayerController, L"Teleported successfully!");
 		}
 		else if (Command == "bugitgo" || Command == "b")
 		{
@@ -4910,8 +4971,10 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 - cheat togglesnowmap - Toggles the map to have snow or not. (7.10, 7.30, 11.31, 15.10, 19.01, & 19.10 ONLY).
 - cheat tp - Teleports to what the player is looking at.
 - cheat tpalltomax - Teleports everyone to max height, in the middle of the map.
+- cheat tpto \PlayerName\ - Teleports the executing player to the recieving player.
 - cheat tptomax - Teleports player to max height, in the middle of the map.
 - cheat tutorial - Opens the Project Reboot V3 Tutorial (host only).
+- cheat unban - Unbans a player if they are either HWID banned or IP banned.
 - cheat waypoint {saved phrase/number} - Teleports the player to the selected existing waypoint.
 - cheat wipe/clear {Primary = Guns || Secondary = Ammo & Mats} - Removes the specified quickbar.
 - cheat wipeall/clearall - Removes the player's entire inventory.
