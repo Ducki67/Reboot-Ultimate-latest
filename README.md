@@ -71,7 +71,7 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 - [ ] Apparently Editing
 - [ ] Auto Pause Zone
 - [ ] Auto God?
-- [ ] AI Lobbies???
+- [ ] Update Reactive Cosmetics (killing a player adds lights to candy axe, etc)
 
 # Installation
 

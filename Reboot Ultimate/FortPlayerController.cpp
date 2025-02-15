@@ -684,29 +684,32 @@ void AFortPlayerController::ServerAttemptInteractHook(UObject* Context, FFrame* 
 
 				Pawn->EquipWeaponDefinition(VehicleWeaponDefinition, ReplicatedEntry->GetItemGuid());
 
-				auto VehicleWeapon = Cast<AFortWeaponRangedForVehicle>(Pawn->GetCurrentWeapon());
+				if (Fortnite_Version > 9)
+				{
+					auto VehicleWeapon = Cast<AFortWeaponRangedForVehicle>(Pawn->GetCurrentWeapon());
 
-				if (!VehicleWeapon)
-					return;
+					if (!VehicleWeapon)
+						return;
 
-				FMountedWeaponInfo MountedWeaponInfo;
-				MountedWeaponInfo.bTargetSourceFromVehicleMuzzle = true;
-				MountedWeaponInfo.bNeedsVehicleAttachment = true;
+					FMountedWeaponInfo MountedWeaponInfo;
+					MountedWeaponInfo.bTargetSourceFromVehicleMuzzle = true;
+					MountedWeaponInfo.bNeedsVehicleAttachment = true;
 
-				auto SeatIndex = Pawn->GetVehicleSeatIndex();
+					auto SeatIndex = Pawn->GetVehicleSeatIndex();
 
-				FMountedWeaponInfoRepped MountedWeaponInfoRepped;
-				MountedWeaponInfoRepped.HostVehicleCachedActor = Vehicle;
-				MountedWeaponInfoRepped.HostVehicleSeatIndexCached = SeatIndex;
+					FMountedWeaponInfoRepped MountedWeaponInfoRepped;
+					MountedWeaponInfoRepped.HostVehicleCachedActor = Vehicle;
+					MountedWeaponInfoRepped.HostVehicleSeatIndexCached = SeatIndex;
 
-				VehicleWeapon->GetMountedWeaponInfo() = MountedWeaponInfo;
-				VehicleWeapon->GetMountedWeaponInfoRepped() = MountedWeaponInfoRepped;
+					VehicleWeapon->GetMountedWeaponInfo() = MountedWeaponInfo;
+					VehicleWeapon->GetMountedWeaponInfoRepped() = MountedWeaponInfoRepped;
 
-				static auto OnRep_MountedWeaponInfoReppedFn = FindObject<UFunction>("/Script/FortniteGame.FortWeaponRangedForVehicle.OnRep_MountedWeaponInfoRepped");
-				VehicleWeapon->ProcessEvent(OnRep_MountedWeaponInfoReppedFn);
+					static auto OnRep_MountedWeaponInfoReppedFn = FindObject<UFunction>("/Script/FortniteGame.FortWeaponRangedForVehicle.OnRep_MountedWeaponInfoRepped");
+					VehicleWeapon->ProcessEvent(OnRep_MountedWeaponInfoReppedFn);
 
-				static auto OnHostVehicleSetupdFn = FindObject<UFunction>("/Script/FortniteGame.FortWeaponRangedForVehicle.OnHostVehicleSetup");
-				VehicleWeapon->ProcessEvent(OnHostVehicleSetupdFn);
+					static auto OnHostVehicleSetupdFn = FindObject<UFunction>("/Script/FortniteGame.FortWeaponRangedForVehicle.OnHostVehicleSetup");
+					VehicleWeapon->ProcessEvent(OnHostVehicleSetupdFn);
+				}
 			}
 		}
 
