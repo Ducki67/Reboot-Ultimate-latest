@@ -6,4 +6,5 @@ class UFortInventoryInterface
 {
 public:
 	static char RemoveInventoryItemHook(__int64 a1, FGuid a2, int Count, char bForceRemoveFromQuickBars, char bForceRemoval);
+	static void ModLoadedAmmoHook(__int64 a1, const FGuid& ItemGuid, int Count);
 };
