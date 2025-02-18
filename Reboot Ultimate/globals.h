@@ -14,6 +14,7 @@ namespace Globals
 	extern inline bool bIsTickTiming = false;
 	extern inline bool UPTimeStarted = false;
 
+	extern inline bool bPartyRoyale = false;
 	extern inline bool bCreative = false;
 	extern inline bool bGoingToPlayEvent = false;
 	extern inline bool bEnableAGIDs = true;

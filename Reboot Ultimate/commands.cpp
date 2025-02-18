@@ -9,7 +9,6 @@
 #include "AIBlueprintHelperLibrary.h"
 #include "FortServerBotManagerAthena.h"
 #include "FortAthenaAIBotSpawnerData.h"
-#include "PawnBot.h"
 
 #include <iomanip>
 #include <sstream>
@@ -3618,7 +3617,10 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		else if (Command == "spawnbot" || Command == "bot" || Command == "bots")
 		{
 			if (Fortnite_Version >= 7.40 && Fortnite_Version <= 8.51)
+			{
+				SendMessageToConsole(PlayerController, L"Bots are currently not supported on these versions!");
 				return;
+			}
 
 			auto Pawn = ReceivingController->GetPawn();
 
@@ -3628,38 +3630,32 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				return;
 			}
 
-			FVector SpawnLocation = Pawn->GetActorLocation();
-
 			int Count = 1;
 
-			try
+			if (Arguments.size() >= 2)
 			{
-				if (Arguments.size() >= 4)
-				{
-					SpawnLocation.X = std::stof(Arguments[1]);
-					SpawnLocation.Y = std::stof(Arguments[2]);
-					SpawnLocation.Z = std::stof(Arguments[3]);
-
-					if (Arguments.size() >= 5)
-						Count = std::stoi(Arguments[4]);
-				}
-				else if (Arguments.size() == 2)
-				{
-					Count = std::stoi(Arguments[1]);
-					SpawnLocation.Z += 1000;
-				}
+				try { Count = std::stod(Arguments[1]); }
+				catch (...) {}
 			}
 
-			catch (const std::invalid_argument&)
-			{
-				SendMessageToConsole(PlayerController, L"Invalid input for coordinates or count!");
-				return;
-			}
+			auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
 
-			catch (const std::out_of_range&)
+			bool bShouldSpawnAtZoneCenter = false;
+
+			if (NumArgs >= 3 && Arguments[2] == "center")
+				bShouldSpawnAtZoneCenter = true;
+
+			if (bShouldSpawnAtZoneCenter && GameMode->GetGameStateAthena()->GetGamePhaseStep() <= EAthenaGamePhaseStep::BusFlying)
+				bShouldSpawnAtZoneCenter = false;
+
+			FRotator SpawnRotation = Pawn->GetActorRotation();
+
+			int SizeMultiplier = 1;
+
+			if (Arguments.size() >= 4)
 			{
-				SendMessageToConsole(PlayerController, L"Input value out of range!");
-				return;
+				try { SizeMultiplier = std::stod(Arguments[3]); }
+				catch (...) {}
 			}
 
 			constexpr int Max = 99;
@@ -3670,28 +3666,24 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				Count = Max;
 			}
 
-			FRotator SpawnRotation = Pawn->GetActorRotation();
-
 			int AmountSpawned = 0;
 
 			for (int i = 0; i < Count; i++)
 			{
 				FActorSpawnParameters SpawnParameters{};
+				// SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+				auto SafeZoneIndicator = GameMode->GetSafeZoneIndicator();
+
+				auto Loc = bShouldSpawnAtZoneCenter ? SafeZoneIndicator->GetSafeZoneCenter() : Pawn->GetActorLocation();
+				Loc.Z += bShouldSpawnAtZoneCenter ? 10000 : 0;
+
 				FTransform Transform;
-				Transform.Translation = SpawnLocation;
-				Transform.Scale3D = FVector(1, 1, 1);
+				Transform.Translation = Loc;
+				Transform.Scale3D = FVector(1 * SizeMultiplier, 1 * SizeMultiplier, 1 * SizeMultiplier);
 				Transform.Rotation = SpawnRotation.Quaternion();
 
-				auto NewActor = nullptr;
-
-				if (Fortnite_Version > 9 && Engine_Version < 422)
-				{
-					NewActor == Bots::SpawnBot(Transform, Pawn);
-				}
-				else
-				{
-					NewActor == PawnBots::SpawnPawnBot(Transform); // hello how does this not work
-				}
+				auto NewActor = Bots::SpawnBot(Transform, Pawn);
 
 				if (!NewActor)
 				{
@@ -3703,7 +3695,10 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				}
 			}
 
-			SendMessageToConsole(PlayerController, (std::wstring(L"Summoned ") + std::to_wstring(AmountSpawned) + L" bot(s)!").c_str());
+			if (!bShouldSpawnAtZoneCenter)
+				SendMessageToConsole(PlayerController, (std::wstring(L"Summoned ") + std::to_wstring(AmountSpawned) + L" bot(s)!").c_str());
+			else
+				SendMessageToConsole(PlayerController, L"Summoned at zone center!");
 		}
 		else if (Command == "marktoteleport" || Command == "marktotp" || Command == "markertp" || Command == "marktp" || Command == "mark" || Command == "marker")
 		{

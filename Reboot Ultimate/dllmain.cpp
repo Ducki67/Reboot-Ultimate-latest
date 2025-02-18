@@ -72,12 +72,13 @@ const std::vector<std::string> WhitelistedIPs = {
     "26.198.115.19", // Heliato
     "26.69.16.29", // rit main
     "26.157.120.241", // sylo
+    "26.20.41.121", // liend
     "26.61.188.132", // crazy
     "26.0.11.135", // kye of norcal
     "26.38.76.122", // bubble
     "26.71.231.41", // axt
     "26.223.77.91", // say
-    "26.193.136.115", // rit shadow
+    "26.204.97.61", // rit shadow
     "26.186.58.140" // jecity
 };
 
@@ -737,7 +738,7 @@ static void Athena_MedConsumable_TriggeredHook(UObject* Context, FFrame& Stack, 
     return Athena_MedConsumable_TriggeredOriginal(Context, Stack, Ret);
 }
 
-static void ChangeLevels()
+void ChangeLevels()
 {
     constexpr bool bUseRemovePlayer = false;
     constexpr bool bUseSwitchLevel = false;
@@ -748,34 +749,52 @@ static void ChangeLevels()
     // auto bruh = std::wstring(CustomMapName.begin(), CustomMapName.end());
     // auto bruhh = (L"open " + bruh);
 
-    FString LevelB = /* bUseCustomMap ? bruhh.c_str() : */ (Engine_Version < 424
-        ? L"open Athena_Terrain" : Engine_Version >= 500 ? Engine_Version >= 501
-        ? L"open Asteria_Terrain"
-        : Globals::bCreative ? L"open Creative_NoApollo_Terrain"
-        : L"open Artemis_Terrain"
-        : Globals::bCreative ? L"open Creative_NoApollo_Terrain"
-        : L"open Apollo_Terrain");
+    auto FortGlobalsDefault = FindObject("/Script/FortniteGame.Default__FortGlobals");
 
-    FString Level = /* bUseCustomMap ? bruh.c_str() : */ (Engine_Version < 424
-        ? L"Athena_Terrain" : Engine_Version >= 500 ? Engine_Version >= 501
-        ? L"Asteria_Terrain"
-        : Globals::bCreative ? L"Creative_NoApollo_Terrain"
-        : L"Artemis_Terrain"
-        : Globals::bCreative ? L"Creative_NoApollo_Terrain"
-        : L"Apollo_Terrain");
+    FString LevelToOpen;
 
-    LOG_INFO(LogDev, "Using {}.", bUseSwitchLevel ? Level.ToString() : LevelB.ToString());
+    if (FortGlobalsDefault->GetOffset("BRMapFullName", false) == -1)
+    {
+        LevelToOpen = L"open Athena_Terrain";
+    }
+    else
+    {
+        if (Globals::bCreative)
+        {
+            LevelToOpen = L"open Creative_NoApollo_Terrain"; // stays the same on all versions ch2+
+        }
+        else if (Globals::bPartyRoyale)
+        {
+            LevelToOpen = L"open Apollo_Papaya";
+        }
+        else
+        {
+            std::string BRMapFullName = FortGlobalsDefault->Get<FString>("BRMapFullName").ToString();
+
+            if (!BRMapFullName.empty())
+            {
+                size_t LastSlash = BRMapFullName.find_last_of('/');
+                if (LastSlash != std::string::npos) {
+                    std::string MapName = "open " + BRMapFullName.substr(LastSlash + 1);
+                    LevelToOpen = std::wstring(MapName.begin(), MapName.end()).c_str();
+                }
+                else
+                {
+                    MessageBoxA(0, "FAILED TO OPEN MAP", "Reboot Ultimate Stable", MB_ICONERROR);
+                    return;
+                }
+            }
+        }
+    }
+
+    LOG_INFO(LogDev, "Using {}.", LevelToOpen.ToString());
 
     auto LocalPC = GetLocalPlayerController();
 
     LOG_INFO(LogDev, "Got PC: {}", __int64(LocalPC));
 
-    if (bUseSwitchLevel)
+    if (Fortnite_Version != 18.10)
     {
-        static auto SwitchLevelFn = FindObject<UFunction>(L"/Script/Engine.PlayerController.SwitchLevel");
-
-        LocalPC->ProcessEvent(SwitchLevelFn, &Level);
-
         if (FindGIsServer())
         {
             *(bool*)FindGIsServer() = true;
@@ -786,40 +805,25 @@ static void ChangeLevels()
             *(bool*)FindGIsClient() = false;
         }
     }
-    else
+
+    if (bShouldRemoveLocalPlayer)
     {
-        if (FindGIsServer())
+        if (!bUseRemovePlayer)
         {
-            *(bool*)FindGIsServer() = true;
-        }
+            auto& LocalPlayers = GetLocalPlayers();
 
-        if (Fortnite_Version != 18.10)
-        {
-            if (FindGIsClient())
+            if (LocalPlayers.Num() && LocalPlayers.Data)
             {
-                *(bool*)FindGIsClient() = false;
+                LocalPlayers.Remove(0);
             }
         }
-
-        if (bShouldRemoveLocalPlayer)
+        else if (bUseRemovePlayer)
         {
-            if (!bUseRemovePlayer)
-            {
-                auto& LocalPlayers = GetLocalPlayers();
-
-                if (LocalPlayers.Num() && LocalPlayers.Data)
-                {
-                    LocalPlayers.Remove(0);
-                }
-            }
-            else if (bUseRemovePlayer)
-            {
-                UGameplayStatics::RemovePlayer((APlayerController*)LocalPC, true);
-            }
+            UGameplayStatics::RemovePlayer((APlayerController*)LocalPC, true);
         }
-
-        UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), LevelB, nullptr);
     }
+
+    UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), LevelToOpen, nullptr);
 
     LOG_INFO(LogPlayer, "Switched level.");
 
