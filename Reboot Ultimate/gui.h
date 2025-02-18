@@ -993,7 +993,7 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 	const FVector ZoneCenterLocation = SafeZoneLocations.at(3);
 
 	FVector LocationToStartAircraft = ZoneCenterLocation;
-	LocationToStartAircraft.Z += 16000;
+	LocationToStartAircraft.Z += 32000;
 
 	auto Aircrafts = GetAircrafts();
 

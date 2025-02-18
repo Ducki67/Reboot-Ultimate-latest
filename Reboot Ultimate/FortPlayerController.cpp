@@ -1571,7 +1571,6 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 	auto KillerPawn = Cast<AFortPlayerPawn>(*(AFortPawn**)(__int64(DeathReport) + MemberOffsets::DeathReport::KillerPawn));
 	auto KillerPlayerState = Cast<AFortPlayerStateAthena>(*(AFortPlayerState**)(__int64(DeathReport) + MemberOffsets::DeathReport::KillerPlayerState));
 	auto KillerWeapon = Cast<UFortWeaponItemDefinition>(*(UFortWeaponItemDefinition**)__int64(DeathReport) + MemberOffsets::DeathReport::KillerWeapon);
-	auto KillerController = Cast<AFortPlayerControllerAthena>(KillerPlayerState->GetOwner());
 
 	if (!DeadPawn || !GameState || !DeadPlayerState)
 		return ClientOnPawnDiedOriginal(PlayerController, DeathReport);
@@ -1983,23 +1982,6 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 						{
 							KillerPlayerControllerAthena->ClientNotifyWon(KillerPawn, KillerWeaponDef, DeathCause);
 							KillerPlayerControllerAthena->ClientNotifyTeamWon(KillerPawn, KillerWeaponDef, DeathCause);
-						}
-					}
-
-					if (GameState->GetPlayersLeft() <= 1 && !GameState->IsRespawningAllowed(KillerPlayerState))
-					{
-						if (Fortnite_Version == 11.31 || Fortnite_Version == 12.41)
-						{
-							KillerController->PlayWinEffects(KillerPawn, KillerPawn->GetCurrentWeapon() ? KillerPawn->GetCurrentWeapon()->GetWeaponData() : nullptr, DeathCause, false);
-							KillerController->ClientNotifyWon(KillerPawn, KillerPawn->GetCurrentWeapon() ? KillerPawn->GetCurrentWeapon()->GetWeaponData() : nullptr, DeathCause);
-							KillerController->ClientNotifyTeamWon(KillerPawn, KillerPawn->GetCurrentWeapon() ? KillerPawn->GetCurrentWeapon()->GetWeaponData() : nullptr, DeathCause);
-							KillerPlayerState->GetPlace() = 1;
-							KillerPlayerState->OnRep_Place();
-							GameState->GetWinningPlayerState() = KillerPlayerState;
-							GameState->GetWinningTeam() = KillerPlayerState->GetTeamIndex();
-							GameState->OnRep_WinningPlayerState();
-							GameState->OnRep_WinningTeam();
-							GameMode->EndMatch();
 						}
 					}
 
