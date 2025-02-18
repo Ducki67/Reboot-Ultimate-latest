@@ -493,6 +493,7 @@
     <ClInclude Include="Package.h" />
     <ClInclude Include="PathFollowingTypes.h" />
     <ClInclude Include="Pawn.h" />
+    <ClInclude Include="PawnBot.h" />
     <ClInclude Include="PersistentObjectPtr.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerController.h" />

@@ -13,7 +13,7 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 - [x] Fixed Placing Traps on 19.10
 - [x] Added Swag Lines to S16+
 - [x] Customizable Lategame Loadouts (also now for one shot)
-- [x] Fixed Boat Rockets (exxertz)
+- [x] Fixed Boat Rockets/Some Vehicle Weapons on S9+
 - [x] Fixed Respawning on 12.41+
 - [x] Fixed Attached Actor Chest Loot
 

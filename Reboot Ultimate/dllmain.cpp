@@ -71,12 +71,12 @@ const std::vector<std::string> WhitelistedIPs = {
     "26.153.21.74", // sweefy
     "26.198.115.19", // Heliato
     "26.69.16.29", // rit main
+    "26.157.120.241", // sylo
     "26.61.188.132", // crazy
     "26.0.11.135", // kye of norcal
     "26.38.76.122", // bubble
     "26.71.231.41", // axt
     "26.223.77.91", // say
-    "26.82.40.174", // jacxs
     "26.193.136.115", // rit shadow
     "26.186.58.140" // jecity
 };
@@ -1230,7 +1230,7 @@ DWORD WINAPI Main(LPVOID)
     // Hooking::MinHook::Hook(FindObject<UFortServerBotManagerAthena>(L"/Script/FortniteGame.Default__FortServerBotManagerAthena"), FindObject<UFunction>(L"/Script/FortniteGame.FortServerBotManagerAthena.SpawnBot"),
        // UFortServerBotManagerAthena::SpawnBotHook, (PVOID*)&UFortServerBotManagerAthena::SpawnBotOriginal, false);
 
-    if (Fortnite_Version != 19.01 || Fortnite_Version != 18.40)
+    if (Fortnite_Version < 18)
     {
         Hooking::MinHook::Hook(GameModeDefault, FindObject<UFunction>(L"/Script/Engine.GameModeBase.SpawnDefaultPawnFor"),
             AGameModeBase::SpawnDefaultPawnForHook, nullptr, false);
@@ -1700,7 +1700,7 @@ DWORD WINAPI Main(LPVOID)
             UAthenaMarkerComponent::ServerRemoveMapMarkerHook, nullptr, false);
     }
 
-    if (Fortnite_Version != 18.40)
+    if (Globals::bBotPC)
     {
         Hooking::MinHook::Hook(FindObject<AFortAthenaAIBotController>(L"/Script/FortniteGame.Default__FortAthenaAIBotController"), FindObject<UFunction>(L"/Script/FortniteGame.FortAthenaAIBotController.OnPossesedPawnDied"),
             AFortAthenaAIBotController::OnPossesedPawnDiedHook, (PVOID*)&AFortAthenaAIBotController::OnPossesedPawnDiedOriginal, false);

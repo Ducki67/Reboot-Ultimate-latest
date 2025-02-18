@@ -196,7 +196,7 @@ public:
 
 	FString GetRandomName()
 	{
-		int RandomNumber = 264 + (std::rand() % 101);
+		int RandomNumber = 200 + (std::rand() % 151);
 		static int CurrentBotNum = 1;
 		std::wstring BotNumWStr;
 		FString NewName;

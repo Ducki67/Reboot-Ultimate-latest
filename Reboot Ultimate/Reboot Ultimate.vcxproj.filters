@@ -900,6 +900,9 @@
     <ClInclude Include="bots.h">
       <Filter>Reboot\Public</Filter>
     </ClInclude>
+    <ClInclude Include="PawnBot.h">
+      <Filter>Reboot\Public</Filter>
+    </ClInclude>
     <ClInclude Include="gui.h">
       <Filter>Reboot\Public</Filter>
     </ClInclude>

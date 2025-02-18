@@ -9,6 +9,7 @@
 #include "AIBlueprintHelperLibrary.h"
 #include "FortServerBotManagerAthena.h"
 #include "FortAthenaAIBotSpawnerData.h"
+#include "PawnBot.h"
 
 #include <iomanip>
 #include <sstream>
@@ -3369,6 +3370,228 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			CheatManager->ToggleDebugCamera();
 			CheatManager = nullptr;
 		}
+		else if (Command == "randomize")
+		{
+			auto WorldInventory = ReceivingController->GetWorldInventory();
+
+			if (!WorldInventory)
+			{
+				SendMessageToConsole(PlayerController, L"Player does not have a WorldInventory!\n");
+				return;
+			}
+
+			static auto WoodItemData = FindObject<UFortItemDefinition>(
+				L"/Game/Items/ResourcePickups/WoodItemData.WoodItemData");
+			static auto StoneItemData = FindObject<UFortItemDefinition>(
+				L"/Game/Items/ResourcePickups/StoneItemData.StoneItemData");
+			static auto MetalItemData = FindObject<UFortItemDefinition>(
+				L"/Game/Items/ResourcePickups/MetalItemData.MetalItemData");
+			static auto Gold = FindObject<UFortItemDefinition>(
+				L"/Game/Items/ResourcePickups/Athena_WadsItemData.Athena_WadsItemData");
+
+			if (PlaylistName.find("/Game/Athena/Playlists/Low") != std::string::npos)
+			{
+				static UFortItemDefinition* OSLoot1 = nullptr;
+
+				do
+				{
+					OSLoot1 = FindObject<UFortItemDefinition>(RandomizeItems(OSL1), nullptr, ANY_PACKAGE);
+				} while (!OSLoot1);
+
+				static UFortItemDefinition* OSLoot2 = nullptr;
+
+				do
+				{
+					OSLoot2 = FindObject<UFortItemDefinition>(RandomizeItems(OSL2), nullptr, ANY_PACKAGE);
+				} while (!OSLoot2);
+
+				static UFortItemDefinition* OSLoot3 = nullptr;
+
+				do
+				{
+					OSLoot3 = FindObject<UFortItemDefinition>(RandomizeItems(OSL3), nullptr, ANY_PACKAGE);
+				} while (!OSLoot3);
+
+				static UFortItemDefinition* OSLoot4 = nullptr;
+
+				do
+				{
+					OSLoot4 = FindObject<UFortItemDefinition>(RandomizeItems(OSL4), nullptr, ANY_PACKAGE);
+				} while (!OSLoot4);
+
+				static UFortItemDefinition* OSLoot5 = nullptr;
+
+				do
+				{
+					OSLoot5 = FindObject<UFortItemDefinition>(RandomizeItems(OSL5), nullptr, ANY_PACKAGE);
+				} while (!OSLoot5);
+
+				static UFortItemDefinition* OSTraps = nullptr;
+
+				if (Fortnite_Version < 19)
+				{
+					do
+					{
+						OSTraps = FindObject<UFortItemDefinition>(RandomizeItems(OSLTraps), nullptr, ANY_PACKAGE);
+					} while (!OSTraps);
+				}
+
+				static auto HeavyAmmo = FindObject<UFortItemDefinition>(
+					L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsHeavy.AthenaAmmoDataBulletsHeavy");
+				static auto ShellsAmmo = FindObject<UFortItemDefinition>(
+					L"/Game/Athena/Items/Ammo/AthenaAmmoDataShells.AthenaAmmoDataShells");
+				static auto MediumAmmo = FindObject<UFortItemDefinition>(
+					L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsMedium.AthenaAmmoDataBulletsMedium");
+				static auto LightAmmo = FindObject<UFortItemDefinition>(
+					L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsLight.AthenaAmmoDataBulletsLight");
+				static auto RocketAmmo = FindObject<UFortItemDefinition>(
+					L"/Game/Athena/Items/Ammo/AmmoDataRockets.AmmoDataRockets");
+				static auto ExplosiveAmmo = FindObject<UFortItemDefinition>(
+					L"/Game/Items/Ammo/AmmoDataExplosive.AmmoDataExplosive");
+				static auto EnergyCells = FindObject<UFortItemDefinition>(
+					L"/Game/Items/Ammo/AmmoDataEnergyCell.AmmoDataEnergyCell");
+				static auto Arrows = FindObject<UFortItemDefinition>(
+					L"/PrimalGameplay/Items/Ammo/AthenaAmmoDataArrows.AthenaAmmoDataArrows");
+				static auto ReconAmmo = FindObject<UFortItemDefinition>(
+					L"/MotherGameplay/Items/Scooter/Ammo_Athena_Mother_Scooter.Ammo_Athena_Mother_Scooter");
+				static auto STWHeavy = FindObject<UFortItemDefinition>(
+					L"/Game/Items/Ammo/AmmoDataBulletsHeavy.AmmoDataBulletsHeavy");
+				static auto STWMedium = FindObject<UFortItemDefinition>(
+					L"/Game/Items/Ammo/AmmoDataBulletsMedium.AmmoDataBulletsMedium");
+				static auto STWLight = FindObject<UFortItemDefinition>(
+					L"/Game/Items/Ammo/AmmoDataBulletsLight.AmmoDataBulletsLight");
+				static auto STWShells = FindObject<UFortItemDefinition>(
+					L"/Game/Items/Ammo/AmmoDataShells.AmmoDataShells");
+
+				WorldInventory->AddItem(WoodItemData, nullptr, 70);
+				WorldInventory->AddItem(StoneItemData, nullptr, 50);
+				WorldInventory->AddItem(MetalItemData, nullptr, 30);
+				WorldInventory->AddItem(Gold, nullptr, (std::rand() % 7500) + 1200);
+				WorldInventory->AddItem(OSLoot1, nullptr, 1);
+				WorldInventory->AddItem(OSLoot2, nullptr, 1);
+				WorldInventory->AddItem(OSLoot3, nullptr, 1);
+				WorldInventory->AddItem(OSLoot4, nullptr, OSLoot4->GetMaxStackSize());
+				WorldInventory->AddItem(OSLoot5, nullptr, OSLoot5->GetMaxStackSize());
+				WorldInventory->AddItem(ShellsAmmo, nullptr, (std::rand() % 576) + 87);
+				WorldInventory->AddItem(HeavyAmmo, nullptr, (std::rand() % 576) + 50);
+				WorldInventory->AddItem(MediumAmmo, nullptr, (std::rand() % 824) + 186);
+				WorldInventory->AddItem(LightAmmo, nullptr, (std::rand() % 824) + 124);
+				WorldInventory->AddItem(RocketAmmo, nullptr, (std::rand() % 12) + 3);
+				WorldInventory->AddItem(ExplosiveAmmo, nullptr, (std::rand() % 999) + 186);
+				WorldInventory->AddItem(EnergyCells, nullptr, (std::rand() % 999) + 186);
+				WorldInventory->AddItem(STWHeavy, nullptr, (std::rand() % 999) + 186);
+				WorldInventory->AddItem(STWMedium, nullptr, (std::rand() % 999) + 186);
+				WorldInventory->AddItem(STWLight, nullptr, (std::rand() % 999) + 186);
+				WorldInventory->AddItem(STWShells, nullptr, (std::rand() % 999) + 186);
+				WorldInventory->AddItem(Arrows, nullptr, (std::rand() % 30) + 12);
+				WorldInventory->AddItem(ReconAmmo, nullptr, 999);
+				WorldInventory->AddItem(OSTraps, nullptr, (std::rand() % 5) + 2);
+
+				WorldInventory->Update();
+			}
+			else
+			{
+				static UFortItemDefinition* Primary = nullptr;
+
+				do
+				{
+					Primary = FindObject<UFortItemDefinition>(RandomizeItems(Primaries), nullptr, ANY_PACKAGE);
+				} while (!Primary);
+
+				static UFortItemDefinition* Secondary = nullptr;
+
+				do
+				{
+					Secondary = FindObject<UFortItemDefinition>(RandomizeItems(Secondaries), nullptr, ANY_PACKAGE);
+				} while (!Secondary);
+
+				static UFortItemDefinition* Tertiary = nullptr;
+
+				do
+				{
+					Tertiary = FindObject<UFortItemDefinition>(RandomizeItems(Tertiaries), nullptr, ANY_PACKAGE);
+				} while (!Tertiary);
+
+				static UFortItemDefinition* Consumable1 = nullptr;
+
+				do
+				{
+					Consumable1 = FindObject<UFortItemDefinition>(RandomizeItems(Consumables1), nullptr, ANY_PACKAGE);
+				} while (!Consumable1);
+
+				static UFortItemDefinition* Consumable2 = nullptr;
+
+				do
+				{
+					Consumable2 = FindObject<UFortItemDefinition>(RandomizeItems(Consumables2), nullptr, ANY_PACKAGE);
+				} while (!Consumable2);
+
+				static UFortItemDefinition* Trap = nullptr;
+
+				if (Fortnite_Version < 19)
+				{
+					do
+					{
+						Trap = FindObject<UFortItemDefinition>(RandomizeItems(Traps), nullptr, ANY_PACKAGE);
+					} while (!Trap);
+				}
+
+				static auto HeavyAmmo = FindObject<UFortItemDefinition>(
+					L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsHeavy.AthenaAmmoDataBulletsHeavy");
+				static auto ShellsAmmo = FindObject<UFortItemDefinition>(
+					L"/Game/Athena/Items/Ammo/AthenaAmmoDataShells.AthenaAmmoDataShells");
+				static auto MediumAmmo = FindObject<UFortItemDefinition>(
+					L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsMedium.AthenaAmmoDataBulletsMedium");
+				static auto LightAmmo = FindObject<UFortItemDefinition>(
+					L"/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsLight.AthenaAmmoDataBulletsLight");
+				static auto RocketAmmo = FindObject<UFortItemDefinition>(
+					L"/Game/Athena/Items/Ammo/AmmoDataRockets.AmmoDataRockets");
+				static auto ExplosiveAmmo = FindObject<UFortItemDefinition>(
+					L"/Game/Items/Ammo/AmmoDataExplosive.AmmoDataExplosive");
+				static auto EnergyCells = FindObject<UFortItemDefinition>(
+					L"/Game/Items/Ammo/AmmoDataEnergyCell.AmmoDataEnergyCell");
+				static auto Arrows = FindObject<UFortItemDefinition>(
+					L"/PrimalGameplay/Items/Ammo/AthenaAmmoDataArrows.AthenaAmmoDataArrows");
+				static auto ReconAmmo = FindObject<UFortItemDefinition>(
+					L"/MotherGameplay/Items/Scooter/Ammo_Athena_Mother_Scooter.Ammo_Athena_Mother_Scooter");
+				static auto STWHeavy = FindObject<UFortItemDefinition>(
+					L"/Game/Items/Ammo/AmmoDataBulletsHeavy.AmmoDataBulletsHeavy");
+				static auto STWMedium = FindObject<UFortItemDefinition>(
+					L"/Game/Items/Ammo/AmmoDataBulletsMedium.AmmoDataBulletsMedium");
+				static auto STWLight = FindObject<UFortItemDefinition>(
+					L"/Game/Items/Ammo/AmmoDataBulletsLight.AmmoDataBulletsLight");
+				static auto STWShells = FindObject<UFortItemDefinition>(
+					L"/Game/Items/Ammo/AmmoDataShells.AmmoDataShells");
+
+				WorldInventory->AddItem(WoodItemData, nullptr, (std::rand() % 646) + 186);
+				WorldInventory->AddItem(StoneItemData, nullptr, (std::rand() % 646) + 186);
+				WorldInventory->AddItem(MetalItemData, nullptr, (std::rand() % 646) + 186);
+				WorldInventory->AddItem(Gold, nullptr, (std::rand() % 7500) + 1200);
+				WorldInventory->AddItem(Primary, nullptr, 1);
+				WorldInventory->AddItem(Secondary, nullptr, 1);
+				WorldInventory->AddItem(Tertiary, nullptr, 1);
+				WorldInventory->AddItem(Consumable1, nullptr, Consumable1->GetMaxStackSize());
+				WorldInventory->AddItem(Consumable2, nullptr, Consumable2->GetMaxStackSize());
+				WorldInventory->AddItem(ShellsAmmo, nullptr, (std::rand() % 576) + 87);
+				WorldInventory->AddItem(HeavyAmmo, nullptr, (std::rand() % 576) + 50);
+				WorldInventory->AddItem(MediumAmmo, nullptr, (std::rand() % 824) + 186);
+				WorldInventory->AddItem(LightAmmo, nullptr, (std::rand() % 824) + 124);
+				WorldInventory->AddItem(RocketAmmo, nullptr, (std::rand() % 12) + 3);
+				WorldInventory->AddItem(ExplosiveAmmo, nullptr, (std::rand() % 999) + 186);
+				WorldInventory->AddItem(EnergyCells, nullptr, (std::rand() % 999) + 186);
+				WorldInventory->AddItem(STWHeavy, nullptr, (std::rand() % 999) + 186);
+				WorldInventory->AddItem(STWMedium, nullptr, (std::rand() % 999) + 186);
+				WorldInventory->AddItem(STWLight, nullptr, (std::rand() % 999) + 186);
+				WorldInventory->AddItem(STWShells, nullptr, (std::rand() % 999) + 186);
+				WorldInventory->AddItem(Arrows, nullptr, (std::rand() % 30) + 12);
+				WorldInventory->AddItem(ReconAmmo, nullptr, 999);
+				WorldInventory->AddItem(Trap, nullptr, (std::rand() % 5) + 2);
+			}
+
+			WorldInventory->Update();
+
+			SendMessageToConsole(PlayerController, L"Randomized loadout!\n");
+		}
 		else if (Command == "restart" || Command == "restartserver")
 		{
 			auto& IP = PlayerState->GetSavedNetworkAddress();
@@ -3426,11 +3649,13 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 					SpawnLocation.Z += 1000;
 				}
 			}
+
 			catch (const std::invalid_argument&)
 			{
 				SendMessageToConsole(PlayerController, L"Invalid input for coordinates or count!");
 				return;
 			}
+
 			catch (const std::out_of_range&)
 			{
 				SendMessageToConsole(PlayerController, L"Input value out of range!");
@@ -3438,6 +3663,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			}
 
 			constexpr int Max = 99;
+
 			if (Count > Max)
 			{
 				SendMessageToConsole(PlayerController, (std::wstring(L"You went over the limit! Only spawning ") + std::to_wstring(Max) + L".").c_str());
@@ -3456,7 +3682,16 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				Transform.Scale3D = FVector(1, 1, 1);
 				Transform.Rotation = SpawnRotation.Quaternion();
 
-				auto NewActor = Bots::SpawnBot(Transform, Pawn);
+				auto NewActor = nullptr;
+
+				if (Fortnite_Version > 9 && Engine_Version < 422)
+				{
+					NewActor == Bots::SpawnBot(Transform, Pawn);
+				}
+				else
+				{
+					NewActor == PawnBots::SpawnPawnBot(Transform); // hello how does this not work
+				}
 
 				if (!NewActor)
 				{
@@ -4950,6 +5185,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 - cheat pausetimeofday - Pauses the current time of day cycle.
 - cheat pickaxe {ID} - Set player's pickaxe. Can be either the PID or WID.
 - cheat pickaxeall {ID} - Gives all players a specified pickaxe.
+- cheat randomize - Randomizes the players loadout into a lategame loadout.
+- cheat randomizeall - Randomizes everyones loadout to be a lategame loadout.
 - cheat regen - Regenerates the players health and shield to their max.
 - cheat regenall - Heals all players health and shield.
 - cheat restart - Restarts the game. (Chapter 1 & Host ONLY)

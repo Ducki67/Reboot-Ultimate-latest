@@ -281,6 +281,15 @@ static inline T GetRandomItem(std::vector<T>& Vector, int ConnectionIndex)
 	return Vector[RandomIndex];
 }
 
+template<typename T>
+static inline T RandomizeItems(std::vector<T>& Vector)
+{
+	std::srand(static_cast<unsigned>(std::time(0)));
+	int RandomIndex = std::rand() % Vector.size();
+	// LOG_INFO(LogDev, "RandomIndex: {}", __int64(RandomIndex));
+	return Vector[RandomIndex];
+}
+
 static std::vector Tertiaries = {
 	"WID_Sniper_NoScope_Athena_SR_Ore_T03",
 	"WID_Sniper_NoScope_Athena_VR_Ore_T03",
@@ -984,7 +993,7 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 	const FVector ZoneCenterLocation = SafeZoneLocations.at(3);
 
 	FVector LocationToStartAircraft = ZoneCenterLocation;
-	LocationToStartAircraft.Z += 10000;
+	LocationToStartAircraft.Z += 16000;
 
 	auto Aircrafts = GetAircrafts();
 
