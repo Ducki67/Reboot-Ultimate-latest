@@ -439,66 +439,66 @@ void AFortPlayerControllerAthena::ServerRestartPlayerHook(AFortPlayerControllerA
 	return ZoneServerRestartPlayerOriginal(Controller);
 }
 
-//void AFortPlayerControllerAthena::ServerClientIsReadyToRespawn(AFortPlayerControllerAthena* PlayerControllerAthena)
-//{
-//	AFortPlayerStateAthena* PlayerStateAthena = Cast<AFortPlayerStateAthena>(PlayerControllerAthena->GetPlayerStateAthena());
-//
-//	auto GameMode = (AFortGameModeAthena*)GetWorld()->GetGameMode();
-//
-//	if (!PlayerStateAthena || !GameMode)
-//		return;
-//
-//	FFortRespawnData* RespawnData = PlayerStateAthena->GetRespawnData();
-//
-//	if (RespawnData->IsServerReady() && RespawnData->IsRespawnDataAvailable())
-//	{
-//		const FVector& RespawnLocation = RespawnData->RespawnLocation();
-//		const FRotator& RespawnRotation = RespawnData->RespawnRotation();
-//
-//		FTransform SpawnTransform = UKismetMathLibrary::MakeTransform(RespawnLocation, RespawnRotation, FVector({ 1, 1, 1 }));
-//
-//		static auto SpawnDefaultPawnAtTransformFn = FindObject<UFunction>(L"/Script/Engine.GameModeBase.SpawnDefaultPawnAtTransform");
-//
-//		if (!SpawnDefaultPawnAtTransformFn)
-//		{
-//			LOG_ERROR(LogDev, "Failed to find SpawnDefaultPawnAtTransform function!");
-//			return;
-//		}
-//
-//		struct
-//		{
-//			AController* NewPlayer;
-//			FTransform SpawnTransform;
-//			APawn* ReturnValue;
-//		} Params{ PlayerControllerAthena, SpawnTransform, nullptr };
-//
-//		LOG_INFO(LogDev, "Calling SpawnDefaultPawnAtTransformFn!");
-//
-//		GameMode->ProcessEvent(SpawnDefaultPawnAtTransformFn, &Params);
-//
-//		auto PlayerPawn = Cast<AFortPlayerPawn>(Params.ReturnValue);
-//
-//		if (!PlayerPawn)
-//		{
-//			return;
-//		}
-//
-//		PlayerPawn->Owner = PlayerControllerAthena;
-//		PlayerPawn->OnRep_Owner();
-//
-//		PlayerControllerAthena->Pawn = PlayerPawn;
-//		PlayerControllerAthena->OnRep_Pawn();
-//
-//		PlayerControllerAthena->Possess(PlayerPawn);
-//
-//		PlayerPawn->SetHealth(100);
-//		PlayerPawn->SetShield(0);
-//
-//		PlayerControllerAthena->SetControlRotation(RespawnRotation);
-//
-//		RespawnData->IsClientReady() = true;
-//	}
-//}
+void AFortPlayerControllerAthena::ServerClientIsReadyToRespawn(AFortPlayerControllerAthena* PlayerControllerAthena)
+{
+	AFortPlayerStateAthena* PlayerStateAthena = Cast<AFortPlayerStateAthena>(PlayerControllerAthena->GetPlayerStateAthena());
+
+	auto GameMode = (AFortGameModeAthena*)GetWorld()->GetGameMode();
+
+	if (!PlayerStateAthena || !GameMode)
+		return;
+
+	FFortRespawnData* RespawnData = PlayerStateAthena->GetRespawnData();
+
+	if (RespawnData->IsServerReady() && RespawnData->IsRespawnDataAvailable())
+	{
+		const FVector& RespawnLocation = RespawnData->RespawnLocation();
+		const FRotator& RespawnRotation = RespawnData->RespawnRotation();
+
+		FTransform SpawnTransform = UKismetMathLibrary::MakeTransform(RespawnLocation, RespawnRotation, FVector({ 1, 1, 1 }));
+
+		static auto SpawnDefaultPawnAtTransformFn = FindObject<UFunction>(L"/Script/Engine.GameModeBase.SpawnDefaultPawnAtTransform");
+
+		if (!SpawnDefaultPawnAtTransformFn)
+		{
+			LOG_ERROR(LogDev, "Failed to find SpawnDefaultPawnAtTransform function!");
+			return;
+		}
+
+		struct
+		{
+			AController* NewPlayer;
+			FTransform SpawnTransform;
+			APawn* ReturnValue;
+		} Params{ PlayerControllerAthena, SpawnTransform, nullptr };
+
+		LOG_INFO(LogDev, "Calling SpawnDefaultPawnAtTransformFn!");
+
+		GameMode->ProcessEvent(SpawnDefaultPawnAtTransformFn, &Params);
+
+		auto PlayerPawn = Cast<AFortPlayerPawn>(Params.ReturnValue);
+
+		if (!PlayerPawn)
+		{
+			return;
+		}
+
+		PlayerPawn->Owner = PlayerControllerAthena;
+		PlayerPawn->OnRep_Owner();
+
+		PlayerControllerAthena->Pawn = PlayerPawn;
+		PlayerControllerAthena->OnRep_Pawn();
+
+		PlayerControllerAthena->Possess(PlayerPawn);
+
+		PlayerPawn->SetHealth(100);
+		PlayerPawn->SetShield(0);
+
+		PlayerControllerAthena->SetControlRotation(RespawnRotation);
+
+		RespawnData->IsClientReady() = true;
+	}
+}
 
 void AFortPlayerControllerAthena::ServerGiveCreativeItemHook(AFortPlayerControllerAthena* Controller, FFortItemEntry CreativeItem)
 {

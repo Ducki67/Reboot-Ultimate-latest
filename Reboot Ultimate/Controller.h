@@ -29,4 +29,6 @@ public:
 		static auto PlayerStateOffset = this->GetOffset("PlayerState");
 		return this->Get<class APlayerState*>(PlayerStateOffset);
 	}
+
+	class APawn* Pawn; // 0x0260(0x0008)(Net, ZeroConstructor, IsPlainOldData, RepNotify, NoDestructor, UObjectWrapper, HasGetValueTypeHash, NativeAccessSpecifierPrivate)
 };

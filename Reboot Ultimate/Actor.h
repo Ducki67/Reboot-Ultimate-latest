@@ -26,7 +26,7 @@ public:
 	int32& GetNetTag();
 	void SetNetDormancy(ENetDormancy Dormancy);
 	AActor* GetOwner();
-	// AActor* OnRep_Owner();
+	AActor* OnRep_Owner();
 	struct FVector GetActorScale3D();
 	struct FVector GetActorLocation();
 	struct FVector GetActorForwardVector();
@@ -72,6 +72,8 @@ public:
 
 		return IsRelevancyOwnerForOriginal(this, ReplicatedActor, ActorOwner, ConnectionActor);
 	}
+
+	class AActor* Owner; // 0x00E8(0x0008)(Net, ZeroConstructor, IsPlainOldData, RepNotify, NoDestructor, Protected, UObjectWrapper, HasGetValueTypeHash, NativeAccessSpecifierProtected)
 
 	static class UClass* StaticClass();
 };
