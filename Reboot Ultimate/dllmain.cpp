@@ -1331,7 +1331,7 @@ DWORD WINAPI Main(LPVOID)
     Hooking::MinHook::Hook(FortWeaponDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortWeapon.ServerReleaseWeaponAbility"),
         AFortWeapon::ServerReleaseWeaponAbilityHook, (PVOID*)&AFortWeapon::ServerReleaseWeaponAbilityOriginal, false, true);
 
-    if (Fortnite_Version > 12.41)
+    /*if (Fortnite_Version > 12.41)
     {
         auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
 
@@ -1347,7 +1347,7 @@ DWORD WINAPI Main(LPVOID)
                     (void*)AFortPlayerControllerAthena::ServerClientIsReadyToRespawn, nullptr, false);
             }
         }
-    }
+    }*/
 
     if (Fortnite_Version == 19.10)
     {

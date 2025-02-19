@@ -7,11 +7,11 @@
 
 struct FFortRespawnData
 {
-	FFortRespawnData* GetRespawnData()
+	/*FFortRespawnData* GetRespawnData()
 	{
 		static auto RespawnDataOffset = FindOffsetStruct("/Script/FortniteGame.AFortPlayerStateAthena", "RespawnData");
 		return (FFortRespawnData*)(__int64(this) + RespawnDataOffset);
-	}
+	}*/
 
 	static UStruct* GetStruct()
 	{
