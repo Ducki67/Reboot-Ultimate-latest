@@ -1331,9 +1331,6 @@ DWORD WINAPI Main(LPVOID)
     Hooking::MinHook::Hook(FortWeaponDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortWeapon.ServerReleaseWeaponAbility"),
         AFortWeapon::ServerReleaseWeaponAbilityHook, (PVOID*)&AFortWeapon::ServerReleaseWeaponAbilityOriginal, false, true);
 
-    Hooking::MinHook::Hook(FortPlayerControllerAthenaDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerControllerAthena.ServerClientIsReadyToRespawn"),
-        (void*)AFortPlayerControllerAthena::ServerClientIsReadyToRespawn, nullptr, false); // if statements were never needed ig, maybe im just stupid
-
     if (Fortnite_Version == 19.10)
     {
         static auto FortDecoToolDefault = FindObject(L"/Script/FortniteGame.Default__FortDecoTool");
@@ -1344,9 +1341,6 @@ DWORD WINAPI Main(LPVOID)
                 AFortDecoTool::ServerSpawnDeco, nullptr, false, true);
         }
     }
-
-    /*Hooking::MinHook::Hook(FortWeaponDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortDecoTool.ServerCreateBuildingAndSpawnDeco"),
-        AFortDecoTool::ServerCreateBuildingAndSpawnDeco, nullptr, false, true);*/
 
     Hooking::MinHook::Hook(FindObject<UKismetSystemLibrary>(L"/Script/Engine.Default__KismetSystemLibrary"), FindObject<UFunction>(L"/Script/Engine.KismetSystemLibrary.PrintString"),
         UKismetSystemLibrary::PrintStringHook, (PVOID*)&UKismetSystemLibrary::PrintStringOriginal, false, true); // todo FortShippingLog

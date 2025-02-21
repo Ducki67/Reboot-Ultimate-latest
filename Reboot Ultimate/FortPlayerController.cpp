@@ -2121,7 +2121,7 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 
 	DeadPlayerState->EndDBNOAbilities();
 
-	if (GameState->GetPlayersLeft() == 0)
+	/*if (GameState->GetPlayersLeft() == 0)
 	{
 		if (Fortnite_Version >= 11)
 		{
@@ -2132,7 +2132,7 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 		{
 			Restart();
 		}
-	}
+	}*/
 
 	return ClientOnPawnDiedOriginal(PlayerController, DeathReport);
 }
