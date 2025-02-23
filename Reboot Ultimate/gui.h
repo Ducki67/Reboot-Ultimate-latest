@@ -936,7 +936,7 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 		Sleep(1000);
 	}
 
-	float MaxTickRate = 30;
+	float MaxTickRate = 1;
 
 	auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
 	auto GameState = Cast<AFortGameStateAthena>(GameMode->GetGameState());
