@@ -47,6 +47,12 @@ UWorld* AActor::GetWorld()
 
 */
 
+void AActor::SetNetDormancy(ENetDormancy Dormancy)
+{
+	static auto SetNetDormancyFn = FindObject<UFunction>(L"/Script/Engine.Actor.SetNetDormancy");
+	this->ProcessEvent(SetNetDormancyFn, &Dormancy);
+}
+
 AActor* AActor::OnRep_Owner()
 {
 	static auto GetOwnerFunction = FindObject<UFunction>(L"/Script/Engine.Actor.OnRep_Owner");
@@ -55,12 +61,6 @@ AActor* AActor::OnRep_Owner()
 	this->ProcessEvent(GetOwnerFunction);
 
 	return Owner;
-}
-
-void AActor::SetNetDormancy(ENetDormancy Dormancy)
-{
-	static auto SetNetDormancyFn = FindObject<UFunction>(L"/Script/Engine.Actor.SetNetDormancy");
-	this->ProcessEvent(SetNetDormancyFn, &Dormancy);
 }
 
 AActor* AActor::GetOwner()

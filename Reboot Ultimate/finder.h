@@ -1920,7 +1920,7 @@ static inline uint64 FindCreativeEndGame()
 static inline uint64 FindModLoadedAmmo()
 {
 	/*if (Fortnite_Version <= 12.10)
-		return Memcury::Scanner::FindPattern("40 53 48 83 EC 30 80 B9 ? ? ? ? ? 41 8B D8 75 3F").Get(); // 1.7.2 - 12.10*/
+	return Memcury::Scanner::FindPattern("40 53 48 83 EC 30 80 B9 ? ? ? ? ? 41 8B D8 75 3F").Get(); // 1.7.2 - 12.10*/
 
 	// Check on 7.40, 11.31, 13.40, 19.10
 	return Memcury::Scanner::FindPattern("40 53 48 83 EC 30 80 B9 ? ? ? ? ? 41 8B D8 75").Get();

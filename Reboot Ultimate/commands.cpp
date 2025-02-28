@@ -1193,133 +1193,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, L"Successfully set pickaxe!");
 		}
-		else if (Command == "backbling" || Command == "setbackbling" || Command == "backpack")
-		{
-			if (NumArgs < 1)
-			{
-				SendMessageToConsole(PlayerController, L"Please provide a backbling ID!");
-				return;
-			}
-
-			auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn());
-
-			if (!Pawn)
-			{
-				SendMessageToConsole(PlayerController, L"No pawn!");
-				return;
-			}
-
-			static auto CustomCharacterPartClass = FindObject<UClass>(L"/Script/FortniteGame.CustomCharacterPart");
-
-			auto& BackblingID = Arguments[1];
-
-			if (BackblingID == "none" || BackblingID == "clear")
-			{
-				BackblingID = "NoBackpack";
-			}
-			else if (BackblingID == "blackknight")
-			{
-				BackblingID = "Male_Commando_BlackKnight";
-			}
-			else if (BackblingID == "cuddle")
-			{
-				BackblingID = "Female_Commando_BR039";
-			}
-			else if (BackblingID == "brite")
-			{
-				BackblingID = "CP_Backpack_Brite";
-			}
-			else if (BackblingID == "tp1")
-			{
-				BackblingID = "CP_Backpack_RetroGrey";
-			}
-			else if (BackblingID == "guitar")
-			{
-				BackblingID = "Female_Commando_Guitar";
-			}
-			else if (BackblingID == "crested")
-			{
-				BackblingID = "CP_Backpack_CuChulainn";
-			}
-			else if (BackblingID == "ventura")
-			{
-				BackblingID = "CP_Backpack_DecoFemale";
-			}
-			else if (BackblingID == "viking")
-			{
-				BackblingID = "CP_Backpack_VikingMale";
-			}
-			else if (BackblingID == "shark")
-			{
-				BackblingID = "CP_Backpack_Shark";
-			}
-			else if (BackblingID == "galaxy" || BackblingID == "gal" || BackblingID == "galdisc")
-			{
-				BackblingID = "CP_Backpack_Celestial";
-			}
-			else if (BackblingID == "cape")
-			{
-				BackblingID = "CP_Backpack_DarkViking";
-			}
-			else if (BackblingID == "ghostportal")
-			{
-				BackblingID = "CP_Backpack_GhostPortal";
-			}
-			else if (BackblingID == "vamp" || BackblingID == "vampire" || BackblingID == "coven")
-			{
-				BackblingID = "CP_Backpack_VampireMale02";
-			}
-			else if (BackblingID == "darkbag" || BackblingID == "dark")
-			{
-				BackblingID = "CP_Backpack_DarkBomber";
-			}
-			else if (BackblingID == "sunsprout")
-			{
-				BackblingID = "CP_Backpack_FarmerFemale";
-			}
-			else if (BackblingID == "clover")
-			{
-				BackblingID = "CP_Backpack_LuckyRiderMale";
-			}
-			else if (BackblingID == "butterfly")
-			{
-				BackblingID = "CP_Backpack_ShatterFly";
-			}
-			else if (BackblingID == "coin")
-			{
-				BackblingID = "CP_Backpack_AssassinSuitCoin";
-			}
-			else if (BackblingID == "star")
-			{
-				BackblingID = "CP_Backpack_Constellation";
-			}
-			else if (BackblingID == "cuddlepool" || BackblingID == "redcuddle")
-			{
-				BackblingID = "CP_Backpack_FuzzyBearDonut";
-			}
-			else if (BackblingID == "cactusjack")
-			{
-				BackblingID = "CP_Backpack_Cyclone";
-			}
-
-			std::string BackblingPath = "/Game/Characters/CharacterParts/Backpacks/" + BackblingID + "." + BackblingID;
-
-			auto backpackPart = LoadObject(BackblingPath, CustomCharacterPartClass);
-
-			if (!backpackPart)
-			{
-				SendMessageToConsole(PlayerController, L"Invalid backbling ID!");
-				return;
-			}
-
-			Pawn->ServerChoosePart(EFortCustomPartType::Backpack, backpackPart);
-
-			SendMessageToConsole(PlayerController, L"Backbling set successfully!");
-		}
-		else if (Command == "glider" || Command == "setglider")
-		{
-
-		}
 		else if (Command == "pickaxeall")
 		{
 			static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
@@ -1493,6 +1366,257 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				WorldInventory->Update();
 
 				SendMessageToConsole(PlayerController, L"Successfully gave pickaxe to all players!");
+			}
+		}
+		else if (Command == "backbling" || Command == "setbackbling" || Command == "backpack")
+		{
+			if (NumArgs < 1)
+			{
+				SendMessageToConsole(PlayerController, L"Please provide a backbling ID!");
+				return;
+			}
+
+			auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn());
+
+			if (!Pawn)
+			{
+				SendMessageToConsole(PlayerController, L"No pawn!");
+				return;
+			}
+
+			static auto CustomCharacterPartClass = FindObject<UClass>(L"/Script/FortniteGame.CustomCharacterPart");
+
+			auto& BackblingID = Arguments[1];
+
+			if (BackblingID.starts_with("BID_"))
+			{
+				BackblingID.replace(0, 4, "CP_Backpack_");
+			}
+
+			if (BackblingID == "blackknight")
+			{
+				BackblingID = "Male_Commando_BlackKnight";
+			}
+			else if (BackblingID == "cuddle")
+			{
+				BackblingID = "Female_Commando_BR039";
+			}
+			else if (BackblingID == "brite")
+			{
+				BackblingID = "CP_Backpack_Brite";
+			}
+			else if (BackblingID == "tp1")
+			{
+				BackblingID = "CP_Backpack_RetroGrey";
+			}
+			else if (BackblingID == "guitar")
+			{
+				BackblingID = "Female_Commando_Guitar";
+			}
+			else if (BackblingID == "crested")
+			{
+				BackblingID = "CP_Backpack_CuChulainn";
+			}
+			else if (BackblingID == "ventura")
+			{
+				BackblingID = "CP_Backpack_DecoFemale";
+			}
+			else if (BackblingID == "viking")
+			{
+				BackblingID = "CP_Backpack_VikingMale";
+			}
+			else if (BackblingID == "shark")
+			{
+				BackblingID = "CP_Backpack_Shark";
+			}
+			else if (BackblingID == "galaxy" || BackblingID == "gal" || BackblingID == "galdisc")
+			{
+				BackblingID = "CP_Backpack_Celestial";
+			}
+			else if (BackblingID == "cape")
+			{
+				BackblingID = "CP_Backpack_DarkViking";
+			}
+			else if (BackblingID == "ghostportal")
+			{
+				BackblingID = "CP_Backpack_GhostPortal";
+			}
+			else if (BackblingID == "vamp" || BackblingID == "vampire" || BackblingID == "coven")
+			{
+				BackblingID = "CP_Backpack_VampireMale02";
+			}
+			else if (BackblingID == "darkbag" || BackblingID == "dark")
+			{
+				BackblingID = "CP_Backpack_DarkBomber";
+			}
+			else if (BackblingID == "sunsprout")
+			{
+				BackblingID = "CP_Backpack_FarmerFemale";
+			}
+			else if (BackblingID == "clover")
+			{
+				BackblingID = "CP_Backpack_LuckyRiderMale";
+			}
+			else if (BackblingID == "butterfly")
+			{
+				BackblingID = "CP_Backpack_ShatterFly";
+			}
+			else if (BackblingID == "coin")
+			{
+				BackblingID = "CP_Backpack_AssassinSuitCoin";
+			}
+			else if (BackblingID == "star")
+			{
+				BackblingID = "CP_Backpack_Constellation";
+			}
+			else if (BackblingID == "cuddlepool" || BackblingID == "redcuddle")
+			{
+				BackblingID = "CP_Backpack_FuzzyBearDonut";
+			}
+			else if (BackblingID == "cactusjack")
+			{
+				BackblingID = "CP_Backpack_Cyclone";
+			}
+
+			std::string BackblingPath = "/Game/Characters/CharacterParts/Backpacks/" + BackblingID + "." + BackblingID;
+
+			auto backpackPart = LoadObject(BackblingPath, CustomCharacterPartClass);
+
+			if (!backpackPart)
+			{
+				SendMessageToConsole(PlayerController, L"Invalid backbling ID!");
+				return;
+			}
+
+			Pawn->ServerChoosePart(EFortCustomPartType::Backpack, backpackPart);
+
+			SendMessageToConsole(PlayerController, L"Backbling set successfully!");
+		}
+		else if (Command == "backblingall" || Command == "setbackblingall" || Command == "backpackall")
+		{
+			for (int i = 0; i < ClientConnections.Num(); i++)
+			{
+				if (NumArgs < 1)
+				{
+					SendMessageToConsole(PlayerController, L"Please provide a backbling ID!");
+					return;
+				}
+
+				auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn());
+
+				if (!Pawn)
+				{
+					SendMessageToConsole(PlayerController, L"No pawn!");
+					return;
+				}
+
+				static auto CustomCharacterPartClass = FindObject<UClass>(L"/Script/FortniteGame.CustomCharacterPart");
+
+				auto& BackblingID = Arguments[1];
+
+				if (BackblingID.starts_with("BID_"))
+				{
+					BackblingID.replace(0, 4, "CP_Backpack_");
+				}
+
+				if (BackblingID == "blackknight")
+				{
+					BackblingID = "Male_Commando_BlackKnight";
+				}
+				else if (BackblingID == "cuddle")
+				{
+					BackblingID = "Female_Commando_BR039";
+				}
+				else if (BackblingID == "brite")
+				{
+					BackblingID = "CP_Backpack_Brite";
+				}
+				else if (BackblingID == "tp1")
+				{
+					BackblingID = "CP_Backpack_RetroGrey";
+				}
+				else if (BackblingID == "guitar")
+				{
+					BackblingID = "Female_Commando_Guitar";
+				}
+				else if (BackblingID == "crested")
+				{
+					BackblingID = "CP_Backpack_CuChulainn";
+				}
+				else if (BackblingID == "ventura")
+				{
+					BackblingID = "CP_Backpack_DecoFemale";
+				}
+				else if (BackblingID == "viking")
+				{
+					BackblingID = "CP_Backpack_VikingMale";
+				}
+				else if (BackblingID == "shark")
+				{
+					BackblingID = "CP_Backpack_Shark";
+				}
+				else if (BackblingID == "galaxy" || BackblingID == "gal" || BackblingID == "galdisc")
+				{
+					BackblingID = "CP_Backpack_Celestial";
+				}
+				else if (BackblingID == "cape")
+				{
+					BackblingID = "CP_Backpack_DarkViking";
+				}
+				else if (BackblingID == "ghostportal")
+				{
+					BackblingID = "CP_Backpack_GhostPortal";
+				}
+				else if (BackblingID == "vamp" || BackblingID == "vampire" || BackblingID == "coven")
+				{
+					BackblingID = "CP_Backpack_VampireMale02";
+				}
+				else if (BackblingID == "darkbag" || BackblingID == "dark")
+				{
+					BackblingID = "CP_Backpack_DarkBomber";
+				}
+				else if (BackblingID == "sunsprout")
+				{
+					BackblingID = "CP_Backpack_FarmerFemale";
+				}
+				else if (BackblingID == "clover")
+				{
+					BackblingID = "CP_Backpack_LuckyRiderMale";
+				}
+				else if (BackblingID == "butterfly")
+				{
+					BackblingID = "CP_Backpack_ShatterFly";
+				}
+				else if (BackblingID == "coin")
+				{
+					BackblingID = "CP_Backpack_AssassinSuitCoin";
+				}
+				else if (BackblingID == "star")
+				{
+					BackblingID = "CP_Backpack_Constellation";
+				}
+				else if (BackblingID == "cuddlepool" || BackblingID == "redcuddle")
+				{
+					BackblingID = "CP_Backpack_FuzzyBearDonut";
+				}
+				else if (BackblingID == "cactusjack")
+				{
+					BackblingID = "CP_Backpack_Cyclone";
+				}
+
+				std::string BackblingPath = "/Game/Characters/CharacterParts/Backpacks/" + BackblingID + "." + BackblingID;
+
+				auto backpackPart = LoadObject(BackblingPath, CustomCharacterPartClass);
+
+				if (!backpackPart)
+				{
+					SendMessageToConsole(PlayerController, L"Invalid backbling ID!");
+					return;
+				}
+
+				Pawn->ServerChoosePart(EFortCustomPartType::Backpack, backpackPart);
+
+				SendMessageToConsole(PlayerController, L"Backbling set successfully!");
 			}
 		}
 		else if (Command == "load")
@@ -3074,7 +3198,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn());
 
 			std::string HIDStr = Arguments[1];
-
 			auto HIDDef = FindObject(HIDStr, nullptr, ANY_PACKAGE);
 
 			if (!HIDDef)
@@ -3616,81 +3739,91 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		}
 		else if (Command == "spawnbot" || Command == "bot" || Command == "bots")
 		{
-			if (Fortnite_Version >= 7.40 && Fortnite_Version <= 8.51)
-				return;
-
-			auto Pawn = ReceivingController->GetPawn();
-
-			if (!Pawn)
+			if (Fortnite_Version == 8.51 || Fortnite_Version == 7.40)
 			{
-				SendMessageToConsole(PlayerController, L"No pawn to spawn bot at!");
-				return;
+				SendMessageToConsole(PlayerController, L"You cannot spawn a bot on this version!");
+				SendMessageToConsole(PlayerController, L"Try restarting the server using « cheat restart » and using another account as a bot instead!");
 			}
-
-			FVector SpawnLocation = Pawn->GetActorLocation();
-
-			int Count = 1;
-
-			try
+			else
 			{
+				auto Pawn = ReceivingController->GetPawn();
+
+				if (!Pawn)
+				{
+					SendMessageToConsole(PlayerController, L"No pawn to spawn bot at!");
+					return;
+				}
+
+				int Count = 1;
+
+				if (Arguments.size() >= 2)
+				{
+					try { Count = std::stod(Arguments[1]); }
+					catch (...) {}
+				}
+
+				auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
+
+				bool bShouldSpawnAtZoneCenter = false;
+
+				if (NumArgs >= 3 && Arguments[2] == "center")
+					bShouldSpawnAtZoneCenter = true;
+
+				if (bShouldSpawnAtZoneCenter && GameMode->GetGameStateAthena()->GetGamePhaseStep() <= EAthenaGamePhaseStep::BusFlying)
+					bShouldSpawnAtZoneCenter = false;
+
+				FRotator SpawnRotation = Pawn->GetActorRotation();
+
+				int SizeMultiplier = 1;
+
 				if (Arguments.size() >= 4)
 				{
-					SpawnLocation.X = std::stof(Arguments[1]);
-					SpawnLocation.Y = std::stof(Arguments[2]);
-					SpawnLocation.Z = std::stof(Arguments[3]);
-
-					if (Arguments.size() >= 5)
-						Count = std::stoi(Arguments[4]);
+					try { SizeMultiplier = std::stod(Arguments[3]); }
+					catch (...) {}
 				}
-				else if (Arguments.size() == 2)
+
+				constexpr int Max = 99;
+
+				if (Count > Max)
 				{
-					Count = std::stoi(Arguments[1]);
-					SpawnLocation.Z += 1000;
+					SendMessageToConsole(PlayerController, (std::wstring(L"You went over the limit! Only spawning ") + std::to_wstring(Max) + L".").c_str());
+					Count = Max;
 				}
-			}
-			catch (const std::invalid_argument&)
-			{
-				SendMessageToConsole(PlayerController, L"Invalid input for coordinates or count!");
-				return;
-			}
-			catch (const std::out_of_range&)
-			{
-				SendMessageToConsole(PlayerController, L"Input value out of range!");
-				return;
-			}
 
-			constexpr int Max = 99;
-			if (Count > Max)
-			{
-				SendMessageToConsole(PlayerController, (std::wstring(L"You went over the limit! Only spawning ") + std::to_wstring(Max) + L".").c_str());
-				Count = Max;
-			}
+				int AmountSpawned = 0;
 
-			FRotator SpawnRotation = Pawn->GetActorRotation();
-
-			int AmountSpawned = 0;
-
-			for (int i = 0; i < Count; i++)
-			{
-				FActorSpawnParameters SpawnParameters{};
-				FTransform Transform;
-				Transform.Translation = SpawnLocation;
-				Transform.Scale3D = FVector(1, 1, 1);
-				Transform.Rotation = SpawnRotation.Quaternion();
-
-				auto NewActor = Bots::SpawnBot(Transform, Pawn);
-
-				if (!NewActor)
+				for (int i = 0; i < Count; i++)
 				{
-					SendMessageToConsole(PlayerController, L"Failed to spawn an actor!");
+					FActorSpawnParameters SpawnParameters{};
+					// SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+					auto SafeZoneIndicator = GameMode->GetSafeZoneIndicator();
+
+					auto Loc = bShouldSpawnAtZoneCenter ? SafeZoneIndicator->GetSafeZoneCenter() : Pawn->GetActorLocation();
+					Loc.Z += bShouldSpawnAtZoneCenter ? 10000 : 0;
+
+					FTransform Transform;
+					Transform.Translation = Loc;
+					Transform.Scale3D = FVector(1 * SizeMultiplier, 1 * SizeMultiplier, 1 * SizeMultiplier);
+					Transform.Rotation = SpawnRotation.Quaternion();
+
+					auto NewActor = Bots::SpawnBot(Transform, Pawn);
+
+					if (!NewActor)
+					{
+						SendMessageToConsole(PlayerController, L"Failed to spawn an actor!");
+					}
+					else
+					{
+						AmountSpawned++;
+					}
 				}
+
+				if (!bShouldSpawnAtZoneCenter)
+					SendMessageToConsole(PlayerController, L"Summoned!");
 				else
-				{
-					AmountSpawned++;
-				}
+					SendMessageToConsole(PlayerController, L"Summoned at zone center!");
 			}
-
-			SendMessageToConsole(PlayerController, (std::wstring(L"Summoned ") + std::to_wstring(AmountSpawned) + L" bot(s)!").c_str());
 		}
 		else if (Command == "marktoteleport" || Command == "marktotp" || Command == "markertp" || Command == "marktp" || Command == "mark" || Command == "marker")
 		{
@@ -4337,20 +4470,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			CheatManager->DestroyTarget();
 			CheatManager = nullptr;
 			SendMessageToConsole(PlayerController, L"Destroyed target!");
-		}
-		else if (Command == "slomo")
-		{
-			UCheatManager*& CheatManager = ReceivingController->SpawnCheatManager(UCheatManager::StaticClass());
-
-			if (!CheatManager)
-			{
-				SendMessageToConsole(PlayerController, L"Failed to spawn player's cheat manager!");
-				return;
-			}
-
-			CheatManager->Slomo();
-			CheatManager = nullptr;
-			SendMessageToConsole(PlayerController, L"Toggled slomo!");
 		}
 		else if (Command == "buildfree" || Command == "infmats")
 		{
@@ -5141,7 +5260,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 	if (bSendHelpMessage)
 	{
 		FString HelpMessage = LR"(
-- cheat backbling - {CharacterPart} - Sets a player's backbling.
+- cheat backbling - {CharacterPart/BID} - Sets a player's backbling.
+- cheat backblingall - {CharacterPart/BID} - Sets everyones backbling.
 - cheat ban - Permanently bans the player from the game. (IP Ban)
 - cheat bot {#} - Spawns a bot at the player (experimental).
 - cheat buildfree - Toggles Infinite Materials.

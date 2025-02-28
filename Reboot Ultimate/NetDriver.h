@@ -166,6 +166,12 @@ public:
 		return Get<TArray<UNetConnection*>>(ClientConnectionsOffset);
 	}
 
+	UNetConnection* GetLastClientConnection()
+	{
+		auto& ClientConnections = GetClientConnections();
+		return ClientConnections.Num() > 0 ? ClientConnections[ClientConnections.Num() - 1] : nullptr;
+	}
+
 	float& GetTime()
 	{
 		static auto TimeOffset = GetOffset("Time");

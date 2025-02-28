@@ -329,7 +329,7 @@ void Addresses::FindAll()
 
 	LOG_INFO(LogDev, "Finding CreativeEndGame");
 	Addresses::CreativeEndGame = FindCreativeEndGame();
-	
+
 	LOG_INFO(LogDev, "Finding ModLoadedAmmo");
 	Addresses::ModLoadedAmmo = FindModLoadedAmmo();
 

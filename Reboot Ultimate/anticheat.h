@@ -43,7 +43,7 @@ public:
 			AmountOfLowWarnings++;
 		if (severity == Severity::MEDIUM)
 			AmountOfMediumWarnings++;
-		if (severity == Severity::HIGH)
+		if (severity == Severity::LOW)
 			AmountOfHighWarnings++;
 
 		return IsCheater();

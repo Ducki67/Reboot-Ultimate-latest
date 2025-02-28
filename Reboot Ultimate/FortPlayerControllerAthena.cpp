@@ -258,7 +258,8 @@ void AFortPlayerControllerAthena::EnterAircraftHook(UObject* PC, AActor* Aircraf
 		}
 	);
 
-	/*auto HandleGiveItemsAtGamePhaseStepMutator = [&](AFortAthenaMutator* Mutator) {
+	/*auto HandleGiveItemsAtGamePhaseStepMutator = [&](AFortAthenaMutator* Mutator)
+	{
 		if (auto GiveItemsAtGamePhaseStepMutator = Cast<AFortAthenaMutator_GiveItemsAtGamePhaseStep>(Mutator))
 		{
 			auto PhaseToGive = GiveItemsAtGamePhaseStepMutator->GetPhaseToGiveItems();
@@ -282,12 +283,17 @@ void AFortPlayerControllerAthena::EnterAircraftHook(UObject* PC, AActor* Aircraf
 						Out2 = UDataTableFunctionLibrary::EvaluateCurveTableRow(ItemToGive->GetNumberToGive().GetCurve().CurveTable, ItemToGive->GetNumberToGive().GetCurve().RowName, 0.f);
 					}
 
+					if (!Out2)
+						Out2 = ItemToGive->GetNumberToGive().GetValue();
+
 					LOG_INFO(LogDev, "[{}] Out2: {} ItemToGive.ItemToDrop: {}", j, Out2, ItemToGive->GetItemToDrop()->IsValidLowLevel() ? ItemToGive->GetItemToDrop()->GetFullName() : "BadRead");
 
-					if (!Out2) // ?
-						Out2 = 0;
+					bool bShouldUpdate = false;
 
-					WorldInventory->AddItem(ItemToGive->GetItemToDrop(), nullptr, Out2);
+					WorldInventory->AddItem(ItemToGive->GetItemToDrop(), &bShouldUpdate, Out2);
+
+					// if (bShouldUpdate)
+						// WorldInventory->Update();
 				}
 			}
 		}
@@ -443,60 +449,66 @@ void AFortPlayerControllerAthena::ServerClientIsReadyToRespawn(AFortPlayerContro
 {
 	AFortPlayerStateAthena* PlayerStateAthena = Cast<AFortPlayerStateAthena>(PlayerControllerAthena->GetPlayerStateAthena());
 
-	auto GameMode = (AFortGameModeAthena*)GetWorld()->GetGameMode();
+	auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
+	auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
 
-	if (!PlayerStateAthena || !GameMode)
+	if (!PlayerStateAthena || !GameMode || !GameState)
 		return;
 
-	FFortRespawnData* RespawnData = PlayerStateAthena->GetRespawnData();
-
-	if (RespawnData->IsServerReady() && RespawnData->IsRespawnDataAvailable())
+	if (GameState->IsRespawningAllowed(PlayerStateAthena))
 	{
-		const FVector& RespawnLocation = RespawnData->RespawnLocation();
-		const FRotator& RespawnRotation = RespawnData->RespawnRotation();
+		FFortRespawnData* RespawnData = PlayerStateAthena->GetRespawnData();
 
-		FTransform SpawnTransform = UKismetMathLibrary::MakeTransform(RespawnLocation, RespawnRotation, FVector({ 1, 1, 1 }));
-
-		static auto SpawnDefaultPawnAtTransformFn = FindObject<UFunction>(L"/Script/Engine.GameModeBase.SpawnDefaultPawnAtTransform");
-
-		if (!SpawnDefaultPawnAtTransformFn)
+		if (RespawnData->IsServerReady() && RespawnData->IsRespawnDataAvailable())
 		{
-			LOG_ERROR(LogDev, "Failed to find SpawnDefaultPawnAtTransform function!");
-			return;
+			const FVector& RespawnLocation = RespawnData->RespawnLocation();
+			const FRotator& RespawnRotation = RespawnData->RespawnRotation();
+
+			FTransform SpawnTransform = UKismetMathLibrary::MakeTransform(RespawnLocation, RespawnRotation, FVector({ 1, 1, 1 }));
+
+			static auto SpawnDefaultPawnAtTransformFn = FindObject<UFunction>(L"/Script/Engine.GameModeBase.SpawnDefaultPawnAtTransform");
+
+			if (!SpawnDefaultPawnAtTransformFn)
+			{
+				LOG_ERROR(LogDev, "Failed to find SpawnDefaultPawnAtTransform function!");
+				return;
+			}
+
+			struct
+			{
+				AController* NewPlayer;
+				FTransform SpawnTransform;
+				APawn* ReturnValue;
+			} Params{ PlayerControllerAthena, SpawnTransform, nullptr };
+
+			LOG_INFO(LogDev, "Calling SpawnDefaultPawnAtTransformFn!");
+
+			GameMode->ProcessEvent(SpawnDefaultPawnAtTransformFn, &Params);
+
+			auto PlayerPawn = Cast<AFortPlayerPawn>(Params.ReturnValue);
+
+			if (!PlayerPawn)
+			{
+				LOG_ERROR(LogDev, "Failed to spawn PlayerPawn after ServerIsClientReadyToRespawn!");
+				return;
+			}
+
+			PlayerPawn->Owner = PlayerControllerAthena;
+			PlayerPawn->OnRep_Owner();
+
+			PlayerControllerAthena->Pawn = PlayerPawn;
+			PlayerControllerAthena->OnRep_Pawn();
+			PlayerControllerAthena->Possess(PlayerPawn);
+
+			// PlayerPawn->SetMaxHealth(100);
+			PlayerPawn->SetHealth(100);
+			// PlayerPawn->SetMaxShield(100);
+			PlayerPawn->SetShield(100);
+
+			PlayerControllerAthena->SetControlRotation(RespawnRotation);
+
+			RespawnData->IsClientReady() = true;
 		}
-
-		struct
-		{
-			AController* NewPlayer;
-			FTransform SpawnTransform;
-			APawn* ReturnValue;
-		} Params{ PlayerControllerAthena, SpawnTransform, nullptr };
-
-		LOG_INFO(LogDev, "Calling SpawnDefaultPawnAtTransformFn!");
-
-		GameMode->ProcessEvent(SpawnDefaultPawnAtTransformFn, &Params);
-
-		auto PlayerPawn = Cast<AFortPlayerPawn>(Params.ReturnValue);
-
-		if (!PlayerPawn)
-		{
-			return;
-		}
-
-		PlayerPawn->Owner = PlayerControllerAthena;
-		PlayerPawn->OnRep_Owner();
-
-		PlayerControllerAthena->Pawn = PlayerPawn;
-		PlayerControllerAthena->OnRep_Pawn();
-
-		PlayerControllerAthena->Possess(PlayerPawn);
-
-		PlayerPawn->SetHealth(100);
-		PlayerPawn->SetShield(0);
-
-		PlayerControllerAthena->SetControlRotation(RespawnRotation);
-
-		RespawnData->IsClientReady() = true;
 	}
 }
 
@@ -692,11 +704,13 @@ void AFortPlayerControllerAthena::ServerPlaySquadQuickChatMessageHook(AFortPlaye
 void AFortPlayerControllerAthena::GetPlayerViewPointHook(AFortPlayerControllerAthena* PlayerController, FVector& Location, FRotator& Rotation)
 {
 	// I don't know why but GetActorEyesViewPoint only works on some versions.
-	 static auto GetActorEyesViewPointFn = FindObject<UFunction>(L"/Script/Engine.Actor.GetActorEyesViewPoint");
+	/*static auto GetActorEyesViewPointFn = FindObject<UFunction>(L"/Script/Engine.Actor.GetActorEyesViewPoint");
 	static auto GetActorEyesViewPointIndex = GetFunctionIdxOrPtr(GetActorEyesViewPointFn) / 8;
 
-	void (*GetActorEyesViewPointOriginal)(AActor* Actor, FVector* OutLocation, FRotator* OutRotation) = decltype(GetActorEyesViewPointOriginal)(PlayerController->VFTable[GetActorEyesViewPointIndex]);
-	return GetActorEyesViewPointOriginal(PlayerController, &Location, &Rotation);
+	void (*GetActorEyesViewPointOriginal)(AActor * Actor, FVector * OutLocation, FRotator * OutRotation) = decltype(GetActorEyesViewPointOriginal)(PlayerController->VFTable[GetActorEyesViewPointIndex]);
+	return GetActorEyesViewPointOriginal(PlayerController, &Location, &Rotation);*/
+
+	// auto PCViewTarget = PlayerController->GetViewTarget();
 
 	if (auto MyFortPawn = PlayerController->GetMyFortPawn())
 	{

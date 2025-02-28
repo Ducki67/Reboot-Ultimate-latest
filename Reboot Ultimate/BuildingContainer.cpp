@@ -6,11 +6,6 @@
 
 bool ABuildingContainer::SpawnLoot(AFortPawn* Pawn)
 {
-	/*
-	if (!Pawn)
-		return false;
-	*/
-
 	this->ForceNetUpdate();
 
 	auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());

@@ -5,7 +5,6 @@ UClass* UFortDecoItemDefinition::StaticClass()
 	static auto ptr = FindObject<UClass>(L"/Script/FortniteGame.FortDecoItemDefinition");
 	return ptr;
 }
-
 TSubclassOf<class ABuildingActor> UFortDecoItemDefinition::GetBlueprintClass()
 {
     static auto GetBlueprintClassFn = FindObject<UFunction>(L"/Script/FortniteGame.FortDecoItemDefinition.GetBlueprintClass");

@@ -39,7 +39,7 @@ char UFortInventoryInterface::RemoveInventoryItemHook(__int64 a1, FGuid a2, int 
 			WorldInventory->Update();
 	}
 
-	if (Engine_Version < 424 && !Addresses::ModLoadedAmmo) // doesnt work on c2+ idk why
+	if (Engine_Version < 424 && !Addresses::ModLoadedAmmo)
 	{
 		auto Pawn = PlayerController->GetMyFortPawn();
 
@@ -55,7 +55,6 @@ char UFortInventoryInterface::RemoveInventoryItemHook(__int64 a1, FGuid a2, int 
 	return true;
 }
 
-// 1:1 mais ta capter faut les choquer
 void UFortInventoryInterface::ModLoadedAmmoHook(__int64 a1, const FGuid& ItemGuid, int Count)
 {
 	static auto FortPlayerControllerSuperSize = (*(UClass**)(__int64(FindObject<UClass>(L"/Script/FortniteGame.FortPlayerController")) + Offsets::SuperStruct))->GetPropertiesSize();

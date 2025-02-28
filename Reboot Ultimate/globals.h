@@ -14,7 +14,6 @@ namespace Globals
 	extern inline bool bIsTickTiming = false;
 	extern inline bool UPTimeStarted = false;
 
-	extern inline bool bPartyRoyale = false;
 	extern inline bool bCreative = false;
 	extern inline bool bGoingToPlayEvent = false;
 	extern inline bool bEnableAGIDs = true;
@@ -37,11 +36,6 @@ namespace Globals
 	extern inline std::string BotPickaxeID = "WID_Harvest_HalloweenScythe_Athena_C_T01";
 	extern inline std::string BotName = "";
 	extern inline std::string BotSkin = "";
-
-	extern inline bool bVBucksOnKill = false;
-	extern inline std::string BackendIP = "127.0.0.1";
-	extern inline std::string BackendPort = "8080";
-	extern inline std::string BackendName = "Reload";
 
 	// extern inline std::map<int, std::string> CustomBotNames;
 	// extern inline int CurrentBotID = 1;

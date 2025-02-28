@@ -10,7 +10,6 @@ public:
 	void Teleport();
 	void DestroyTarget();
 	void God();
-	void Slomo();
 	void DestroyAll(TSubclassOf<AActor> AClass);
 	void ChangeSize(float F);
 	void ToggleDebugCamera();

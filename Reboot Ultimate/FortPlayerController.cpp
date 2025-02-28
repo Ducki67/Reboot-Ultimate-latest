@@ -27,66 +27,6 @@
 #include "quests.h"
 #include "FortVehicleWeapons.h"
 
-std::string BackendIP = Globals::BackendIP;
-std::string BackendPort = Globals::BackendPort;
-std::string BackendName = Globals::BackendName;
-
-static size_t write_callback(char* ptr, size_t size, size_t nmemb, void* userdata) 
-{
-	((std::string*)userdata)->append(ptr, size * nmemb);
-	return size * nmemb;
-}
-
-std::string getResponse(std::string url)
-{
-	curl_global_init(CURL_GLOBAL_ALL);
-
-	CURL* curl = curl_easy_init();
-
-	if (!curl) 
-	{
-		fprintf(stderr, "Failed to initialize libcurl.\n");
-		curl_global_cleanup();
-	}
-
-	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
-
-	std::string response_body;
-
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_body);
-
-	CURLcode res = curl_easy_perform(curl);
-
-	if (res != CURLE_OK) 
-	{
-		fprintf(stderr, "Failed to perform HTTP request: %s\n", curl_easy_strerror(res));
-		curl_easy_cleanup(curl);
-		curl_global_cleanup();
-		return "failure";
-	}
-
-	long response_code;
-
-	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-
-	if (response_code >= 200 && response_code < 300) 
-	{
-		curl_easy_cleanup(curl);
-		curl_global_cleanup();
-		return response_body;
-
-	}
-	else 
-	{
-		fprintf(stderr, "HTTP request failed with status code %ld.\n", response_code);
-		curl_easy_cleanup(curl);
-		curl_global_cleanup();
-		return "failure";
-	}
-}
-
 void AFortPlayerController::ClientReportDamagedResourceBuilding(ABuildingSMActor* BuildingSMActor, EFortResourceType PotentialResourceType, int PotentialResourceCount, bool bDestroyed, bool bJustHitWeakspot)
 {
 	static auto fn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerController.ClientReportDamagedResourceBuilding");
@@ -684,32 +624,29 @@ void AFortPlayerController::ServerAttemptInteractHook(UObject* Context, FFrame* 
 
 				Pawn->EquipWeaponDefinition(VehicleWeaponDefinition, ReplicatedEntry->GetItemGuid());
 
-				if (Fortnite_Version > 9)
-				{
-					auto VehicleWeapon = Cast<AFortWeaponRangedForVehicle>(Pawn->GetCurrentWeapon());
+				auto VehicleWeapon = Cast<AFortWeaponRangedForVehicle>(Pawn->GetCurrentWeapon());
 
-					if (!VehicleWeapon)
-						return;
+				if (!VehicleWeapon)
+					return;
 
-					FMountedWeaponInfo MountedWeaponInfo;
-					MountedWeaponInfo.bTargetSourceFromVehicleMuzzle = true;
-					MountedWeaponInfo.bNeedsVehicleAttachment = true;
+				FMountedWeaponInfo MountedWeaponInfo;
+				MountedWeaponInfo.bTargetSourceFromVehicleMuzzle = true;
+				MountedWeaponInfo.bNeedsVehicleAttachment = true;
 
-					auto SeatIndex = Pawn->GetVehicleSeatIndex();
+				auto SeatIndex = Pawn->GetVehicleSeatIndex();
 
-					FMountedWeaponInfoRepped MountedWeaponInfoRepped;
-					MountedWeaponInfoRepped.HostVehicleCachedActor = Vehicle;
-					MountedWeaponInfoRepped.HostVehicleSeatIndexCached = SeatIndex;
+				FMountedWeaponInfoRepped MountedWeaponInfoRepped;
+				MountedWeaponInfoRepped.HostVehicleCachedActor = Vehicle;
+				MountedWeaponInfoRepped.HostVehicleSeatIndexCached = SeatIndex;
 
-					VehicleWeapon->GetMountedWeaponInfo() = MountedWeaponInfo;
-					VehicleWeapon->GetMountedWeaponInfoRepped() = MountedWeaponInfoRepped;
+				VehicleWeapon->GetMountedWeaponInfo() = MountedWeaponInfo;
+				VehicleWeapon->GetMountedWeaponInfoRepped() = MountedWeaponInfoRepped;
 
-					static auto OnRep_MountedWeaponInfoReppedFn = FindObject<UFunction>("/Script/FortniteGame.FortWeaponRangedForVehicle.OnRep_MountedWeaponInfoRepped");
-					VehicleWeapon->ProcessEvent(OnRep_MountedWeaponInfoReppedFn);
+				static auto OnRep_MountedWeaponInfoReppedFn = FindObject<UFunction>("/Script/FortniteGame.FortWeaponRangedForVehicle.OnRep_MountedWeaponInfoRepped");
+				VehicleWeapon->ProcessEvent(OnRep_MountedWeaponInfoReppedFn);
 
-					static auto OnHostVehicleSetupdFn = FindObject<UFunction>("/Script/FortniteGame.FortWeaponRangedForVehicle.OnHostVehicleSetup");
-					VehicleWeapon->ProcessEvent(OnHostVehicleSetupdFn);
-				}
+				static auto OnHostVehicleSetupdFn = FindObject<UFunction>("/Script/FortniteGame.FortWeaponRangedForVehicle.OnHostVehicleSetup");
+				VehicleWeapon->ProcessEvent(OnHostVehicleSetupdFn);
 			}
 		}
 
@@ -1357,7 +1294,7 @@ void AFortPlayerController::ServerAttemptInventoryDropHook(AFortPlayerController
 
 			// To Fix
 			/*struct
-			{ 
+			{
 				FFortItemEntry Item;
 			} FortItemEntryComponent_SetOwnedItem{ *ReplicatedEntry };
 
@@ -1584,16 +1521,6 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 		victory.detach();
 	}
 
-	if (Globals::bVBucksOnKill) // kill vbucks
-	{
-		if (KillerPlayerState)
-		{
-			(AFortPlayerStateAthena*)((AFortPlayerState**)DeathReport + MemberOffsets::DeathReport::KillerPlayerState);
-
-			getResponse(BackendIP + ":" + BackendPort + BackendName + KillerPlayerState->GetPlayerName().ToString() + "/incKills");
-		}
-	}
-
 	// std::thread victory(DBNOToggleOnWin);
 
 	static auto FallDamageEnumValue = 1;
@@ -1773,11 +1700,6 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 		{
 			KillerPawn->SiphonMats();
 
-			if (Globals::bUseSiphon)
-			{
-				KillerPlayerState->ApplySiphonEffect();
-			}
-
 			if (Globals::AmountOfHealthSiphon > 0)
 			{
 				float Health = KillerPawn->GetHealth();
@@ -1797,6 +1719,11 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 
 				if (RemainingSiphon > 0 && Shield < MaxShield)
 				{
+					if (Globals::bUseSiphon)
+					{
+						KillerPlayerState->ApplySiphonEffect();
+					}
+
 					float ShieldToGive = FMath::Min(RemainingSiphon, MaxShield - Shield);
 					KillerPawn->SetShield(Shield + ShieldToGive);
 				}
@@ -2065,8 +1992,6 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 
 				bool bDidSomeoneWin = AllPlayerStates.Num() == 0;
 
-				TArray<AFortPlayerControllerAthena*> AlivePlayers = GameMode->GetAlivePlayers();
-
 				for (int i = 0; i < AllPlayerStates.Num(); ++i)
 				{
 					auto CurrentPlayerState = (AFortPlayerStateAthena*)AllPlayerStates.at(i);
@@ -2085,31 +2010,6 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 				{
 					CreateThread(0, 0, RestartThread, 0, 0, 0);
 				}
-
-				if (Globals::bVBucksOnKill) // win vbucks
-				{
-					if (AlivePlayers.Num() == 1)
-					{
-						try
-						{
-							TArray<AFortPlayerControllerAthena*> AlivePlayers = GameMode->GetAlivePlayers();
-
-							auto AllPlayerStates = UGameplayStatics::GetAllActorsOfClass(GetWorld(), AFortPlayerStateAthena::StaticClass());
-
-							for (int i = 0; i < AllPlayerStates.Num(); ++i)
-							{
-								auto CurrentPlayerState = (AFortPlayerStateAthena*)AllPlayerStates.at(i);
-								std::string PlayerName = CurrentPlayerState->GetPlayerName().ToString();
-								getResponse(BackendIP + ":" + BackendPort + BackendName + PlayerName + "/incWins");
-							}
-						}
-
-						catch (const std::exception& ex)
-						{
-							std::cerr << "Error occurred: " << ex.what() << std::endl;
-						}
-					}
-				}
 			}
 		}
 	}
@@ -2120,19 +2020,6 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 	}
 
 	DeadPlayerState->EndDBNOAbilities();
-
-	/*if (GameState->GetPlayersLeft() == 0)
-	{
-		if (Fortnite_Version >= 11)
-		{
-			std::this_thread::sleep_for(std::chrono::seconds(10));
-			system("taskkill /f /fi \"IMAGENAME eq FortniteClient-Win64-*\" /fi \"WINDOWTITLE eq Reboot Ultimate\"");
-		}
-		else
-		{
-			Restart();
-		}
-	}*/
 
 	return ClientOnPawnDiedOriginal(PlayerController, DeathReport);
 }

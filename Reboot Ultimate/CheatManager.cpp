@@ -20,12 +20,6 @@ void UCheatManager::God()
 	this->ProcessEvent(GodFn, nullptr);
 }
 
-void UCheatManager::Slomo()
-{
-	static auto SlomoFn = FindObject<UFunction>(L"/Script/Engine.CheatManager.Slomo");
-	this->ProcessEvent(SlomoFn, nullptr);
-}
-
 void UCheatManager::ChangeSize(float F)
 {
 	static auto ChangeSizeFn = FindObject<UFunction>("/Script/Engine.CheatManager.ChangeSize");

@@ -44,7 +44,7 @@ public:
             , Mask(InMask)
         {
         }
-        FORCEINLINE const FBitReference(const uint32& InData, const uint32 InMask) // DO NOT UPDATE TO VS 17.13 (breaks project)
+        FORCEINLINE const FBitReference(const uint32& InData, const uint32 InMask)
             : Data(const_cast<uint32&>(InData))
             , Mask(InMask)
         {

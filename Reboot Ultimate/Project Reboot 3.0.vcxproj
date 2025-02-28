@@ -24,7 +24,7 @@
     <ProjectGuid>{69618184-b9db-4982-b4fe-f83e9bdd0555}</ProjectGuid>
     <RootNamespace>ProjectReboot30</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Reboot Ultimate</ProjectName>
+	<ProjectName>Reboot Ultimate</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -79,7 +79,6 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;PROJECTREBOOT30_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(AboveS20)'!=''">ABOVE_S20;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -102,7 +101,6 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;PROJECTREBOOT30_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(AboveS20)'!=''">ABOVE_S20;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -127,7 +125,6 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;PROJECTREBOOT30_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(AboveS20)'!=''">ABOVE_S20;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -183,10 +180,7 @@
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="ActorComponent.cpp" />
     <ClCompile Include="addresses.cpp" />
-    <ClCompile Include="AIBlueprintHelperLibrary.cpp" />
-    <ClCompile Include="AIController.cpp" />
     <ClCompile Include="AthenaMarkerComponent.cpp" />
-    <ClCompile Include="BehaviorTree.h" />
     <ClCompile Include="BP_IslandScripting.cpp" />
     <ClCompile Include="BuildingActor.cpp" />
     <ClCompile Include="BuildingContainer.cpp" />
@@ -207,21 +201,15 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="EngineTypes.cpp" />
     <ClCompile Include="finder.cpp" />
-    <ClCompile Include="FortAthenaAIBotController.cpp" />
-    <ClCompile Include="FortAthenaAIBotCustomizationData.cpp" />
-    <ClCompile Include="FortAthenaAISpawnerData.cpp" />
-    <ClCompile Include="FortAthenaAISpawnerDataComponentList.cpp" />
     <ClCompile Include="FortAthenaCreativePortal.cpp" />
     <ClCompile Include="FortAthenaMapInfo.cpp" />
     <ClCompile Include="FortAthenaMutator_Barrier.cpp" />
-    <ClCompile Include="FortAthenaMutator_DadBro.cpp" />
     <ClCompile Include="FortAthenaMutator_Disco.cpp" />
     <ClCompile Include="FortAthenaMutator_GiveItemsAtGamePhaseStep.cpp" />
     <ClCompile Include="FortAthenaSupplyDrop.cpp" />
     <ClCompile Include="FortAthenaVehicle.cpp" />
     <ClCompile Include="FortAthenaVehicleSpawner.cpp" />
     <ClCompile Include="FortDecoItemDefinition.cpp" />
-    <ClCompile Include="FortDecoTool.cpp" />
     <ClCompile Include="FortGadgetItemDefinition.cpp" />
     <ClCompile Include="FortGameMode.cpp" />
     <ClCompile Include="FortGameModeAthena.cpp" />
@@ -249,8 +237,6 @@
     <ClCompile Include="FortPlayerStateAthena.cpp" />
     <ClCompile Include="FortPlaysetItemDefinition.cpp" />
     <ClCompile Include="FortSafeZoneIndicator.cpp" />
-    <ClCompile Include="FortServerBotManagerAthena.cpp" />
-    <ClCompile Include="FortVolumeManager.cpp" />
     <ClCompile Include="FortWeapon.cpp" />
     <ClCompile Include="FortWeaponItemDefinition.cpp" />
     <ClCompile Include="FortWeaponRangedMountedCannon.cpp" />
@@ -259,11 +245,9 @@
     <ClCompile Include="GameplayStatics.cpp" />
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="GenericPlatformMath.cpp" />
-    <ClCompile Include="HardwareUtils.cpp" />
     <ClCompile Include="inc.cpp" />
     <ClCompile Include="InventoryManagementLibrary.cpp" />
     <ClCompile Include="KismetMathLibrary.cpp" />
-    <ClCompile Include="KismetRenderingLibrary.cpp" />
     <ClCompile Include="KismetStringLibrary.cpp" />
     <ClCompile Include="KismetSystemLibrary.cpp" />
     <ClCompile Include="KismetTextLibrary.cpp" />
@@ -278,12 +262,9 @@
     <ClCompile Include="objectviewer.cpp" />
     <ClCompile Include="PlayerController.cpp" />
     <ClCompile Include="PlayerState.cpp" />
-    <ClCompile Include="PlaysetLevelStreamComponent.cpp" />
-    <ClCompile Include="quests.cpp" />
     <ClCompile Include="reboot.cpp" />
     <ClCompile Include="SavePackage.cpp" />
     <ClCompile Include="ScriptDisassembler.cpp" />
-    <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="UnrealMath.cpp" />
     <ClCompile Include="UnrealNames.cpp" />
     <ClCompile Include="UObjectGlobals.cpp" />
@@ -296,9 +277,6 @@
     <ClInclude Include="ActorComponent.h" />
     <ClInclude Include="addresses.h" />
     <ClInclude Include="ai.h" />
-    <ClInclude Include="AIBlueprintHelperLibrary.h" />
-    <ClInclude Include="AIController.h" />
-    <ClInclude Include="AIStimulus.h" />
     <ClInclude Include="AndOrNot.h" />
     <ClInclude Include="anticheat.h" />
     <ClInclude Include="Array.h" />
@@ -314,9 +292,6 @@
     <ClInclude Include="BGA.h" />
     <ClInclude Include="BinaryHeap.h" />
     <ClInclude Include="BitArray.h" />
-    <ClInclude Include="BlackboardComponent.h" />
-    <ClInclude Include="BlackboardData.h" />
-    <ClInclude Include="botnames.h" />
     <ClInclude Include="bots.h" />
     <ClInclude Include="BP_IslandScripting.h" />
     <ClInclude Include="BuildingActor.h" />
@@ -330,7 +305,6 @@
     <ClInclude Include="BuildingStructuralSupportSystem.h" />
     <ClInclude Include="BuildingTrap.h" />
     <ClInclude Include="Channel.h" />
-    <ClInclude Include="Character.h" />
     <ClInclude Include="CheatManager.h" />
     <ClInclude Include="Class.h" />
     <ClInclude Include="commands.h" />
@@ -356,24 +330,13 @@
     <ClInclude Include="finder.h" />
     <ClInclude Include="FortAbilitySet.h" />
     <ClInclude Include="FortAIEncounterInfo.h" />
-    <ClInclude Include="FortAIPawn.h" />
     <ClInclude Include="FortAthenaAIBotCharacterCustomization.h" />
-    <ClInclude Include="FortAthenaAIBotController.h" />
     <ClInclude Include="FortAthenaAIBotCustomizationData.h" />
-    <ClInclude Include="FortAthenaAIBotInventoryItems.h" />
-    <ClInclude Include="FortAthenaAIBotSpawnerData.h" />
-    <ClInclude Include="FortAthenaAISpawnerData.h" />
-    <ClInclude Include="FortAthenaAISpawnerDataComponent.h" />
-    <ClInclude Include="FortAthenaAISpawnerDataComponentList.h" />
-    <ClInclude Include="FortAthenaAISpawnerDataComponent_CosmeticLoadout.h" />
-    <ClInclude Include="FortAthenaAISpawnerDataComponent_SpawnParams.h" />
     <ClInclude Include="FortAthenaCreativePortal.h" />
     <ClInclude Include="FortAthenaMapInfo.h" />
     <ClInclude Include="FortAthenaMutator.h" />
-    <ClInclude Include="FortAthenaMutator_Ashton.h" />
     <ClInclude Include="FortAthenaMutator_Barrier.h" />
     <ClInclude Include="FortAthenaMutator_Bots.h" />
-    <ClInclude Include="FortAthenaMutator_DadBro.h" />
     <ClInclude Include="FortAthenaMutator_Disco.h" />
     <ClInclude Include="FortAthenaMutator_GG.h" />
     <ClInclude Include="FortAthenaMutator_GiveItemsAtGamePhaseStep.h" />
@@ -392,7 +355,6 @@
     <ClInclude Include="FortBotNameSettings.h" />
     <ClInclude Include="FortDagwoodVehicle.h" />
     <ClInclude Include="FortDecoItemDefinition.h" />
-    <ClInclude Include="FortDecoTool.h" />
     <ClInclude Include="FortGadgetItemDefinition.h" />
     <ClInclude Include="FortGameMode.h" />
     <ClInclude Include="FortGameModeAthena.h" />
@@ -425,10 +387,7 @@
     <ClInclude Include="FortQuickBars.h" />
     <ClInclude Include="FortResourceItemDefinition.h" />
     <ClInclude Include="FortSafeZoneIndicator.h" />
-    <ClInclude Include="FortScriptedAction.h" />
-    <ClInclude Include="FortServerBotManagerAthena.h" />
     <ClInclude Include="FortVehicleItemDefinition.h" />
-    <ClInclude Include="FortVehicleWeapons.h" />
     <ClInclude Include="FortVolume.h" />
     <ClInclude Include="FortWeapon.h" />
     <ClInclude Include="FortWeaponItemDefinition.h" />
@@ -451,7 +410,6 @@
     <ClInclude Include="GenericPlatformTime.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="gui.h" />
-    <ClInclude Include="HardwareUtils.h" />
     <ClInclude Include="hooking.h" />
     <ClInclude Include="IdentityFunctor.h" />
     <ClInclude Include="inc.h" />
@@ -465,7 +423,6 @@
     <ClInclude Include="IsPointer.h" />
     <ClInclude Include="IsTriviallyCopyConstructible.h" />
     <ClInclude Include="KismetMathLibrary.h" />
-    <ClInclude Include="KismetRenderingLibrary.h" />
     <ClInclude Include="KismetStringLibrary.h" />
     <ClInclude Include="KismetSystemLibrary.h" />
     <ClInclude Include="KismetTextLibrary.h" />
@@ -489,16 +446,13 @@
     <ClInclude Include="OnlineReplStructs.h" />
     <ClInclude Include="OutputDevice.h" />
     <ClInclude Include="Package.h" />
-    <ClInclude Include="PathFollowingTypes.h" />
     <ClInclude Include="Pawn.h" />
     <ClInclude Include="PersistentObjectPtr.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerController.h" />
     <ClInclude Include="PlayerState.h" />
-    <ClInclude Include="PlaysetLevelStreamComponent.h" />
     <ClInclude Include="PointerIsConvertibleFromTo.h" />
     <ClInclude Include="Quat.h" />
-    <ClInclude Include="quests.h" />
     <ClInclude Include="RandomStream.h" />
     <ClInclude Include="reboot.h" />
     <ClInclude Include="RemoveCV.h" />
@@ -511,7 +465,6 @@
     <ClInclude Include="Set.h" />
     <ClInclude Include="SharedPointer.h" />
     <ClInclude Include="SharedPointerInternals.h" />
-    <ClInclude Include="SoftClassPtr.h" />
     <ClInclude Include="SoftObjectPath.h" />
     <ClInclude Include="SoftObjectPtr.h" />
     <ClInclude Include="Sort.h" />
@@ -520,15 +473,12 @@
     <ClInclude Include="Stack.h" />
     <ClInclude Include="StringAssetReference.h" />
     <ClInclude Include="Text.h" />
-    <ClInclude Include="Texture2D.h" />
     <ClInclude Include="TimerManager.h" />
     <ClInclude Include="Transform.h" />
-    <ClInclude Include="TSubClassOf.h" />
     <ClInclude Include="Tuple.h" />
     <ClInclude Include="TypeCompatibleBytes.h" />
     <ClInclude Include="TypeWrapper.h" />
     <ClInclude Include="UnrealMathUtility.h" />
-    <ClInclude Include="UnrealNames.h" />
     <ClInclude Include="UnrealString.h" />
     <ClInclude Include="UnrealTemplate.h" />
     <ClInclude Include="UnrealTypeTraits.h" />
@@ -546,7 +496,6 @@
     <None Include="DelegateSignatureImpl.inl" />
     <None Include="ExpressionParserTypes.inl" />
     <None Include="UnrealEngine.cpp" />
-    <None Include="UnrealNames.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

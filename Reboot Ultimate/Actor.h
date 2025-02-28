@@ -25,8 +25,8 @@ public:
 	/* FORCEINLINE */ ENetDormancy& GetNetDormancy();
 	int32& GetNetTag();
 	void SetNetDormancy(ENetDormancy Dormancy);
-	AActor* GetOwner();
 	AActor* OnRep_Owner();
+	AActor* GetOwner();
 	struct FVector GetActorScale3D();
 	struct FVector GetActorLocation();
 	struct FVector GetActorForwardVector();

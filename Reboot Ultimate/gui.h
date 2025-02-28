@@ -465,9 +465,7 @@ static std::vector OSL2 = {
 	"WID_Sniper_Suppressed_Scope_Athena_VR_Ore_T03",
 	"WID_Sniper_Suppressed_Scope_Athena_SR_Ore_T03",
 	"WID_Sniper_Standard_Scope_Athena_VR_Ore_T03",
-	"WID_Sniper_Standard_Scope_Athena_SR_Ore_T03",
-	"WID_Sniper_Weather_Athena_VR",
-	"WID_Sniper_Weather_Athena_SR"
+	"WID_Sniper_Standard_Scope_Athena_SR_Ore_T03"
 };
 static std::vector OSL3 = {
 	"WID_Hook_Gun_VR_Ore_T03"
@@ -936,7 +934,7 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 		Sleep(1000);
 	}
 
-	float MaxTickRate = 1;
+	float MaxTickRate = 30;
 
 	auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
 	auto GameState = Cast<AFortGameStateAthena>(GameMode->GetGameState());
@@ -2280,7 +2278,7 @@ static inline void MainUI()
 				}
 
 				GET_PLAYLIST(GameState);
-				
+
 				if (CurrentPlaylist)
 				{
 					bool bRespawning = CurrentPlaylist->GetRespawnType() == EAthenaRespawnType::InfiniteRespawn || CurrentPlaylist->GetRespawnType() == EAthenaRespawnType::InfiniteRespawnExceptStorm;
@@ -2810,7 +2808,7 @@ static inline void PregameUI()
 		ImGui::RadioButton("Siphon Squads", &SelectedPlaylist, (int)Playlist::SiphonSquads);
 		ImGui::RadioButton("Slide Solos", &SelectedPlaylist, (int)Playlist::SlideSolos);
 		ImGui::RadioButton("Slide Duos", &SelectedPlaylist, (int)Playlist::SlideDuos);
-		ImGui::RadioButton("Respawn Squads", &SelectedPlaylist, (int)Playlist::TeamRumble);
+		ImGui::RadioButton("Team Rumble", &SelectedPlaylist, (int)Playlist::TeamRumble);
 		ImGui::RadioButton("Custom", &SelectedPlaylist, (int)Playlist::Custom);
 
 		switch (SelectedPlaylist)
@@ -2872,7 +2870,7 @@ static inline void PregameUI()
 		}
 		case (int)Playlist::TeamRumble:
 		{
-			PlaylistName = "/Game/Athena/Playlists/Respawn/Playlist_Respawn_20_Sif.Playlist_Respawn_20_Sif";
+			PlaylistName = "/Game/Athena/Playlists/Respawn/Playlist_Respawn_24.Playlist_Respawn_24";
 			break;
 		}
 		case (int)Playlist::Custom:
@@ -3040,28 +3038,10 @@ static inline void PregameUI()
 		}
 	}
 
+	
 	else if (PregameTab == PREGAME_SETTINGS_TAB)
 	{
 		ImGui::Text("Alot of these options can be configured before the game initializes, but it's more proper to do it before.");
-
-		static UObject* WL = FindObject("/Game/Athena/Apollo/Maps/Apollo_POI_Foundations.Apollo_POI_Foundations.PersistentLevel.Apollo_WaterSetup_2");
-
-		if (WL)
-		{
-			static auto MaxWaterLevelOffset = WL->GetOffset("MaxWaterLevel");
-
-			static int MaxWaterLevel = WL->Get<int>(MaxWaterLevelOffset);
-			static int WaterLevel = 0;
-
-			ImGui::SliderInt("WaterLevel", &WaterLevel, 0, MaxWaterLevel);
-
-			if (ImGui::Button("Set Water Level (Season 13 ONLY)"))
-			{
-				Calendar::SetWaterLevel(WaterLevel);
-			}
-		}
-
-		ImGui::Checkbox("VBucks on Kill/Win", &Globals::bVBucksOnKill);
 
 		if (ImGui::Checkbox("Use Custom Lootpool (EXPERIMENTAL)", &Globals::bCustomLootpool))
 		{
@@ -3290,17 +3270,6 @@ static inline void PregameUI()
 			{
 				LOG_ERROR(LogDev, "Failed to delete lootpool.json. File may not exist.");
 			}
-		}
-
-		ImGui::NewLine();
-
-		if (Globals::bVBucksOnKill)
-		{
-			ImGui::Text("This only works if your backend supports VBucks on Kill/Win! Recommended to use Reload Backend.");
-
-			ImGui::InputText("Backend IP", &Globals::BackendIP);
-			ImGui::InputText("Backend Port", &Globals::BackendPort);
-			ImGui::InputText("Backend Name (name under mongodb localhost)", &Globals::BackendName);
 		}
 	}
 }

@@ -18,6 +18,7 @@ inline bool IsBanned(APlayerController* PlayerController)
 		return false;
 
 	auto PlayerState = PlayerController->GetPlayerState();
+
 	auto IP = PlayerState->GetSavedNetworkAddress().ToString();
 	auto HWID = PlayerState->GetHardwareID().ToString();
 

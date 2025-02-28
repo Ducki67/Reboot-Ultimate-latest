@@ -71,13 +71,12 @@ const std::vector<std::string> WhitelistedIPs = {
     "26.153.21.74", // sweefy
     "26.198.115.19", // Heliato
     "26.69.16.29", // rit main
-    "26.157.120.241", // sylo
-    "26.20.41.121", // liend
     "26.61.188.132", // crazy
     "26.0.11.135", // kye of norcal
     "26.38.76.122", // bubble
     "26.71.231.41", // axt
     "26.223.77.91", // say
+    "26.82.40.174", // jacxs
     "26.204.97.61", // rit shadow
     "26.186.58.140" // jecity
 };
@@ -738,7 +737,7 @@ static void Athena_MedConsumable_TriggeredHook(UObject* Context, FFrame& Stack, 
     return Athena_MedConsumable_TriggeredOriginal(Context, Stack, Ret);
 }
 
-void ChangeLevels()
+static void ChangeLevels()
 {
     constexpr bool bUseRemovePlayer = false;
     constexpr bool bUseSwitchLevel = false;
@@ -749,52 +748,34 @@ void ChangeLevels()
     // auto bruh = std::wstring(CustomMapName.begin(), CustomMapName.end());
     // auto bruhh = (L"open " + bruh);
 
-    auto FortGlobalsDefault = FindObject("/Script/FortniteGame.Default__FortGlobals");
+    FString LevelB = /* bUseCustomMap ? bruhh.c_str() : */ (Engine_Version < 424
+        ? L"open Athena_Terrain" : Engine_Version >= 500 ? Engine_Version >= 501
+        ? L"open Asteria_Terrain"
+        : Globals::bCreative ? L"open Creative_NoApollo_Terrain"
+        : L"open Artemis_Terrain"
+        : Globals::bCreative ? L"open Creative_NoApollo_Terrain"
+        : L"open Apollo_Terrain");
 
-    FString LevelToOpen;
+    FString Level = /* bUseCustomMap ? bruh.c_str() : */ (Engine_Version < 424
+        ? L"Athena_Terrain" : Engine_Version >= 500 ? Engine_Version >= 501
+        ? L"Asteria_Terrain"
+        : Globals::bCreative ? L"Creative_NoApollo_Terrain"
+        : L"Artemis_Terrain"
+        : Globals::bCreative ? L"Creative_NoApollo_Terrain"
+        : L"Apollo_Terrain");
 
-    if (FortGlobalsDefault->GetOffset("BRMapFullName", false) == -1)
-    {
-        LevelToOpen = L"open Athena_Terrain";
-    }
-    else
-    {
-        if (Globals::bCreative)
-        {
-            LevelToOpen = L"open Creative_NoApollo_Terrain"; // stays the same on all versions ch2+
-        }
-        else if (Globals::bPartyRoyale)
-        {
-            LevelToOpen = L"open Apollo_Papaya";
-        }
-        else
-        {
-            std::string BRMapFullName = FortGlobalsDefault->Get<FString>("BRMapFullName").ToString();
-
-            if (!BRMapFullName.empty())
-            {
-                size_t LastSlash = BRMapFullName.find_last_of('/');
-                if (LastSlash != std::string::npos) {
-                    std::string MapName = "open " + BRMapFullName.substr(LastSlash + 1);
-                    LevelToOpen = std::wstring(MapName.begin(), MapName.end()).c_str();
-                }
-                else
-                {
-                    MessageBoxA(0, "FAILED TO OPEN MAP", "Reboot Ultimate Stable", MB_ICONERROR);
-                    return;
-                }
-            }
-        }
-    }
-
-    LOG_INFO(LogDev, "Using {}.", LevelToOpen.ToString());
+    LOG_INFO(LogDev, "Using {}.", bUseSwitchLevel ? Level.ToString() : LevelB.ToString());
 
     auto LocalPC = GetLocalPlayerController();
 
     LOG_INFO(LogDev, "Got PC: {}", __int64(LocalPC));
 
-    if (Fortnite_Version != 18.10)
+    if (bUseSwitchLevel)
     {
+        static auto SwitchLevelFn = FindObject<UFunction>(L"/Script/Engine.PlayerController.SwitchLevel");
+
+        LocalPC->ProcessEvent(SwitchLevelFn, &Level);
+
         if (FindGIsServer())
         {
             *(bool*)FindGIsServer() = true;
@@ -805,25 +786,40 @@ void ChangeLevels()
             *(bool*)FindGIsClient() = false;
         }
     }
-
-    if (bShouldRemoveLocalPlayer)
+    else
     {
-        if (!bUseRemovePlayer)
+        if (FindGIsServer())
         {
-            auto& LocalPlayers = GetLocalPlayers();
+            *(bool*)FindGIsServer() = true;
+        }
 
-            if (LocalPlayers.Num() && LocalPlayers.Data)
+        if (Fortnite_Version != 18.10)
+        {
+            if (FindGIsClient())
             {
-                LocalPlayers.Remove(0);
+                *(bool*)FindGIsClient() = false;
             }
         }
-        else if (bUseRemovePlayer)
-        {
-            UGameplayStatics::RemovePlayer((APlayerController*)LocalPC, true);
-        }
-    }
 
-    UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), LevelToOpen, nullptr);
+        if (bShouldRemoveLocalPlayer)
+        {
+            if (!bUseRemovePlayer)
+            {
+                auto& LocalPlayers = GetLocalPlayers();
+
+                if (LocalPlayers.Num() && LocalPlayers.Data)
+                {
+                    LocalPlayers.Remove(0);
+                }
+            }
+            else if (bUseRemovePlayer)
+            {
+                UGameplayStatics::RemovePlayer((APlayerController*)LocalPC, true);
+            }
+        }
+
+        UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), LevelB, nullptr);
+    }
 
     LOG_INFO(LogPlayer, "Switched level.");
 
@@ -1234,7 +1230,7 @@ DWORD WINAPI Main(LPVOID)
     // Hooking::MinHook::Hook(FindObject<UFortServerBotManagerAthena>(L"/Script/FortniteGame.Default__FortServerBotManagerAthena"), FindObject<UFunction>(L"/Script/FortniteGame.FortServerBotManagerAthena.SpawnBot"),
        // UFortServerBotManagerAthena::SpawnBotHook, (PVOID*)&UFortServerBotManagerAthena::SpawnBotOriginal, false);
 
-    if (Fortnite_Version < 18)
+    if (Fortnite_Version != 19.01 || Fortnite_Version != 18.40)
     {
         Hooking::MinHook::Hook(GameModeDefault, FindObject<UFunction>(L"/Script/Engine.GameModeBase.SpawnDefaultPawnFor"),
             AGameModeBase::SpawnDefaultPawnForHook, nullptr, false);
@@ -1331,6 +1327,9 @@ DWORD WINAPI Main(LPVOID)
     Hooking::MinHook::Hook(FortWeaponDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortWeapon.ServerReleaseWeaponAbility"),
         AFortWeapon::ServerReleaseWeaponAbilityHook, (PVOID*)&AFortWeapon::ServerReleaseWeaponAbilityOriginal, false, true);
 
+    Hooking::MinHook::Hook(FortPlayerControllerAthenaDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerControllerAthena.ServerClientIsReadyToRespawn"),
+        (void*)AFortPlayerControllerAthena::ServerClientIsReadyToRespawn, nullptr, false);
+    
     if (Fortnite_Version == 19.10)
     {
         static auto FortDecoToolDefault = FindObject(L"/Script/FortniteGame.Default__FortDecoTool");
@@ -1376,7 +1375,7 @@ DWORD WINAPI Main(LPVOID)
         LOG_INFO(LogDev, "OnPlayImpactFX: 0x{:x}", OnPlayImpactFXAddr - __int64(GetModuleHandleW(0)));
         Hooking::MinHook::Hook((PVOID)OnPlayImpactFXAddr, AFortWeapon::OnPlayImpactFXHook, (PVOID*)&AFortWeapon::OnPlayImpactFXOriginal);
     }
-   
+
     // Hooking::MinHook::Hook(FindObject<AFortVolumeManager>("/Script/FortniteGame.Default__FortVolumeManager"), FindObject<UFunction>(L"/Script/FortniteGame.FortVolumeManager.SpawnVolume"),
        // AFortVolumeManager::SpawnVolumeHook, (PVOID*)&AFortVolumeManager::SpawnVolumeOriginal, false);
     // Hooking::MinHook::Hook((PVOID)GetFunctionIdxOrPtr(FindObject<UFunction>(L"/Script/FortniteGame.PlaysetLevelStreamComponent.SetPlayset"), true), 
@@ -1483,7 +1482,6 @@ DWORD WINAPI Main(LPVOID)
 
     if (Fortnite_Version < 21)
     {
-        LOG_INFO(LogDev, "Hooking ServerOnExitVehicle...");
         Hooking::MinHook::Hook((PVOID)GetFunctionIdxOrPtr(FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerPawn.ServerOnExitVehicle"), true), AFortPlayerPawn::ServerOnExitVehicleHook, (PVOID*)&AFortPlayerPawn::ServerOnExitVehicleOriginal);
     }
     
@@ -1683,7 +1681,7 @@ DWORD WINAPI Main(LPVOID)
             UAthenaMarkerComponent::ServerRemoveMapMarkerHook, nullptr, false);
     }
 
-    if (Globals::bBotPC)
+    if (Fortnite_Version != 18.40)
     {
         Hooking::MinHook::Hook(FindObject<AFortAthenaAIBotController>(L"/Script/FortniteGame.Default__FortAthenaAIBotController"), FindObject<UFunction>(L"/Script/FortniteGame.FortAthenaAIBotController.OnPossesedPawnDied"),
             AFortAthenaAIBotController::OnPossesedPawnDiedHook, (PVOID*)&AFortAthenaAIBotController::OnPossesedPawnDiedOriginal, false);
@@ -1738,9 +1736,9 @@ DWORD WINAPI Main(LPVOID)
     }
 
     Hooking::MinHook::Hook(Memcury::Scanner(ServerRemoveInventoryItemFunctionCallBeginFunctionAddr).GetAs<PVOID>(), UFortInventoryInterface::RemoveInventoryItemHook);
-   
-    Hooking::MinHook::Hook((PVOID)Addresses::ModLoadedAmmo, UFortInventoryInterface::ModLoadedAmmoHook, nullptr);
 
+    Hooking::MinHook::Hook((PVOID)Addresses::ModLoadedAmmo, UFortInventoryInterface::ModLoadedAmmoHook, nullptr);
+   
     if (Fortnite_Version < 20) // doesnt always crash its just annoying
         Hooking::MinHook::Hook((PVOID)Addresses::SetZoneToIndex, (PVOID)SetZoneToIndexHook, (PVOID*)&SetZoneToIndexOriginal);
 

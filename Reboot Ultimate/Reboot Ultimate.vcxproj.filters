@@ -184,9 +184,6 @@
     <ClCompile Include="FortOctopusVehicle.cpp">
       <Filter>FortniteGame\Source\FortniteGame\Private\Vehicle</Filter>
     </ClCompile>
-    <ClCompile Include="FortCharacterVehicle.cpp">
-      <Filter>FortniteGame\Source\FortniteGame\Private\Vehicle</Filter>
-    </ClCompile>
     <ClCompile Include="BuildingStructuralSupportSystem.cpp">
       <Filter>FortniteGame\Source\FortniteGame\Private</Filter>
     </ClCompile>
@@ -724,9 +721,6 @@
       <Filter>Engine\Source\Runtime\Engine\Classes\Kismet</Filter>
     </ClInclude>
     <ClInclude Include="FortOctopusVehicle.h">
-      <Filter>FortniteGame\Source\FortniteGame\Public\Athena\Vehicle</Filter>
-    </ClInclude>
-    <ClInclude Include="FortCharacterVehicle.h">
       <Filter>FortniteGame\Source\FortniteGame\Public\Athena\Vehicle</Filter>
     </ClInclude>
     <ClInclude Include="IntroSort.h">

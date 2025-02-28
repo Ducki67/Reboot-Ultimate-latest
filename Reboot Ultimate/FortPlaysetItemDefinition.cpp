@@ -25,7 +25,7 @@ void UFortPlaysetItemDefinition::ShowPlayset(UFortPlaysetItemDefinition* Playset
 
 	auto VolumeToUse = Volume;
 
-	static auto PlaysetLevelStreamComponentClass = FindObject<UClass>("/Script/FortniteGame.PlaysetLevelStreamComponent");
+	static auto PlaysetLevelStreamComponentClass = FindObject<UClass>(L"/Script/FortniteGame.PlaysetLevelStreamComponent");
 	auto LevelStreamComponent = (UPlaysetLevelStreamComponent*)VolumeToUse->GetComponentByClass(PlaysetLevelStreamComponentClass);
 
 	if (!LevelStreamComponent)
@@ -33,7 +33,7 @@ void UFortPlaysetItemDefinition::ShowPlayset(UFortPlaysetItemDefinition* Playset
 		return;
 	}
 
-	static auto SetPlaysetFn = FindObject<UFunction>("/Script/FortniteGame.PlaysetLevelStreamComponent.SetPlayset");
+	static auto SetPlaysetFn = FindObject<UFunction>(L"/Script/FortniteGame.PlaysetLevelStreamComponent.SetPlayset");
 	LevelStreamComponent->ProcessEvent(SetPlaysetFn, &PlaysetItemDef);
 
 	LoadPlaysetOriginal(LevelStreamComponent);

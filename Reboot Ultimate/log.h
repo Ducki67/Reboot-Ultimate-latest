@@ -53,7 +53,7 @@ inline void InitLogger()
 
     FILE* stream = nullptr;
 
-    bool bStopFortniteOutput = true;
+    bool bStopFortniteOutput = false;
 
     if (bStopFortniteOutput)
     {
@@ -65,6 +65,8 @@ inline void InitLogger()
     }
 
     SetConsoleTitleA("Reboot Ultimate");
+
+#ifdef ENABLE_SPD_LOG
 
     std::string logName = "reboot.log"; // GenerateLogFileName();
 
@@ -100,6 +102,7 @@ inline void InitLogger()
     MakeLogger("LogRebooting");
     MakeLogger("LogObjectViewer");
     MakeLogger("LogLateGame");
+#endif
 }
 
 #ifdef ENABLE_SPD_LOG
