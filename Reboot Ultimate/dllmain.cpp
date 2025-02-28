@@ -72,13 +72,10 @@ const std::vector<std::string> WhitelistedIPs = {
     "26.198.115.19", // Heliato
     "26.69.16.29", // rit main
     "26.61.188.132", // crazy
-    "26.0.11.135", // kye of norcal
-    "26.38.76.122", // bubble
-    "26.71.231.41", // axt
     "26.223.77.91", // say
-    "26.82.40.174", // jacxs
-    "26.204.97.61", // rit shadow
-    "26.186.58.140" // jecity
+    "26.157.120.241", // sylo
+    "26.20.41.121", // liend
+    "26.204.97.61" // rit shadow
 };
 
 std::string GetLocalIPAddress()
