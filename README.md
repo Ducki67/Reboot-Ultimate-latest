@@ -62,16 +62,10 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 
 ## To Do List:
 
-- [x] Hardware Ban
-- [x] Fix 19.01
-- [ ] Redo Abilites
-- [ ] Llamas
-- [ ] ServerCreateBuildingAndSpawnDeco
-- [x] Give Weapons from Gamemodes
-- [ ] Apparently Editing
-- [ ] Auto Pause Zone
-- [ ] Auto God?
-- [ ] Update Reactive Cosmetics (killing a player adds lights to candy axe, etc)
+- [ ] Ch2+ Map Markers
+- [ ] Ch2+ Llamas
+- [ ] Ch2+ Bus Countdown
+- [ ] Fix Grappler on S14+ (heliato please help)
 
 # Installation
 
