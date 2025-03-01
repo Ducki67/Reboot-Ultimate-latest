@@ -704,11 +704,11 @@ void AFortPlayerControllerAthena::ServerPlaySquadQuickChatMessageHook(AFortPlaye
 void AFortPlayerControllerAthena::GetPlayerViewPointHook(AFortPlayerControllerAthena* PlayerController, FVector& Location, FRotator& Rotation)
 {
 	// I don't know why but GetActorEyesViewPoint only works on some versions.
-	/*static auto GetActorEyesViewPointFn = FindObject<UFunction>(L"/Script/Engine.Actor.GetActorEyesViewPoint");
+	static auto GetActorEyesViewPointFn = FindObject<UFunction>(L"/Script/Engine.Actor.GetActorEyesViewPoint");
 	static auto GetActorEyesViewPointIndex = GetFunctionIdxOrPtr(GetActorEyesViewPointFn) / 8;
 
 	void (*GetActorEyesViewPointOriginal)(AActor * Actor, FVector * OutLocation, FRotator * OutRotation) = decltype(GetActorEyesViewPointOriginal)(PlayerController->VFTable[GetActorEyesViewPointIndex]);
-	return GetActorEyesViewPointOriginal(PlayerController, &Location, &Rotation);*/
+	return GetActorEyesViewPointOriginal(PlayerController, &Location, &Rotation);
 
 	// auto PCViewTarget = PlayerController->GetViewTarget();
 

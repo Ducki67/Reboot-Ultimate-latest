@@ -2728,95 +2728,155 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				return;
 			}
 
-			std::string InputClass = Arguments[1];
-			std::string FullPathClass;
+			std::string Class = Arguments[1];
 
-			if (InputClass == "driftboard" || InputClass == "hoverboard")
-				FullPathClass = "/Game/Athena/DrivableVehicles/JackalVehicle_Athena.JackalVehicle_Athena_C";
-			else if (InputClass == "surfboard")
-				FullPathClass = "/Game/Athena/DrivableVehicles/SurfboardVehicle_Athena.SurfboardVehicle_Athena_C";
-			else if (InputClass == "quadcrasher" || InputClass == "quad")
-				FullPathClass = "/Game/Athena/DrivableVehicles/AntelopeVehicle.AntelopeVehicle_C";
-			else if (InputClass == "baller")
-				FullPathClass = "/Game/Athena/DrivableVehicles/Octopus/OctopusVehicle.OctopusVehicle_C";
-			else if (InputClass == "plane")
-				FullPathClass = "/Game/Athena/DrivableVehicles/Biplane/BluePrints/FerretVehicle.FerretVehicle_C";
-			else if (InputClass == "golfcart" || InputClass == "golf")
-				FullPathClass = "/Game/Athena/DrivableVehicles/Golf_Cart/Golf_Cart_Base/Blueprints/GolfCartVehicleSK.GolfCartVehicleSK_C";
-			else if (InputClass == "ufo")
-				FullPathClass = "/Nevada/Blueprints/Vehicle/Nevada_Vehicle_V2.Nevada_Vehicle_V2_C";
-			else if (InputClass == "cannon")
-				FullPathClass = "/Game/Athena/DrivableVehicles/PushCannon.PushCannon_C";
-			else if (InputClass == "shoppingcart" || InputClass == "shopping")
-				FullPathClass = "/Game/Athena/DrivableVehicles/ShoppingCartVehicleSK.ShoppingCartVehicleSK_C";
-			else if (InputClass == "mech" || InputClass == "brute")
-				FullPathClass = "/Game/Athena/DrivableVehicles/Mech/TestMechVehicle.TestMechVehicle_C";
-			else if (InputClass == "bear" || InputClass == "truck")
-				FullPathClass = "/Valet/BasicTruck/Valet_BasicTruck_Vehicle.Valet_BasicTruck_Vehicle_C";
-			else if (InputClass == "prevelant" || InputClass == "car")
-				FullPathClass = "/Valet/BasicCar/Valet_BasicCar_Vehicle.Valet_BasicCar_Vehicle_C";
-			else if (InputClass == "whiplash" || InputClass == "sportscar")
-				FullPathClass = "/Valet/SportsCar/Valet_SportsCar_Vehicle.Valet_SportsCar_Vehicle_C";
-			else if (InputClass == "taxi")
-				FullPathClass = "/Valet/TaxiCab/Valet_TaxiCab_Vehicle.Valet_TaxiCab_Vehicle_C";
-			else if (InputClass == "mudflap")
-				FullPathClass = "/Valet/BigRig/Valet_BigRig_Vehicle.Valet_BigRig_Vehicle_C";
-			else if (InputClass == "stark")
-				FullPathClass = "/Valet/SportsCar/Valet_SportsCar_Vehicle_HighTower.Valet_SportsCar_Vehicle_HighTower_C";
-			else if (InputClass == "boat")
-				FullPathClass = "/Game/Athena/DrivableVehicles/Meatball/Meatball_Large/MeatballVehicle_L.MeatballVehicle_L_C";
-			else if (InputClass == "heli" || InputClass == "helicopter")
-				FullPathClass = "/Hoagie/HoagieVehicle.HoagieVehicle_C";
-			else if (InputClass == "shark")
-				FullPathClass = "/SpicySake/Pawns/NPC_Pawn_SpicySake_Parent.NPC_Pawn_SpicySake_Parent_C";
-			else if (InputClass == "klombo")
-				FullPathClass = "/ButterCake/Pawns/NPC_Pawn_ButterCake_Base.NPC_Pawn_ButterCake_Base_C";
-			else if (InputClass == "umbrella")
-				FullPathClass = "/Game/Athena/Apollo/Environments/BuildingActors/Papaya/Papaya_BouncyUmbrella_C.Papaya_BouncyUmbrella_C_C";
-			else if (InputClass == "dumpster")
-				FullPathClass = "/Game/Athena/Items/EnvironmentalItems/HidingProps/Props/B_HidingProp_Dumpster.B_HidingProp_Dumpster_C";
-			else if (InputClass == "tire")
-				FullPathClass = "/Game/Building/ActorBlueprints/Prop/Prop_TirePile_04.Prop_TirePile_04_C";
-			else if (InputClass == "llama")
-				FullPathClass = "/Game/Athena/SupplyDrops/Llama/AthenaSupplyDrop_Llama.AthenaSupplyDrop_Llama_C";
-			else if (InputClass == "rift")
-				FullPathClass = "/Game/Athena/Items/ForagedItems/Rift/BGA_RiftPortal_Athena_Spawner.BGA_RiftPortal_Athena_Spawner_C";
-			else if (InputClass == "airvent")
-				FullPathClass = "/Game/Athena/Environments/Blueprints/DUDEBRO/BGA_HVAC.BGA_HVAC_C";
-			else if (InputClass == "geyser")
-				FullPathClass = "/Game/Athena/Environments/Blueprints/DudeBro/BGA_DudeBro_Mini.BGA_DudeBro_Mini_C";
-			else if (InputClass == "nobuildzone")
-				FullPathClass = "/Game/Athena/Prototype/Blueprints/Galileo/BP_Galileo_NoBuildZone.BP_Galileo_NoBuildZone_C";
-			else if (InputClass == "launch" || InputClass == "launchpad")
-				FullPathClass = "/Game/Athena/Items/Traps/Launchpad/BluePrint/Trap_Floor_Player_Launch_Pad.Trap_Floor_Player_Launch_Pad_C";
-			else if (InputClass == "gascan" || InputClass == "gas")
-				FullPathClass = "/Game/Athena/Items/Weapons/Prototype/PetrolPump/BGA_Petrol_Pickup.BGA_Petrol_Pickup_C";
-			else if (InputClass == "supplydrop" || InputClass == "drop")
-				if (Fortnite_Version >= 12.30 && Fortnite_Version <= 12.61)
-					FullPathClass = "/Game/Athena/SupplyDrops/AthenaSupplyDrop_Donut.AthenaSupplyDrop_Donut_C";
-				else if (Fortnite_Version == 5.10 || Fortnite_Version == 9.41 || Fortnite_Version == 14.20 || Fortnite_Version == 18.00)
-					FullPathClass = "/Game/Athena/SupplyDrops/AthenaSupplyDrop_BDay.AthenaSupplyDrop_BDay_C";
-				else if (Fortnite_Version == 1.11 || Fortnite_Version == 7.10 || Fortnite_Version == 7.20 || Fortnite_Version == 7.30 || Fortnite_Version == 11.31 || Fortnite_Version == 15.10 || Fortnite_Version == 19.01)
-					FullPathClass = "/Game/Athena/SupplyDrops/AthenaSupplyDrop_Holiday.AthenaSupplyDrop_Holiday_C";
-				else if (Fortnite_Version == 5.40 || Fortnite_Version == 5.41)
-					FullPathClass = "/Game/Athena/SupplyDrops/Bling/AthenaSupplyDrop_Bling.AthenaSupplyDrop_Bling_C";
-				else FullPathClass = "/Game/Athena/SupplyDrops/AthenaSupplyDrop.AthenaSupplyDrop_C";
-			else if (InputClass == "zeropoint")
-				if (Fortnite_Version < 15.00)
-					FullPathClass = "/Game/Athena/Environments/Nexus/Blueprints/BP_ZeroPoint_Exploding.BP_ZeroPoint_Exploding_C";
-				else FullPathClass = "/Game/Athena/Environments/Nexus/Blueprints/BP_ZeroPoint_2Point0.BP_ZeroPoint_2Point0_C";
-			else if (InputClass == "lowgrav" || InputClass == "lowgravzone")
-				if (Fortnite_Version < 12.00)
-					FullPathClass = "/Game/Athena/Prototype/Blueprints/Cube/BGA_Cube_Area_Effect.BGA_Cube_Area_Effect_C";
-				else FullPathClass = "/MotherGameplay/Items/Alpaca/BGA_Alpaca_AbductedPOI.BGA_Alpaca_AbductedPOI_C";
-
-			TSubclassOf<AActor> AClass = FindObject<UClass>(FullPathClass.c_str());
-
-			if (!AClass)
+			if (Class == "driftboard")
 			{
-				SendMessageToConsole(PlayerController, L"Invalid class provided or class not found!");
-				return;
+				Class = "/Game/Athena/DrivableVehicles/JackalVehicle_Athena.JackalVehicle_Athena_C";
 			}
+			else if (Class == "surfboard")
+			{
+				Class = "/Game/Athena/DrivableVehicles/SurfboardVehicle_Athena.SurfboardVehicle_Athena_C";
+			}
+			else if (Class == "quadcrasher")
+			{
+				Class = "/Game/Athena/DrivableVehicles/AntelopeVehicle.AntelopeVehicle_C";
+			}
+			else if (Class == "baller")
+			{
+				Class = "/Game/Athena/DrivableVehicles/Octopus/OctopusVehicle.OctopusVehicle_C";
+			}
+			else if (Class == "plane")
+			{
+				Class = "/Game/Athena/DrivableVehicles/Biplane/BluePrints/FerretVehicle.FerretVehicle_C";
+			}
+			else if (Class == "atk" || Class == "golfcart")
+			{
+				Class = "/Game/Athena/DrivableVehicles/Golf_Cart/Golf_Cart_Base/Blueprints/GolfCartVehicleSK.GolfCartVehicleSK_C";
+			}
+			else if (Class == "cannon")
+			{
+				Class = "/Game/Athena/DrivableVehicles/PushCannon.PushCannon_C";
+			}
+			else if (Class == "mech" || Class == "brute")
+			{
+				Class = "/Game/Athena/DrivableVehicles/Mech/TestMechVehicle.TestMechVehicle_C";
+			}
+			else if (Class == "bear" || Class == "truck")
+			{
+				Class = "/Valet/BasicTruck/Valet_BasicTruck_Vehicle.Valet_BasicTruck_Vehicle_C";
+			}
+			else if (Class == "car" || Class == "prevelant")
+			{
+				Class = "/Valet/BasicCar/Valet_BasicCar_Vehicle.Valet_BasicCar_Vehicle_C";
+			}
+			else if (Class == "whiplash" || Class == "sportscar")
+			{
+				Class = "/Valet/SportsCar/Valet_SportsCar_Vehicle.Valet_SportsCar_Vehicle_C";
+			}
+			else if (Class == "taxi")
+			{
+				Class = "/Valet/TaxiCab/Valet_TaxiCab_Vehicle.Valet_TaxiCab_Vehicle_C";
+			}
+			else if (Class == "mudflap")
+			{
+				Class = "/Valet/BigRig/Valet_BigRig_Vehicle.Valet_BigRig_Vehicle_C";
+			}
+			else if (Class == "boat")
+			{
+				Class = "/Game/Athena/DrivableVehicles/Meatball/Meatball_Large/MeatballVehicle_L.MeatballVehicle_L_C";
+			}
+			else if (Class == "heli" || Class == "helicopter")
+			{
+				Class = "/Hoagie/HoagieVehicle.HoagieVehicle_C";
+			}
+			else if (Class == "ufo")
+			{
+				Class = "/Nevada/Blueprints/Vehicle/Nevada_Vehicle_V2.Nevada_Vehicle_V2_C";
+			}
+			else if (Class == "supplydrop" || Class == "drop")
+			{
+				if (Fortnite_Version >= 12.30 && Fortnite_Version <= 12.61)
+				{
+					Class = "/Game/Athena/SupplyDrops/AthenaSupplyDrop_Donut.AthenaSupplyDrop_Donut_C";
+				}
+				else if (Fortnite_Version == 5.10 || Fortnite_Version == 9.41 || Fortnite_Version == 14.20 || Fortnite_Version == 18.00)
+				{
+					Class = "/Game/Athena/SupplyDrops/AthenaSupplyDrop_BDay.AthenaSupplyDrop_BDay_C";
+				}
+				else if (Fortnite_Version == 1.11 || Fortnite_Version == 7.10 || Fortnite_Version == 7.20 || Fortnite_Version == 7.30 || Fortnite_Version == 11.31 || Fortnite_Version == 15.10 || Fortnite_Version == 19.01)
+				{
+					Class = "/Game/Athena/SupplyDrops/AthenaSupplyDrop_Holiday.AthenaSupplyDrop_Holiday_C";
+				}
+				else if (Fortnite_Version == 5.40 || Fortnite_Version == 5.41)
+				{
+					Class = "/Game/Athena/SupplyDrops/Bling/AthenaSupplyDrop_Bling.AthenaSupplyDrop_Bling_C";
+				}
+				else
+				{
+					Class = "/Game/Athena/SupplyDrops/AthenaSupplyDrop.AthenaSupplyDrop_C";
+				}
+			}
+			else if (Class == "shark")
+			{
+				Class = "/SpicySake/Pawns/NPC_Pawn_SpicySake_Parent.NPC_Pawn_SpicySake_Parent_C";
+			}
+			else if (Class == "klombo")
+			{
+				Class = "/ButterCake/Pawns/NPC_Pawn_ButterCake_Base.NPC_Pawn_ButterCake_Base_C";
+			}
+			else if (Class == "umbrella")
+			{
+				Class = "/Game/Athena/Apollo/Environments/BuildingActors/Papaya/Papaya_BouncyUmbrella_C.Papaya_BouncyUmbrella_C_C";
+			}
+			else if (Class == "dumpster")
+			{
+				Class = "/Game/Athena/Items/EnvironmentalItems/HidingProps/Props/B_HidingProp_Dumpster.B_HidingProp_Dumpster_C";
+			}
+			else if (Class == "tire")
+			{
+				Class = "/Game/Building/ActorBlueprints/Prop/Prop_TirePile_04.Prop_TirePile_04_C";
+			}
+			else if (Class == "llama")
+			{
+				Class = "/Game/Athena/SupplyDrops/Llama/AthenaSupplyDrop_Llama.AthenaSupplyDrop_Llama_C";
+			}
+			else if (Class == "rift")
+			{
+				Class = "/Game/Athena/Items/ForagedItems/Rift/BGA_RiftPortal_Athena_Spawner.BGA_RiftPortal_Athena_Spawner_C";
+			}
+			else if (Class == "airvent")
+			{
+				Class = "/Game/Athena/Environments/Blueprints/DUDEBRO/BGA_HVAC.BGA_HVAC_C";
+			}
+			else if (Class == "geyser")
+			{
+				Class = "/Game/Athena/Environments/Blueprints/DudeBro/BGA_DudeBro_Mini.BGA_DudeBro_Mini_C";
+			}
+			else if (Class == "zeropoint")
+			{
+				if (Fortnite_Version < 15.00)
+				{
+					Class = "/Game/Athena/Environments/Nexus/Blueprints/BP_ZeroPoint_Exploding.BP_ZeroPoint_Exploding_C";
+				}
+				else
+				{
+					Class = "/Game/Athena/Environments/Nexus/Blueprints/BP_ZeroPoint_2Point0.BP_ZeroPoint_2Point0_C";
+				}
+			}
+			else if (Class == "lowgrav" || Class == "lowgravzone")
+			{
+				if (Fortnite_Version < 12.00)
+				{
+					Class = "/Game/Athena/Prototype/Blueprints/Cube/BGA_Cube_Area_Effect.BGA_Cube_Area_Effect_C";
+				}
+				else
+				{
+					Class = "/MotherGameplay/Items/Alpaca/BGA_Alpaca_AbductedPOI.BGA_Alpaca_AbductedPOI_C";
+				}
+			}
+
+			TSubclassOf<AActor> AClass = FindObject<UClass>(Class.c_str());
 
 			auto CheatManager = ReceivingController->SpawnCheatManager(UCheatManager::StaticClass());
 
@@ -2828,8 +2888,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			CheatManager->DestroyAll(AClass);
 			CheatManager = nullptr;
-
-			SendMessageToConsole(PlayerController, L"Destroyed class!");
 		}
 		else if (Command == "destroyfishingholes")
 		{
@@ -3253,7 +3311,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				}
 				else
 				{
-					Loc.Z += 250;
+					Loc.Z += 1000;
 				}
 
 				if (Arguments.size() == 3)
@@ -3284,84 +3342,151 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				Count = Max;
 			}
 
-			if (ActorName == "driftboard" || ActorName == "hoverboard")
+			if (ActorName == "driftboard")
+			{
 				ActorName = "/Game/Athena/DrivableVehicles/JackalVehicle_Athena.JackalVehicle_Athena_C";
+			}
 			else if (ActorName == "surfboard")
+			{
 				ActorName = "/Game/Athena/DrivableVehicles/SurfboardVehicle_Athena.SurfboardVehicle_Athena_C";
-			else if (ActorName == "quadcrasher" || ActorName == "quad")
+			}
+			else if (ActorName == "quadcrasher")
+			{
 				ActorName = "/Game/Athena/DrivableVehicles/AntelopeVehicle.AntelopeVehicle_C";
+			}
 			else if (ActorName == "baller")
+			{
 				ActorName = "/Game/Athena/DrivableVehicles/Octopus/OctopusVehicle.OctopusVehicle_C";
+			}
 			else if (ActorName == "plane")
+			{
 				ActorName = "/Game/Athena/DrivableVehicles/Biplane/BluePrints/FerretVehicle.FerretVehicle_C";
-			else if (ActorName == "golfcart" || ActorName == "golf")
+			}
+			else if (ActorName == "atk" || ActorName == "golfcart")
+			{
 				ActorName = "/Game/Athena/DrivableVehicles/Golf_Cart/Golf_Cart_Base/Blueprints/GolfCartVehicleSK.GolfCartVehicleSK_C";
-			else if (ActorName == "ufo")
-				SendMessageToConsole(PlayerController, L"for some fuckass reason this doesn't work, go to the V3 script (cheat script if your hosting) and grab the spawn from there");
+			}
 			else if (ActorName == "cannon")
+			{
 				ActorName = "/Game/Athena/DrivableVehicles/PushCannon.PushCannon_C";
-			else if (ActorName == "shoppingcart" || ActorName == "shopping")
-				ActorName = "/Game/Athena/DrivableVehicles/ShoppingCartVehicleSK.ShoppingCartVehicleSK_C";
+			}
 			else if (ActorName == "mech" || ActorName == "brute")
+			{
 				ActorName = "/Game/Athena/DrivableVehicles/Mech/TestMechVehicle.TestMechVehicle_C";
+			}
 			else if (ActorName == "bear" || ActorName == "truck")
+			{
 				ActorName = "/Valet/BasicTruck/Valet_BasicTruck_Vehicle.Valet_BasicTruck_Vehicle_C";
-			else if (ActorName == "prevelant" || ActorName == "car")
+			}
+			else if (ActorName == "car" || ActorName == "prevelant")
+			{
 				ActorName = "/Valet/BasicCar/Valet_BasicCar_Vehicle.Valet_BasicCar_Vehicle_C";
+			}
 			else if (ActorName == "whiplash" || ActorName == "sportscar")
+			{
 				ActorName = "/Valet/SportsCar/Valet_SportsCar_Vehicle.Valet_SportsCar_Vehicle_C";
+			}
 			else if (ActorName == "taxi")
+			{
 				ActorName = "/Valet/TaxiCab/Valet_TaxiCab_Vehicle.Valet_TaxiCab_Vehicle_C";
+			}
 			else if (ActorName == "mudflap")
+			{
 				ActorName = "/Valet/BigRig/Valet_BigRig_Vehicle.Valet_BigRig_Vehicle_C";
-			else if (ActorName == "stark")
-				ActorName = "/Valet/SportsCar/Valet_SportsCar_Vehicle_HighTower.Valet_SportsCar_Vehicle_HighTower_C";
+			}
 			else if (ActorName == "boat")
+			{
 				ActorName = "/Game/Athena/DrivableVehicles/Meatball/Meatball_Large/MeatballVehicle_L.MeatballVehicle_L_C";
+			}
 			else if (ActorName == "heli" || ActorName == "helicopter")
+			{
 				ActorName = "/Hoagie/HoagieVehicle.HoagieVehicle_C";
-			else if (ActorName == "shark")
-				ActorName = "/SpicySake/Pawns/NPC_Pawn_SpicySake_Parent.NPC_Pawn_SpicySake_Parent_C";
-			else if (ActorName == "klombo")
-				ActorName = "/ButterCake/Pawns/NPC_Pawn_ButterCake_Base.NPC_Pawn_ButterCake_Base_C";
-			else if (ActorName == "umbrella")
-				ActorName = "/Game/Athena/Apollo/Environments/BuildingActors/Papaya/Papaya_BouncyUmbrella_C.Papaya_BouncyUmbrella_C_C";
-			else if (ActorName == "dumpster")
-				ActorName = "/Game/Athena/Items/EnvironmentalItems/HidingProps/Props/B_HidingProp_Dumpster.B_HidingProp_Dumpster_C";
-			else if (ActorName == "tire")
-				ActorName = "/Game/Building/ActorBlueprints/Prop/Prop_TirePile_04.Prop_TirePile_04_C";
-			else if (ActorName == "llama")
-				ActorName = "/Game/Athena/SupplyDrops/Llama/AthenaSupplyDrop_Llama.AthenaSupplyDrop_Llama_C";
-			else if (ActorName == "rift")
-				ActorName = "/Game/Athena/Items/ForagedItems/Rift/BGA_RiftPortal_Athena_Spawner.BGA_RiftPortal_Athena_Spawner_C";
-			else if (ActorName == "airvent")
-				ActorName = "/Game/Athena/Environments/Blueprints/DUDEBRO/BGA_HVAC.BGA_HVAC_C";
-			else if (ActorName == "geyser")
-				ActorName = "/Game/Athena/Environments/Blueprints/DudeBro/BGA_DudeBro_Mini.BGA_DudeBro_Mini_C";
-			else if (ActorName == "nobuildzone")
-				ActorName = "/Game/Athena/Prototype/Blueprints/Galileo/BP_Galileo_NoBuildZone.BP_Galileo_NoBuildZone_C";
-			else if (ActorName == "launch" || ActorName == "launchpad")
-				ActorName = "/Game/Athena/Items/Traps/Launchpad/BluePrint/Trap_Floor_Player_Launch_Pad.Trap_Floor_Player_Launch_Pad_C";
-			else if (ActorName == "gascan" || ActorName == "gas")
-				ActorName = "/Game/Athena/Items/Weapons/Prototype/PetrolPump/BGA_Petrol_Pickup.BGA_Petrol_Pickup_C";
-			else if (ActorName == "supplydrop")
+			}
+			else if (ActorName == "ufo")
+			{
+				ActorName = "/Nevada/Blueprints/Vehicle/Nevada_Vehicle_V2.Nevada_Vehicle_V2_C";
+			}
+			else if (ActorName == "supplydrop" || ActorName == "drop")
+			{
 				if (Fortnite_Version >= 12.30 && Fortnite_Version <= 12.61)
+				{
 					ActorName = "/Game/Athena/SupplyDrops/AthenaSupplyDrop_Donut.AthenaSupplyDrop_Donut_C";
+				}
 				else if (Fortnite_Version == 5.10 || Fortnite_Version == 9.41 || Fortnite_Version == 14.20 || Fortnite_Version == 18.00)
+				{
 					ActorName = "/Game/Athena/SupplyDrops/AthenaSupplyDrop_BDay.AthenaSupplyDrop_BDay_C";
+				}
 				else if (Fortnite_Version == 1.11 || Fortnite_Version == 7.10 || Fortnite_Version == 7.20 || Fortnite_Version == 7.30 || Fortnite_Version == 11.31 || Fortnite_Version == 15.10 || Fortnite_Version == 19.01)
+				{
 					ActorName = "/Game/Athena/SupplyDrops/AthenaSupplyDrop_Holiday.AthenaSupplyDrop_Holiday_C";
+				}
 				else if (Fortnite_Version == 5.40 || Fortnite_Version == 5.41)
+				{
 					ActorName = "/Game/Athena/SupplyDrops/Bling/AthenaSupplyDrop_Bling.AthenaSupplyDrop_Bling_C";
-				else ActorName = "/Game/Athena/SupplyDrops/AthenaSupplyDrop.AthenaSupplyDrop_C";
+				}
+				else
+				{
+					ActorName = "/Game/Athena/SupplyDrops/AthenaSupplyDrop.AthenaSupplyDrop_C";
+				}
+			}
+			else if (ActorName == "shark")
+			{
+				ActorName = "/SpicySake/Pawns/NPC_Pawn_SpicySake_Parent.NPC_Pawn_SpicySake_Parent_C";
+			}
+			else if (ActorName == "klombo")
+			{
+				ActorName = "/ButterCake/Pawns/NPC_Pawn_ButterCake_Base.NPC_Pawn_ButterCake_Base_C";
+			}
+			else if (ActorName == "umbrella")
+			{
+				ActorName = "/Game/Athena/Apollo/Environments/BuildingActors/Papaya/Papaya_BouncyUmbrella_C.Papaya_BouncyUmbrella_C_C";
+			}
+			else if (ActorName == "dumpster")
+			{
+				ActorName = "/Game/Athena/Items/EnvironmentalItems/HidingProps/Props/B_HidingProp_Dumpster.B_HidingProp_Dumpster_C";
+			}
+			else if (ActorName == "tire")
+			{
+				ActorName = "/Game/Building/ActorBlueprints/Prop/Prop_TirePile_04.Prop_TirePile_04_C";
+			}
+			else if (ActorName == "llama")
+			{
+				ActorName = "/Game/Athena/SupplyDrops/Llama/AthenaSupplyDrop_Llama.AthenaSupplyDrop_Llama_C";
+			}
+			else if (ActorName == "rift")
+			{
+				ActorName = "/Game/Athena/Items/ForagedItems/Rift/BGA_RiftPortal_Athena_Spawner.BGA_RiftPortal_Athena_Spawner_C";
+			}
+			else if (ActorName == "airvent")
+			{
+				ActorName = "/Game/Athena/Environments/Blueprints/DUDEBRO/BGA_HVAC.BGA_HVAC_C";
+			}
+			else if (ActorName == "geyser")
+			{
+				ActorName = "/Game/Athena/Environments/Blueprints/DudeBro/BGA_DudeBro_Mini.BGA_DudeBro_Mini_C";
+			}
 			else if (ActorName == "zeropoint")
+			{
 				if (Fortnite_Version < 15.00)
+				{
 					ActorName = "/Game/Athena/Environments/Nexus/Blueprints/BP_ZeroPoint_Exploding.BP_ZeroPoint_Exploding_C";
-				else ActorName = "/Game/Athena/Environments/Nexus/Blueprints/BP_ZeroPoint_2Point0.BP_ZeroPoint_2Point0_C";
+				}
+				else
+				{
+					ActorName = "/Game/Athena/Environments/Nexus/Blueprints/BP_ZeroPoint_2Point0.BP_ZeroPoint_2Point0_C";
+				}
+			}
 			else if (ActorName == "lowgrav" || ActorName == "lowgravzone")
+			{
 				if (Fortnite_Version < 12.00)
+				{
 					ActorName = "/Game/Athena/Prototype/Blueprints/Cube/BGA_Cube_Area_Effect.BGA_Cube_Area_Effect_C";
-				else ActorName = "/MotherGameplay/Items/Alpaca/BGA_Alpaca_AbductedPOI.BGA_Alpaca_AbductedPOI_C";
+				}
+				else
+				{
+					ActorName = "/MotherGameplay/Items/Alpaca/BGA_Alpaca_AbductedPOI.BGA_Alpaca_AbductedPOI_C";
+				}
+			}
 
 			static auto BGAClass = FindObject<UClass>(L"/Script/Engine.BlueprintGeneratedClass");
 			static auto ClassClass = FindObject<UClass>(L"/Script/CoreUObject.Class");
@@ -3388,19 +3513,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 					{
 						NewActor->ForceNetUpdate();
 						AmountSpawned++;
-
-						if (ActorName != "ufo")
-						{
-							SendMessageToConsole(PlayerController, L"Summoned!");
-						}
 					}
-				}
-			}
-			else
-			{
-				if (ActorName != "ufo")
-				{
-					SendMessageToConsole(PlayerController, L"Not a valid class!");
 				}
 			}
 		}
