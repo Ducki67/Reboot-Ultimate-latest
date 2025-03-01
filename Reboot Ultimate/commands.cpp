@@ -3311,7 +3311,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				}
 				else
 				{
-					Loc.Z += 1000;
+					Loc.Z += 250;
 				}
 
 				if (Arguments.size() == 3)
@@ -3405,6 +3405,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else if (ActorName == "ufo")
 			{
 				ActorName = "/Nevada/Blueprints/Vehicle/Nevada_Vehicle_V2.Nevada_Vehicle_V2_C";
+				Loc.Z += 1000;
 			}
 			else if (ActorName == "supplydrop" || ActorName == "drop")
 			{

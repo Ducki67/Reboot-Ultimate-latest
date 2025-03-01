@@ -869,40 +869,6 @@ void AFortPlayerController::ServerAttemptInteractHook(UObject* Context, FFrame* 
 	return ServerAttemptInteractOriginal(Context, Stack);
 }
 
-/*void AFortPlayerController::FixRiftPatch()
-{
-	static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
-	auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
-	auto& ClientConnections = WorldNetDriver->GetClientConnections();
-
-	for (int z = 0; z < ClientConnections.Num(); z++)
-	{
-		auto ClientConnection = ClientConnections.at(z);
-		auto FortPC = Cast<AFortPlayerController>(ClientConnection->GetPlayerController());
-
-		if (!FortPC)
-			continue;
-
-	static auto BGAClass = FindObject<UClass>(L"/Script/Engine.BlueprintGeneratedClass");
-	static auto UObjClass = FindObject<UClass>(L"/Script/CoreUObject.Class");
-	auto RiftClass = LoadObject<UClass>(L"/Game/Athena/Items/ForagedItems/Rift/BGA_RiftPortal_Athena_Spawner.BGA_RiftPortal_Athena_Spawner_C", BGAClass);
-
-	if (RiftClass)
-	{
-		FVector PlayerLocation = this->GetPawn()->GetActorLocation();
-
-		TArray<AActor*> OverlappingActors;
-		this->GetPawn()->GetOverlappingActors(OverlappingActors, RiftClass);
-
-		if (OverlappingActors.Num() > 0)
-		{
-			PlayerLocation.Z = 20000.0f;
-
-			this->GetPawn()->SetActorLocation(PlayerLocation, false, nullptr);
-		}
-	}
-}*/
-
 void AFortPlayerController::ServerAttemptAircraftJumpHook(AFortPlayerController* PC, FRotator ClientRotation)
 {
 	auto PlayerController = Cast<AFortPlayerControllerAthena>(Engine_Version < 424 ? PC : ((UActorComponent*)PC)->GetOwner());

@@ -103,6 +103,7 @@ static inline void InitBotNames()
     PlayerBotNames.push_back(L"AlwaysOnTime38");
     PlayerBotNames.push_back(L"AmpleBlindspot");
     PlayerBotNames.push_back(L"AngelEye30");
+    PlayerBotNames.push_back(L"AngeredFish76");
     PlayerBotNames.push_back(L"Angrification");
     PlayerBotNames.push_back(L"AngryDuck51");
     PlayerBotNames.push_back(L"AngryMiau");

@@ -1369,7 +1369,7 @@ static inline void MainUI()
 
 				if (!bStartedBus)
 				{
-					if (Globals::bLateGame.load() || Fortnite_Version >= 11)
+					if (Globals::bLateGame.load())
 					{
 						if (ImGui::Button("Start Bus"))
 						{
@@ -1400,24 +1400,25 @@ static inline void MainUI()
 							auto GameMode = (AFortGameMode*)GetWorld()->GetGameMode();
 							auto GameState = Cast<AFortGameStateAthena>(GameMode->GetGameState());
 
-							AmountOfPlayersWhenBusStart = GameState->GetPlayersLeft(); // scuffed!!!!
+							// AmountOfPlayersWhenBusStart = GameState->GetPlayersLeft(); // scuffed!!!!
 
-							static auto WarmupCountdownEndTimeOffset = GameState->GetOffset("WarmupCountdownEndTime");
-							// GameState->Get<float>(WarmupCountdownEndTimeOffset) = UGameplayStatics::GetTimeSeconds(GetWorld()) + 10;
-
-							float TimeSeconds = GameState->GetServerWorldTimeSeconds(); // UGameplayStatics::GetTimeSeconds(GetWorld());
+							float TimeSeconds = UGameplayStatics::GetTimeSeconds(GetWorld());
 							float Duration = 10;
 							float EarlyDuration = Duration;
 
+							static auto WarmupCountdownEndTimeOffset = GameState->GetOffset("WarmupCountdownEndTime");
 							static auto WarmupCountdownStartTimeOffset = GameState->GetOffset("WarmupCountdownStartTime");
 							static auto WarmupCountdownDurationOffset = GameMode->GetOffset("WarmupCountdownDuration");
 							static auto WarmupEarlyCountdownDurationOffset = GameMode->GetOffset("WarmupEarlyCountdownDuration");
 
-							GameState->Get<float>(WarmupCountdownEndTimeOffset) = TimeSeconds + Duration;
-							GameMode->Get<float>(WarmupCountdownDurationOffset) = Duration;
+							if (TimeSeconds + Duration < GameState->Get<float>(WarmupCountdownEndTimeOffset))
+							{
+								GameState->Get<float>(WarmupCountdownEndTimeOffset) = TimeSeconds + Duration;
+								GameMode->Get<float>(WarmupCountdownDurationOffset) = Duration;
 
-							// GameState->Get<float>(WarmupCountdownStartTimeOffset) = TimeSeconds;
-							GameMode->Get<float>(WarmupEarlyCountdownDurationOffset) = EarlyDuration;
+								GameState->Get<float>(WarmupCountdownStartTimeOffset) = TimeSeconds;
+								GameMode->Get<float>(WarmupEarlyCountdownDurationOffset) = EarlyDuration;
+							}
 						}
 					}
 				}
