@@ -26,6 +26,7 @@
 #include "FortAthenaMutator_GG.h"
 #include "quests.h"
 #include "FortVehicleWeapons.h"
+#include <unordered_set>
 
 void AFortPlayerController::ClientReportDamagedResourceBuilding(ABuildingSMActor* BuildingSMActor, EFortResourceType PotentialResourceType, int PotentialResourceCount, bool bDestroyed, bool bJustHitWeakspot)
 {
@@ -1580,61 +1581,75 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 			}
 
 			LoopMutators([&](AFortAthenaMutator* Mutator)
+			{
+				if (auto GG_Mutator = Cast<AFortAthenaMutator_GG>(Mutator))
 				{
-					if (auto GG_Mutator = Cast<AFortAthenaMutator_GG>(Mutator))
+					auto WorldInventory = Cast<AFortPlayerControllerAthena>(KillerPawn->GetController())->GetWorldInventory();
+					auto ItemsToFullyLoad = GameState->GetCurrentPlaylist()->GetItemsToFullyLoad();
+					auto WeaponToGive = ItemsToFullyLoad.at(KillScore);
+					auto WeaponToRemove = ItemsToFullyLoad.at(KillScore - 1);
+					auto InstanceToRemove = WorldInventory->FindItemInstance(WeaponToRemove);
+
+					bool bShouldUpdate = false;
+
+					if (ItemsToFullyLoad.Num() > KillScore)
 					{
-						auto WorldInventory = Cast<AFortPlayerControllerAthena>(KillerPawn->GetController())->GetWorldInventory();
-						// auto WeaponEntries = GG_Mutator->GetWeaponEntries();
-						// auto WeaponToGive = WeaponEntries.at(KillScore).GetWeapon();
-						// auto WeaponToRemove = WeaponEntries.at(KillScore - 1).GetWeapon();
-						auto ItemsToFullyLoad = GameState->GetCurrentPlaylist()->GetItemsToFullyLoad();
-						auto WeaponToGive = ItemsToFullyLoad.at(KillScore);
-						auto WeaponToRemove = ItemsToFullyLoad.at(KillScore - 1);
-						auto InstanceToRemove = WorldInventory->FindItemInstance(WeaponToRemove);
+						if (WeaponToRemove && InstanceToRemove)
+							WorldInventory->RemoveItem(InstanceToRemove->GetItemEntry()->GetItemGuid(), &bShouldUpdate, InstanceToRemove->GetItemEntry()->GetCount(), true);
 
-						bool bShouldUpdate = false;
-						
-						if (ItemsToFullyLoad.Num() > KillScore)
+						if (WeaponToGive)
+							WorldInventory->AddItem(WeaponToGive, &bShouldUpdate, 1, Cast<UFortWeaponItemDefinition>(WeaponToGive)->GetClipSize());
+
+						if (bShouldUpdate)
+							WorldInventory->Update();
+					}
+
+					if (KillScore == GG_Mutator->GetScoreToWin())
+					{
+						KillerPlayerState->GetPlace() = 1;
+						KillerPlayerState->OnRep_Place();
+
+						for (int i = 0; i < GameMode->GetAlivePlayers().Num(); i++)
 						{
-							if (WeaponToRemove && InstanceToRemove)
-								WorldInventory->RemoveItem(InstanceToRemove->GetItemEntry()->GetItemGuid(), &bShouldUpdate, InstanceToRemove->GetItemEntry()->GetCount(), true);
+							AFortPlayerStateAthena* PlayerState = ((AFortPlayerStateAthena*)GameMode->GetAlivePlayers()[i]->GetPlayerState());
+							int PlayerKills = PlayerState->Get<int>(MemberOffsets::FortPlayerStateAthena::KillScore);
 
-							if (WeaponToGive)
-								WorldInventory->AddItem(WeaponToGive, &bShouldUpdate, 1, Cast<UFortWeaponItemDefinition>(WeaponToGive)->GetClipSize());
-
-							if (bShouldUpdate)
-								WorldInventory->Update();
+							if (GameMode->GetAlivePlayers()[i] != (AFortPlayerControllerAthena*)KillerPlayerState->GetOwner())
+							{
+								PlayerState->GetPlace() = PlayerKills;
+								PlayerState->OnRep_Place();
+							}
 						}
 
-						if (KillScore == GG_Mutator->GetScoreToWin())
+						GameState->GetWinningPlayerState() = KillerPlayerState;
+						GameState->GetWinningScore() = 1;
+						GameState->GetWinningTeam() = KillerPlayerState->GetTeamIndex();
+
+						GameState->OnRep_WinningPlayerState();
+						GameState->OnRep_WinningScore();
+						GameState->OnRep_WinningTeam();
+						GameMode->EndMatch();
+						return;
+					}
+
+					std::unordered_set<int> RemainingTeams;
+
+					for (int i = 0; i < GameMode->GetAlivePlayers().Num(); i++)
+					{
+						auto PlayerState = Cast<AFortPlayerStateAthena>(GameMode->GetAlivePlayers()[i]->GetPlayerState());
+
+						if (PlayerState)
 						{
-							KillerPlayerState->GetPlace() = 1;
-							KillerPlayerState->OnRep_Place();
-
-							for (int i = 0; i < GameMode->GetAlivePlayers().Num(); i++)
-							{
-								AFortPlayerStateAthena* PlayerState = ((AFortPlayerStateAthena*)GameMode->GetAlivePlayers()[i]->GetPlayerState());
-								int PlayerKills = PlayerState->Get<int>(MemberOffsets::FortPlayerStateAthena::KillScore);
-
-								if (GameMode->GetAlivePlayers()[i] != (AFortPlayerControllerAthena*)KillerPlayerState->GetOwner())
-								{
-									PlayerState->GetPlace() = PlayerKills;
-									PlayerState->OnRep_Place();
-								}
-							}
-
-							GameState->GetWinningPlayerState() = KillerPlayerState;
-							GameState->GetWinningScore() = 1;
-							GameState->GetWinningTeam() = KillerPlayerState->GetTeamIndex();
-
-							GameState->OnRep_WinningPlayerState();
-							GameState->OnRep_WinningScore();
-							GameState->OnRep_WinningTeam();
-							GameMode->EndMatch();
+							RemainingTeams.insert(PlayerState->GetTeamIndex());
 						}
 					}
+
+					if (RemainingTeams.size() == 1)
+					{
+						GameMode->EndMatch();
+					}
 				}
-			);
+			});
 		}
 
 		// LOG_INFO(LogDev, "Reported kill.");

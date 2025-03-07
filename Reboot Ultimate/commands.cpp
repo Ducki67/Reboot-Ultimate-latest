@@ -2529,8 +2529,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		}
 		else if (Command == "god")
 		{
-			bool bGod = false;
-
 			auto Pawn = ReceivingController->GetMyFortPawn();
 
 			if (!Pawn)
@@ -2538,31 +2536,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				SendMessageToConsole(PlayerController, L"No pawn!");
 				return;
 			}
-
-			if (NumArgs >= 1)
-			{
-				auto& GodCheck = Arguments[1];
-
-				if (GodCheck == "check" || GodCheck == "c")
-				{
-					if (bGod)
-					{
-						SendMessageToConsole(PlayerController, L"You currently have god mode **ON**.");
-						return;
-					}
-					else
-					{
-						SendMessageToConsole(PlayerController, L"You currently have god mode **OFF**.");
-						return;
-					}
-				}
-				else
-				{
-					goto Continue;
-				}
-			}
-
-			Continue:
 
 			float MaxHealth = Pawn->GetMaxHealth();
 
@@ -2577,6 +2550,25 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			static auto HealthOffset = HealthSet->GetOffset("Health");
 			auto& Health = HealthSet->Get<FFortGameplayAttributeData>(HealthOffset);
 
+			if (NumArgs >= 1)
+			{
+				auto& GodCheck = Arguments[1];
+
+				if (GodCheck == "check" || GodCheck == "c")
+				{
+					if (Health.GetMinimum() == MaxHealth)
+					{
+						SendMessageToConsole(PlayerController, L"You currently have god mode **ON**.");
+					}
+					else
+					{
+						SendMessageToConsole(PlayerController, L"You currently have god mode **OFF**.");
+					}
+
+					return;
+				}
+			}
+
 			Pawn->SetHealth(100.f);
 			Pawn->SetShield(100.f);
 
@@ -2584,13 +2576,11 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				Health.GetMinimum() = MaxHealth;
 				SendMessageToConsole(PlayerController, L"God ON.");
-				bGod = true;
 			}
 			else
 			{
 				Health.GetMinimum() = 0;
 				SendMessageToConsole(PlayerController, L"God OFF.");
-				bGod = false;
 			}
 		}
 		else if (Command == "oldgod" || Command == "canbedamaged")

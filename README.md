@@ -17,6 +17,7 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 - [x] Fixed Respawning on 12.41+
 - [x] Fixed Attached Actor Chest Loot
 - [x] Fixed Reviving on Win
+- [x] Fixed Winning on Teams
 
 ## UI:
 
