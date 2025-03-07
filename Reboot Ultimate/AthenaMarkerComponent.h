@@ -11,7 +11,7 @@ struct FFortClientMarkerRequest
 {
 	char pad[0x20]; // real idk 
 
-	int& GetInstanceID()
+	int32& GetInstanceID() const
 	{
 		static auto InstanceIDOffset = FindOffsetStruct("/Script/FortniteGame.FortClientMarkerRequest", "InstanceID", false) == -1 ?
 			FindOffsetStruct("/Script/FortniteGame.FortClientMarkerRequest", "InstanceId") : FindOffsetStruct("/Script/FortniteGame.FortClientMarkerRequest", "InstanceID");
@@ -19,19 +19,19 @@ struct FFortClientMarkerRequest
 		return *(int*)(__int64(this) + InstanceIDOffset);
 	}
 
-	bool& DoesIncludeSquad()
+	bool& DoesIncludeSquad() const
 	{
 		static auto bIncludeSquadOffset = FindOffsetStruct("/Script/FortniteGame.FortClientMarkerRequest", "bIncludeSquad");
 		return *(bool*)(__int64(this) + bIncludeSquadOffset);
 	}
 
-	bool& UsesHoveredMarkerDetail()
+	bool& UsesHoveredMarkerDetail() const
 	{
 		static auto bUseHoveredMarkerDetailOffset = FindOffsetStruct("/Script/FortniteGame.FortClientMarkerRequest", "bUseHoveredMarkerDetail");
 		return *(bool*)(__int64(this) + bUseHoveredMarkerDetailOffset);
 	}
 
-	FVector& GetWorldPosition()
+	FVector& GetWorldPosition() const
 	{
 		static auto WorldPositionOffset = FindOffsetStruct("/Script/FortniteGame.FortClientMarkerRequest", "WorldPosition", false);
 
@@ -41,13 +41,13 @@ struct FFortClientMarkerRequest
 		return *(FVector*)(__int64(this) + WorldPositionOffset);
 	}
 
-	uint8_t& GetMarkerType()
+	uint8_t& GetMarkerType() const
 	{
 		static auto MarkerTypeOffset = FindOffsetStruct("/Script/FortniteGame.FortClientMarkerRequest", "MarkerType");
 		return *(uint8_t*)(__int64(this) + MarkerTypeOffset);
 	}
 
-	FVector& GetWorldPositionOffset()
+	FVector& GetWorldPositionOffset() const
 	{
 		static auto WorldPositionOffsetOffset = FindOffsetStruct("/Script/FortniteGame.FortClientMarkerRequest", "WorldPositionOffset", false);
 
@@ -57,7 +57,7 @@ struct FFortClientMarkerRequest
 		return *(FVector*)(__int64(this) + WorldPositionOffsetOffset);
 	}
 
-	FVector& GetWorldNormal()
+	FVector& GetWorldNormal() const
 	{
 		static auto WorldNormalOffset = FindOffsetStruct("/Script/FortniteGame.FortClientMarkerRequest", "WorldNormal");
 		return *(FVector*)(__int64(this) + WorldNormalOffset);
@@ -72,7 +72,10 @@ struct FFortWorldMarkerData
 		return Struct;
 	}
 
-	static int GetStructSize() { return GetStruct()->GetPropertiesSize(); }
+	static int GetStructSize() 
+	{ 
+		return GetStruct()->GetPropertiesSize();
+	}
 
 	FMarkerID& GetMarkerID()
 	{

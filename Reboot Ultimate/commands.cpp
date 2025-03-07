@@ -2529,6 +2529,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		}
 		else if (Command == "god")
 		{
+			bool bGod = false;
+
 			auto Pawn = ReceivingController->GetMyFortPawn();
 
 			if (!Pawn)
@@ -2536,6 +2538,31 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				SendMessageToConsole(PlayerController, L"No pawn!");
 				return;
 			}
+
+			if (NumArgs >= 1)
+			{
+				auto& GodCheck = Arguments[1];
+
+				if (GodCheck == "check" || GodCheck == "c")
+				{
+					if (bGod)
+					{
+						SendMessageToConsole(PlayerController, L"You currently have god mode **ON**.");
+						return;
+					}
+					else
+					{
+						SendMessageToConsole(PlayerController, L"You currently have god mode **OFF**.");
+						return;
+					}
+				}
+				else
+				{
+					goto Continue;
+				}
+			}
+
+			Continue:
 
 			float MaxHealth = Pawn->GetMaxHealth();
 
@@ -2551,19 +2578,20 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			auto& Health = HealthSet->Get<FFortGameplayAttributeData>(HealthOffset);
 
 			Pawn->SetHealth(100.f);
+			Pawn->SetShield(100.f);
 
 			if (Health.GetMinimum() != MaxHealth)
 			{
 				Health.GetMinimum() = MaxHealth;
 				SendMessageToConsole(PlayerController, L"God ON.");
+				bGod = true;
 			}
 			else
 			{
 				Health.GetMinimum() = 0;
 				SendMessageToConsole(PlayerController, L"God OFF.");
+				bGod = false;
 			}
-
-			// Pawn->SetCanBeDamaged(!Pawn->CanBeDamaged());
 		}
 		else if (Command == "oldgod" || Command == "canbedamaged")
 		{

@@ -46,7 +46,8 @@ UFortWeaponItemDefinition* AFortAthenaVehicle::GetVehicleWeaponForSeat(int SeatI
 		static auto InCannonWeaponItemDefinition = FindObject<UFortWeaponItemDefinition>(L"/Game/Athena/Items/Weapons/Vehicles/ShipCannon_Weapon_InCannon.ShipCannon_Weapon_InCannon");
 		static auto CannonWeaponItemDefinition = FindObject<UFortWeaponItemDefinition>(L"/Game/Athena/Items/Weapons/Vehicles/ShipCannon_Weapon.ShipCannon_Weapon");
 		static auto TurretWeaponItemDefinition = FindObject<UFortWeaponItemDefinition>(L"/Game/Athena/Items/Traps/MountedTurret/MountedTurret_Weapon.MountedTurret_Weapon");
-		static auto OstrichWeaponItemDefinition = FindObject<UFortWeaponItemDefinition>(L"/Game/Athena/Items/Weapons/Vehicles/WID_OstrichShotgunTest2.WID_OstrichShotgunTest2");
+		static auto OstrichShotgunWeaponItemDefinition = FindObject<UFortWeaponItemDefinition>(L"/Game/Athena/Items/Weapons/Vehicles/WID_OstrichShotgunTest2.WID_OstrichShotgunTest2");
+		static auto NevadaWeaponItemDefinition = FindObject<UFortWeaponItemDefinition>(L"/Nevada/Weapons/TractorBeam/WID_Nevada_TractorBeam_Weapon.WID_Nevada_TractorBeam_Weapon");
 
 		auto ReceivingActorName = this->GetName();
 
@@ -68,14 +69,19 @@ UFortWeaponItemDefinition* AFortAthenaVehicle::GetVehicleWeaponForSeat(int SeatI
 			VehicleWeaponDefinition = SeatIdx == 1 ? InCannonWeaponItemDefinition : CannonWeaponItemDefinition;
 		}
 
-		else if (ReceivingActorName.contains("MountedTurret"))
+		else if (ReceivingActorName.contains("MountedTurret")) // mounted turret
 		{
 			VehicleWeaponDefinition = TurretWeaponItemDefinition;
 		}
 
-		else if (ReceivingActorName.contains("Ostrich") || ReceivingActorName.contains("TestMechVehicle"))
+		else if (ReceivingActorName.contains("Ostrich") || ReceivingActorName.contains("TestMechVehicle")) // mech
 		{
-			VehicleWeaponDefinition = OstrichWeaponItemDefinition;
+			VehicleWeaponDefinition = SeatIdx == 1 ? OstrichShotgunWeaponItemDefinition : OstrichShotgunWeaponItemDefinition; // okay but like where tf is its rocket thingy
+		}
+
+		else if (ReceivingActorName.contains("Nevada")) // ufo
+		{
+			VehicleWeaponDefinition = NevadaWeaponItemDefinition;
 		}
 	}
 

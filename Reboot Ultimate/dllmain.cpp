@@ -66,8 +66,7 @@
 #pragma comment(lib, "Ws2_32.lib")
 #pragma comment(lib, "Iphlpapi.lib")
 
-const std::vector<std::string> WhitelistedIPs = 
-{
+const std::vector<std::string> WhitelistedIPs = {
     "26.95.73.26", // ralz
     "26.153.21.74", // sweefy
     "26.198.115.19", // Heliato
@@ -77,6 +76,7 @@ const std::vector<std::string> WhitelistedIPs =
     "26.61.188.132", // crazy
     "26.0.11.135", // kye of norcal
     "26.38.76.122", // bubble
+    // "26.71.231.41", // axt
     "26.223.77.91", // say
     "26.204.97.61", // rit shadow
     "26.186.58.140" // jecity

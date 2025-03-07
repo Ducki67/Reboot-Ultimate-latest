@@ -95,9 +95,9 @@ extern inline int AmountToSubtractIndex = 1;
 extern inline int SecondsUntilTravel = 25;
 extern inline bool bSwitchedInitialLevel = false;
 extern inline bool bIsInAutoRestart = false;
-extern inline float AutoBusStartSeconds = 60;
+extern inline float AutoBusStartSeconds = 90;
 extern inline float AutoBusStartSecondsThatChanges = AutoBusStartSeconds;
-extern inline int NumRequiredPlayersToStart = 2;
+extern inline int NumRequiredPlayersToStart = 1;
 extern inline bool bDebugPrintLooting = false;
 extern inline bool bDebugPrintFloorLoot = false;
 extern inline bool bDebugPrintSwapping = false;
@@ -687,15 +687,12 @@ static int playerTabTab = MAIN_PLAYERTAB;
 
 static inline void StaticUI()
 {
-	if (IsRestartingSupported())
-	{
-		// ImGui::Checkbox("Auto Restart", &Globals::bAutoRestart);
+	bool Chapter2 = Engine_Version >= 422 && Fortnite_Version <= 18.40;
 
-		if (Globals::bAutoRestart)
-		{
-			ImGui::InputFloat(std::format("How long after {} players join the bus will start", NumRequiredPlayersToStart).c_str(), &AutoBusStartSeconds);
-			ImGui::InputInt("Num Players required for bus auto timer", &NumRequiredPlayersToStart);
-		}
+	if (Globals::bAutoBusStart)
+	{
+		ImGui::InputInt("Players Required To Start:", &NumRequiredPlayersToStart);
+		ImGui::InputFloat("Seconds To Start Bus:", &AutoBusStartSeconds);
 	}
 
 	if (Globals::bUseSiphon)
@@ -714,6 +711,11 @@ static inline void StaticUI()
 	ImGui::Checkbox("Radmin IP's are Operator", &Globals::bPrivateIPsAreOperator);
 
 	ImGui::Checkbox("Toggle Siphon on Kill", &Globals::bUseSiphon);
+
+	if (!bStartedBus || !Chapter2 && !Globals::bLateGame.load())
+	{
+		ImGui::Checkbox("Auto Bus Start", &Globals::bAutoBusStart);
+	}
 
 	// ImGui::Checkbox("No MCP", &Globals::bNoMCP);
 
@@ -1059,16 +1061,6 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 		Sleep(1000 / MaxTickRate);
 	}
 
-	if (Globals::bAutoPauseZone)
-	{
-		while (GameMode->GetGameStateAthena()->GetGamePhaseStep() == EAthenaGamePhaseStep::BusFlying)
-		{
-			std::this_thread::sleep_for(std::chrono::seconds(15));
-
-			UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"pausesafezone", nullptr);
-		}
-	}
-
 	static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
 	auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
 	auto& ClientConnections = WorldNetDriver->GetClientConnections();
@@ -1290,6 +1282,8 @@ static inline void MainUI()
 {
 	bool bLoaded = true;
 
+	bool Chapter2 = Engine_Version >= 422 && Fortnite_Version <= 18.40;
+
 	if (PlayerTab == -1)
 	{
 		MainTabs();
@@ -1369,7 +1363,7 @@ static inline void MainUI()
 
 				if (!bStartedBus)
 				{
-					if (Globals::bLateGame.load())
+					if (Globals::bLateGame.load() && Chapter2)
 					{
 						if (ImGui::Button("Start Bus"))
 						{

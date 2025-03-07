@@ -1251,7 +1251,7 @@ void AFortGameModeAthena::Athena_HandleStartingNewPlayerHook(AFortGameModeAthena
 
 	LOG_INFO(LogPlayer, "HandleStartingNewPlayer!");
 
-	if (Globals::bAutoRestart)
+	if (Globals::bAutoBusStart)
 	{
 		static int LastNum123 = 15;
 
@@ -1259,23 +1259,45 @@ void AFortGameModeAthena::Athena_HandleStartingNewPlayerHook(AFortGameModeAthena
 		{
 			LastNum123 = Globals::AmountOfListens;
 
-			float Duration = AutoBusStartSeconds;
-			float EarlyDuration = Duration;
-
-			float TimeSeconds = UGameplayStatics::GetTimeSeconds(GetWorld());
-
 			static auto WarmupCountdownEndTimeOffset = GameState->GetOffset("WarmupCountdownEndTime");
 			static auto WarmupCountdownStartTimeOffset = GameState->GetOffset("WarmupCountdownStartTime");
 			static auto WarmupCountdownDurationOffset = GameMode->GetOffset("WarmupCountdownDuration");
 			static auto WarmupEarlyCountdownDurationOffset = GameMode->GetOffset("WarmupEarlyCountdownDuration");
 
-			GameState->Get<float>(WarmupCountdownEndTimeOffset) = TimeSeconds + Duration;
-			GameMode->Get<float>(WarmupCountdownDurationOffset) = Duration;
-
-			GameState->Get<float>(WarmupCountdownStartTimeOffset) = TimeSeconds;
-			GameMode->Get<float>(WarmupEarlyCountdownDurationOffset) = EarlyDuration;
-
 			LOG_INFO(LogDev, "Auto starting bus in {}.", AutoBusStartSeconds);
+
+			if (Globals::bLateGame.load())
+			{
+				CreateThread(0, 0, LateGameThread, 0, 0, 0);
+			}
+			else
+			{
+				// auto GameMode = (AFortGameMode*)GetWorld()->GetGameMode(); // not needed
+				auto GameState = Cast<AFortGameStateAthena>(GameMode->GetGameState());
+
+				float TimeSeconds = UGameplayStatics::GetTimeSeconds(GetWorld());
+				float BusDuration = AutoBusStartSecondsThatChanges;
+				float EarlyBusDuration = BusDuration;
+				float WarmupCountdownEndTime = GameState->Get<float>(WarmupCountdownEndTimeOffset);
+
+				if (TimeSeconds + BusDuration < WarmupCountdownEndTime)
+				{
+					GameState->Get<float>(WarmupCountdownEndTimeOffset) = TimeSeconds + BusDuration;
+					GameMode->Get<float>(WarmupCountdownDurationOffset) = BusDuration;
+
+					GameState->Get<float>(WarmupCountdownStartTimeOffset) = TimeSeconds;
+					GameMode->Get<float>(WarmupEarlyCountdownDurationOffset) = EarlyBusDuration;
+
+					/*CreateThread(0, 0, [](LPVOID) -> DWORD
+					{
+						Sleep(10000);
+						UKismetSystemLibrary::ExecuteConsoleCommand(GetWorld(), L"startaircraft", nullptr);
+						return 0;
+					}, 
+						
+					nullptr, 0, 0); */
+				}
+			}
 		}
 	}
 

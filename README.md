@@ -16,6 +16,7 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 - [x] Fixed Boat Rockets/Some Vehicle Weapons on S9+
 - [x] Fixed Respawning on 12.41+
 - [x] Fixed Attached Actor Chest Loot
+- [x] Fixed Reviving on Win
 
 ## UI:
 
@@ -64,7 +65,8 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 
 - [ ] Ch2+ Map Markers
 - [ ] Ch2+ Llamas
-- [ ] Ch2+ Bus Countdown
+- [x] Auto Bus Start (buggy but i may fix later)
+- [ ] Try to fix Recon Ammo
 - [ ] Fix Grappler on S14+ (heliato please help)
 
 # Installation

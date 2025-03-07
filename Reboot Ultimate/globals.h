@@ -42,7 +42,7 @@ namespace Globals
 
 	extern inline bool bCustomLootpool = false;
 
-	extern inline bool bAutoPauseZone = false;
+	extern inline bool bAutoBusStart = false;
 
 	extern inline bool bCrownSlowmo = true;
 

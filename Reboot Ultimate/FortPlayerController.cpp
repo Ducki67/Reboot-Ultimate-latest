@@ -1412,56 +1412,40 @@ void AFortPlayerController::ServerPlaySprayItemHook(AFortPlayerController* Playe
 	PlayerController->ServerPlayEmoteItemHook(PlayerController, SprayAsset);
 }
 
-void VictoryCrownSlowmo()
-{
-	std::this_thread::sleep_for(std::chrono::milliseconds(65));
-
-	static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
-	auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
-	auto& ClientConnections = WorldNetDriver->GetClientConnections();
-
-	for (int z = 0; z < ClientConnections.Num(); z++)
-	{
-		auto ClientConnection = ClientConnections.at(z);
-		auto FortPC = Cast<AFortPlayerController>(ClientConnection->GetPlayerController());
-
-		if (!FortPC)
-			continue;
-
-		auto WorldInventory = FortPC->GetWorldInventory();
-
-		if (!WorldInventory)
-			continue;
-
-		static auto Crown = FindObject<UFortItemDefinition>(
-			L"/VictoryCrownsGameplay/Items/AGID_VictoryCrown.AGID_VictoryCrown");
-
-		auto CrownInstance = WorldInventory->FindItemInstance(Crown);
-		auto CrownCount = CrownInstance ? CrownInstance->GetItemEntry()->GetCount() : 0;
-
-		if (CrownCount < 1)
-		{
-			WorldInventory->AddItem(Crown, nullptr, 1);
-			WorldInventory->Update();
-		}
-	}
-}
-
 void DBNOToggleOnWin()
 {
 	static auto World_NetDriverOffset = GetWorld()->GetOffset("NetDriver");
+
 	auto WorldNetDriver = GetWorld()->Get<UNetDriver*>(World_NetDriverOffset);
+
+	if (!WorldNetDriver) 
+		return;
+
 	auto& ClientConnections = WorldNetDriver->GetClientConnections();
 
 	for (int z = 0; z < ClientConnections.Num(); z++)
 	{
 		auto ClientConnection = ClientConnections.at(z);
 
+		if (!ClientConnection) 
+			continue;
+
 		auto PlayerController = Cast<AFortPlayerController>(ClientConnection->GetPlayerController());
+
+		if (!PlayerController) 
+			continue;
 
 		auto Pawn = PlayerController->GetMyFortPawn();
 
-		Pawn->SetDBNO(false);
+		if (!Pawn) 
+			continue;
+
+		if (Pawn->IsDBNO())
+		{
+			Pawn->SetDBNO(false);
+
+			Pawn->SetHealth(30);
+		}
 	}
 }
 
@@ -1479,13 +1463,6 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 		return ClientOnPawnDiedOriginal(PlayerController, DeathReport);
 
 	auto DeathLocation = DeadPawn->GetActorLocation();
-
-	if (Globals::bCrownSlowmo)
-	{
-		std::thread victory(VictoryCrownSlowmo);
-
-		victory.detach();
-	}
 
 	// std::thread victory(DBNOToggleOnWin);
 
@@ -1867,7 +1844,24 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 						}
 					}
 
-					if (Fortnite_Version >= 16.00)
+					auto AllPlayerStates = UGameplayStatics::GetAllActorsOfClass(GetWorld(), AFortPlayerStateAthena::StaticClass());
+
+					auto KillerPlayerController = Cast<AFortPlayerControllerAthena>(KillerPlayerState->GetOwner());
+
+					bool bDidSomeoneWin = AllPlayerStates.Num() == 0;
+
+					for (int i = 0; i < AllPlayerStates.Num(); ++i)
+					{
+						auto CurrentPlayerState = (AFortPlayerStateAthena*)AllPlayerStates.at(i);
+
+						if (CurrentPlayerState->GetPlace() <= 1)
+						{
+							bDidSomeoneWin = true;
+							break;
+						}
+					}
+
+					if (Fortnite_Version >= 16)
 					{
 						AFortPlayerControllerAthena* KillerPlayerControllerAthena = KillerPawn ? Cast<AFortPlayerControllerAthena>(KillerPawn->GetController()) : nullptr;
 
@@ -1877,6 +1871,21 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 							KillerPlayerControllerAthena->ClientNotifyTeamWon(KillerPawn, KillerWeaponDef, DeathCause);
 						}
 					}
+
+					if (Globals::bCrownSlowmo)
+					{
+						if (Fortnite_Version >= 19)
+						{
+							auto WorldInventory = KillerPlayerController->GetWorldInventory();
+
+							static auto VictoryCrown = FindObject<UFortItemDefinition>(L"/VictoryCrownsGameplay/Items/AGID_VictoryCrown.AGID_VictoryCrown");
+
+							WorldInventory->AddItem(VictoryCrown, nullptr, 1);
+							WorldInventory->Update();
+						}
+					}
+
+					DBNOToggleOnWin();
 
 					RemoveFromAlivePlayers(GameMode, PlayerController, KillerPlayerState == DeadPlayerState ? nullptr : KillerPlayerState, KillerPawn, KillerWeaponDef, DeathCause, 0);
 
