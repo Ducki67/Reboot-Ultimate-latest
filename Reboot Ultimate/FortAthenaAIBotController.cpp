@@ -95,81 +95,84 @@ void AFortAthenaAIBotController::OnPossesedPawnDiedHook(AFortAthenaAIBotControll
 		}
 	}
 
-	if (Globals::AmountOfHealthSiphon != 0)
+	if (Globals::bUseSiphon)
 	{
-		if (KillerPawn && KillerPawn != DeadPawn && KillerPlayerState && KillerPlayerState != DeadPlayerState && KillerPC)
+		if (Globals::AmountOfHealthSiphon > 0)
 		{
-			auto WorldInventory = KillerController->GetWorldInventory();
-
-			if (!WorldInventory)
-				return;
-
-			static auto WoodItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/WoodItemData.WoodItemData");
-			static auto StoneItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/StoneItemData.StoneItemData");
-			static auto MetalItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/MetalItemData.MetalItemData");
-
-			int MaxWood = WoodItemData->GetMaxStackSize();
-			int MaxStone = StoneItemData->GetMaxStackSize();
-			int MaxMetal = MetalItemData->GetMaxStackSize();
-
-			auto WoodInstance = WorldInventory->FindItemInstance(WoodItemData);
-			auto WoodCount = WoodInstance ? WoodInstance->GetItemEntry()->GetCount() : 0;
-
-			auto StoneInstance = WorldInventory->FindItemInstance(StoneItemData);
-			auto StoneCount = StoneInstance ? StoneInstance->GetItemEntry()->GetCount() : 0;
-
-			auto MetalInstance = WorldInventory->FindItemInstance(MetalItemData);
-			auto MetalCount = MetalInstance ? MetalInstance->GetItemEntry()->GetCount() : 0;
-
-			if (WoodCount < MaxWood)
+			if (KillerPawn && KillerPawn != DeadPawn && KillerPlayerState && KillerPlayerState != DeadPlayerState && KillerPC)
 			{
-				int WoodToAdd = FMath::Min(Globals::AmountOfHealthSiphon, MaxWood - WoodCount);
-				WorldInventory->AddItem(WoodItemData, nullptr, WoodToAdd);
-			}
-			if (StoneCount < MaxStone)
-			{
-				int StoneToAdd = FMath::Min(Globals::AmountOfHealthSiphon, MaxStone - StoneCount);
-				WorldInventory->AddItem(StoneItemData, nullptr, StoneToAdd);
-			}
-			if (MetalCount < MaxMetal)
-			{
-				int MetalToAdd = FMath::Min(Globals::AmountOfHealthSiphon, MaxMetal - MetalCount);
-				WorldInventory->AddItem(MetalItemData, nullptr, MetalToAdd);
-			}
+				auto WorldInventory = KillerController->GetWorldInventory();
 
-			WorldInventory->Update();
+				if (!WorldInventory)
+					return;
 
-			float Health = KillerPawn->GetHealth();
-			float Shield = KillerPawn->GetShield();
+				static auto WoodItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/WoodItemData.WoodItemData");
+				static auto StoneItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/StoneItemData.StoneItemData");
+				static auto MetalItemData = FindObject<UFortItemDefinition>(L"/Game/Items/ResourcePickups/MetalItemData.MetalItemData");
 
-			float MaxHealth = KillerPawn->GetMaxHealth();
-			float MaxShield = KillerPawn->GetMaxShield();
+				int MaxWood = WoodItemData->GetMaxStackSize();
+				int MaxStone = StoneItemData->GetMaxStackSize();
+				int MaxMetal = MetalItemData->GetMaxStackSize();
 
-			float AmountGiven = 0;
+				auto WoodInstance = WorldInventory->FindItemInstance(WoodItemData);
+				auto WoodCount = WoodInstance ? WoodInstance->GetItemEntry()->GetCount() : 0;
 
-			if ((MaxHealth - Health) > 0)
-			{
-				float AmountToGive = MaxHealth - Health >= Globals::AmountOfHealthSiphon ? Globals::AmountOfHealthSiphon : MaxHealth - Health;
-				KillerPawn->SetHealth(Health + AmountToGive);
-				AmountGiven += AmountToGive;
-			}
+				auto StoneInstance = WorldInventory->FindItemInstance(StoneItemData);
+				auto StoneCount = StoneInstance ? StoneInstance->GetItemEntry()->GetCount() : 0;
 
-			if ((MaxShield - Shield) >= 0 && AmountGiven < Globals::AmountOfHealthSiphon)
-			{
-				if (DeathReport && Globals::bUseSiphon)
+				auto MetalInstance = WorldInventory->FindItemInstance(MetalItemData);
+				auto MetalCount = MetalInstance ? MetalInstance->GetItemEntry()->GetCount() : 0;
+
+				if (WoodCount < MaxWood)
 				{
-					KillerPC->SiphonEffect(DeathReport, KillerPC);
+					int WoodToAdd = FMath::Min(Globals::AmountOfHealthSiphon, MaxWood - WoodCount);
+					WorldInventory->AddItem(WoodItemData, nullptr, WoodToAdd);
+				}
+				if (StoneCount < MaxStone)
+				{
+					int StoneToAdd = FMath::Min(Globals::AmountOfHealthSiphon, MaxStone - StoneCount);
+					WorldInventory->AddItem(StoneItemData, nullptr, StoneToAdd);
+				}
+				if (MetalCount < MaxMetal)
+				{
+					int MetalToAdd = FMath::Min(Globals::AmountOfHealthSiphon, MaxMetal - MetalCount);
+					WorldInventory->AddItem(MetalItemData, nullptr, MetalToAdd);
 				}
 
-				if (MaxShield - Shield > 0)
-				{
-					float AmountToGive = MaxShield - Shield >= Globals::AmountOfHealthSiphon ? Globals::AmountOfHealthSiphon : MaxShield - Shield;
-					AmountToGive -= AmountGiven;
+				WorldInventory->Update();
 
-					if (AmountToGive > 0)
+				float Health = KillerPawn->GetHealth();
+				float Shield = KillerPawn->GetShield();
+
+				float MaxHealth = KillerPawn->GetMaxHealth();
+				float MaxShield = KillerPawn->GetMaxShield();
+
+				float AmountGiven = 0;
+
+				if ((MaxHealth - Health) > 0)
+				{
+					float AmountToGive = MaxHealth - Health >= Globals::AmountOfHealthSiphon ? Globals::AmountOfHealthSiphon : MaxHealth - Health;
+					KillerPawn->SetHealth(Health + AmountToGive);
+					AmountGiven += AmountToGive;
+				}
+
+				if ((MaxShield - Shield) >= 0 && AmountGiven < Globals::AmountOfHealthSiphon)
+				{
+					if (DeathReport)
 					{
-						KillerPawn->SetShield(Shield + AmountToGive);
-						AmountGiven += AmountToGive;
+						KillerPC->SiphonEffect(DeathReport, KillerPC);
+					}
+
+					if (MaxShield - Shield > 0)
+					{
+						float AmountToGive = MaxShield - Shield >= Globals::AmountOfHealthSiphon ? Globals::AmountOfHealthSiphon : MaxShield - Shield;
+						AmountToGive -= AmountGiven;
+
+						if (AmountToGive > 0)
+						{
+							KillerPawn->SetShield(Shield + AmountToGive);
+							AmountGiven += AmountToGive;
+						}
 					}
 				}
 			}

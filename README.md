@@ -38,6 +38,7 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 - [x] cheat ban {IP/HWID} - Added support for HWID banning a user.
 - [x] cheat unban - Unbans a player. (why did this not exist before tf)
 - [x] cheat rift - Rifts the player.
+- [x] cheat revive - Revives the receiving controller if they are knocked.
 - [x] cheat infammo - Toggles Infinite Ammo.
 - [x] cheat buildfree - Toggles Infinite Materials.
 - [x] cheat launch - (reworked) ; If you want to get flung directly up, you now only need to type "cheat launch 8000" instead of "cheat launch 0 0 8000".

@@ -1650,36 +1650,36 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 
 		// LOG_INFO(LogDev, "Reported kill.");
 
-		if (KillerPawn && KillerPawn != DeadPawn && KillerPlayerState && KillerPlayerState != DeadPlayerState && KillerPlayerState->GetAbilitySystemComponent())
+		if (Globals::bUseSiphon)
 		{
-			KillerPawn->SiphonMats();
-
-			if (Globals::AmountOfHealthSiphon > 0)
+			if (KillerPawn && KillerPawn != DeadPawn && KillerPlayerState && KillerPlayerState != DeadPlayerState && KillerPlayerState->GetAbilitySystemComponent())
 			{
-				float Health = KillerPawn->GetHealth();
-				float Shield = KillerPawn->GetShield();
+				KillerPawn->SiphonMats();
 
-				float MaxHealth = KillerPawn->GetMaxHealth();
-				float MaxShield = KillerPawn->GetMaxShield();
-
-				float RemainingSiphon = Globals::AmountOfHealthSiphon;
-
-				if (Health < MaxHealth)
+				if (Globals::AmountOfHealthSiphon > 0)
 				{
-					float HealthToGive = FMath::Min(RemainingSiphon, MaxHealth - Health);
-					KillerPawn->SetHealth(Health + HealthToGive);
-					RemainingSiphon -= HealthToGive;
-				}
+					float Health = KillerPawn->GetHealth();
+					float Shield = KillerPawn->GetShield();
 
-				if (RemainingSiphon > 0 && Shield < MaxShield)
-				{
-					if (Globals::bUseSiphon)
+					float MaxHealth = KillerPawn->GetMaxHealth();
+					float MaxShield = KillerPawn->GetMaxShield();
+
+					float RemainingSiphon = Globals::AmountOfHealthSiphon;
+
+					if (Health < MaxHealth)
 					{
-						KillerPlayerState->ApplySiphonEffect();
+						float HealthToGive = FMath::Min(RemainingSiphon, MaxHealth - Health);
+						KillerPawn->SetHealth(Health + HealthToGive);
+						RemainingSiphon -= HealthToGive;
 					}
 
-					float ShieldToGive = FMath::Min(RemainingSiphon, MaxShield - Shield);
-					KillerPawn->SetShield(Shield + ShieldToGive);
+					if (RemainingSiphon > 0 && Shield < MaxShield)
+					{
+						KillerPlayerState->ApplySiphonEffect();
+
+						float ShieldToGive = FMath::Min(RemainingSiphon, MaxShield - Shield);
+						KillerPawn->SetShield(Shield + ShieldToGive);
+					}
 				}
 			}
 		}

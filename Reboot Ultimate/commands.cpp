@@ -1388,11 +1388,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			auto& BackblingID = Arguments[1];
 
-			if (BackblingID.starts_with("BID_"))
-			{
-				BackblingID.replace(0, 4, "CP_Backpack_");
-			}
-
 			if (BackblingID == "blackknight")
 			{
 				BackblingID = "Male_Commando_BlackKnight";
@@ -1618,6 +1613,89 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 				SendMessageToConsole(PlayerController, L"Backbling set successfully!");
 			}
+		}
+		else if (Command == "hat" || Command == "sethat")
+		{
+			if (NumArgs < 1)
+			{
+				SendMessageToConsole(PlayerController, L"Please provide a backbling ID!");
+				return;
+			}
+
+			auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn());
+
+			if (!Pawn)
+			{
+				SendMessageToConsole(PlayerController, L"No pawn!");
+				return;
+			}
+
+			static auto CustomCharacterPartClass = FindObject<UClass>(L"/Script/FortniteGame.CustomCharacterPart");
+
+			auto& hatID = Arguments[1];
+
+			if (hatID == "rene")
+			{
+				hatID = "Hat_F_Commando_08_V01";
+			}
+			else if (hatID == "aerial")
+			{
+				hatID = "Hat_M_Commando_02_V1";
+			}
+			else if (hatID == "recon")
+			{
+				hatID = "Hat_F_Commando_06";
+			}
+			else if (hatID == "desperado")
+			{
+				hatID = "Hat_M_Commando_06";
+			}
+			else if (hatID == "survival")
+			{
+				hatID = "Hat_F_Commando_02_V1";
+			}
+			else if (hatID == "nog" || hatID == "nogops" || hatID == "christmas")
+			{
+				hatID = "F_Commando_ChristmasHat";
+			}
+			else if (hatID == "sash")
+			{
+				hatID = "Hat_M_Commando_17";
+			}
+			else if (hatID == "knight")
+			{
+				hatID = "Hat_F_Commando_11B";
+			}
+			else if (hatID == "blackknight")
+			{
+				hatID = "Hat_M_Commando_BlackKnight";
+			}
+			else if (hatID == "btl")
+			{
+				hatID = "Hat_F_Commando_03_V01";
+			}
+			else if (hatID == "none" || hatID == "empty")
+			{
+				hatID = "Empty_None";
+			}
+			else if (hatID == "none2" || hatID == "empty2")
+			{
+				hatID = "Empty_Hat";
+			}
+
+			std::string HatsPath = "/Game/Characters/CharacterParts/Hats/" + hatID + "." + hatID;
+
+			auto hatPart = LoadObject(HatsPath, CustomCharacterPartClass);
+
+			if (!hatPart)
+			{
+				SendMessageToConsole(PlayerController, L"Invalid hat ID!");
+				return;
+			}
+
+			Pawn->ServerChoosePart(EFortCustomPartType::Hat, hatPart);
+
+			SendMessageToConsole(PlayerController, L"Hat set successfully!");
 		}
 		else if (Command == "load")
 		{
@@ -2018,10 +2096,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "Athena_TowerGrenade";
 			}
-			else if (weaponName == "c4")
-			{
-				weaponName = "Athena_C4";
-			}
 			else if (weaponName == "firefly" || weaponName == "fireflies")
 			{
 				weaponName = "WID_Athena_Grenade_Molotov";
@@ -2219,6 +2293,41 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			Pawn->SetDBNO(!Pawn->IsDBNO());
 			SendMessageToConsole(PlayerController, std::wstring(L"DBNO set to " + std::to_wstring(!(bool)Pawn->IsDBNO())).c_str());
+		}
+		else if (Command == "revive" || Command == "res")
+		{
+			auto Pawn = ReceivingController->GetMyFortPawn();
+
+			if (!Pawn)
+			{
+				SendMessageToConsole(ReceivingController, L"No pawn!");
+				return;
+			}
+
+			auto PlayerState = Cast<AFortPlayerState>(PlayerController->GetPlayerState());
+
+			if (!PlayerState)
+			{
+				SendMessageToConsole(ReceivingController, L"No pawn!");
+				return;
+			}
+
+			if (Pawn->IsDBNO())
+			{
+				PlayerState->EndDBNOAbilities();
+
+				Pawn->SetDBNO(false);
+				Pawn->SetHasPlayedDying(false);
+
+				Pawn->SetHealth(30);
+
+				Pawn->OnRep_IsDBNO();
+
+				PlayerController->ClientOnPawnRevived(PlayerController);
+				PlayerController->RespawnPlayerAfterDeath(false);
+
+				// PlayerController->IsMarkedAlive() == true;
+			}
 		}
 		else if (Command == "logprocessevent")
 		{
@@ -4033,6 +4142,10 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			std::wstring Message = isPaused ? L"Time of day paused!\n" : L"Time of day resumed!\n";
 			SendMessageToConsole(PlayerController, Message.c_str());
 		}
+		else if (Command == "destroyallplayerbuilds" || Command == "destroybuilds")
+		{
+			bShouldDestroyAllPlayerBuilds = true;
+		}
 		else if (Command == "sethealth" || Command == "health")
 		{
 			auto Pawn = ReceivingController->GetMyFortPawn();
@@ -5398,6 +5511,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 - cheat bot {#} - Spawns a bot at the player (experimental).
 - cheat buildfree - Toggles Infinite Materials.
 - cheat damagetarget {#} - Damages the Actor in front of you by the specified amount.
+- cheat dbno - Puts the receiving controller in a fake down-but-not-out (knocked) state.
 - cheat demospeed - Speeds up/slows down the speed of the game.
 - cheat destroy - Destroys the actor that the player is looking at.
 - cheat destroyall {ClassPathName} - Destroys every actor of a given class. Useful for removing all floorloot for example.
@@ -5411,6 +5525,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 - cheat givenames - Sends a message to the console of all of the names that work with the "cheat give" command.
 - cheat godall - Gods all players.
 - cheat gravity {#} - Applies a gravity *multiplier* to the player. (0.5 for low gravity, 2 for high gravity, etc.)
+- cheat hat {CharacterPart ID} - Sets a characters hat.
 - cheat health {#} - Sets executing player's health.
 - cheat healthall - Heals all players health.
 - cheat infammo - Toggles Infinite Ammo.
@@ -5429,6 +5544,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 - cheat regen - Regenerates the players health and shield to their max.
 - cheat regenall - Heals all players health and shield.
 - cheat restart - Restarts the game. (Chapter 1 & Host ONLY)
+- cheat revive - Revives the receiving player if they are knocked.
 - cheat rift - Rifts the player into the air.
 - cheat savewaypoint {phrase/number} - Gets the location of where you are standing and saves it as a waypoint.
 - cheat settimeofday {1-23} - Changes the time of day in game to a 24H time period.

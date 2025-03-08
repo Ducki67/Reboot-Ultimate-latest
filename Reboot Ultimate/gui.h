@@ -712,7 +712,7 @@ static inline void StaticUI()
 
 	ImGui::Checkbox("Toggle Siphon on Kill", &Globals::bUseSiphon);
 
-	if (!bStartedBus || !Chapter2 && !Globals::bLateGame.load())
+	if (!bStartedBus || !Chapter2 && !Globals::bLateGame)
 	{
 		ImGui::Checkbox("Auto Bus Start", &Globals::bAutoBusStart);
 	}
@@ -1282,8 +1282,6 @@ static inline void MainUI()
 {
 	bool bLoaded = true;
 
-	bool Chapter2 = Engine_Version >= 422 && Fortnite_Version <= 18.40;
-
 	if (PlayerTab == -1)
 	{
 		MainTabs();
@@ -1363,7 +1361,7 @@ static inline void MainUI()
 
 				if (!bStartedBus)
 				{
-					if (Globals::bLateGame.load() && Chapter2)
+					if (Globals::bLateGame.load() && Engine_Version >= 424)
 					{
 						if (ImGui::Button("Start Bus"))
 						{
@@ -2518,6 +2516,13 @@ static inline void MainUI()
 				{
 					LOG_ERROR(LogDev, "Failed to delete lootpool.json. File may not exist.");
 				}
+			}
+
+			ImGui::NewLine();
+
+			if (ImGui::Button("Destroy All Player Builds"))
+			{
+				bShouldDestroyAllPlayerBuilds = true;
 			}
 		}
 	}
