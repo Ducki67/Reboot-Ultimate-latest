@@ -1431,10 +1431,15 @@ void DBNOToggleOnWin()
 		if (!ClientConnection) 
 			continue;
 
-		auto PlayerController = Cast<AFortPlayerController>(ClientConnection->GetPlayerController());
+		auto PlayerController = Cast<AFortPlayerControllerAthena>(ClientConnection->GetPlayerController());
 
 		if (!PlayerController) 
 			continue;
+
+		auto PlayerState = Cast<AFortPlayerState>(PlayerController->GetPlayerState());
+
+		if (!PlayerState)
+			return;
 
 		auto Pawn = PlayerController->GetMyFortPawn();
 
@@ -1443,9 +1448,19 @@ void DBNOToggleOnWin()
 
 		if (Pawn->IsDBNO())
 		{
+			PlayerState->EndDBNOAbilities();
+
 			Pawn->SetDBNO(false);
+			Pawn->SetHasPlayedDying(false);
 
 			Pawn->SetHealth(30);
+
+			Pawn->OnRep_IsDBNO();
+
+			PlayerController->ClientOnPawnRevived(PlayerController);
+			PlayerController->RespawnPlayerAfterDeath(false);
+
+			// PlayerController->IsMarkedAlive() == true;
 		}
 	}
 }
@@ -1464,8 +1479,6 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 		return ClientOnPawnDiedOriginal(PlayerController, DeathReport);
 
 	auto DeathLocation = DeadPawn->GetActorLocation();
-
-	// std::thread victory(DBNOToggleOnWin);
 
 	static auto FallDamageEnumValue = 1;
 
@@ -1630,23 +1643,6 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 						GameState->OnRep_WinningTeam();
 						GameMode->EndMatch();
 						return;
-					}
-
-					std::unordered_set<int> RemainingTeams;
-
-					for (int i = 0; i < GameMode->GetAlivePlayers().Num(); i++)
-					{
-						auto PlayerState = Cast<AFortPlayerStateAthena>(GameMode->GetAlivePlayers()[i]->GetPlayerState());
-
-						if (PlayerState)
-						{
-							RemainingTeams.insert(PlayerState->GetTeamIndex());
-						}
-					}
-
-					if (RemainingTeams.size() == 1)
-					{
-						GameMode->EndMatch();
 					}
 				}
 			});
