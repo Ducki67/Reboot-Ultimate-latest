@@ -936,7 +936,7 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 		Sleep(1000);
 	}
 
-	float MaxTickRate = 30;
+	float MaxTickRate = 5;
 
 	auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
 	auto GameState = Cast<AFortGameStateAthena>(GameMode->GetGameState());
@@ -1273,7 +1273,7 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 	}
 
 	static auto SafeZonesStartTimeOffset = GameState->GetOffset("SafeZonesStartTime");
-	GameState->Get<float>(SafeZonesStartTimeOffset) = 0.001f;
+	GameState->Get<float>(SafeZonesStartTimeOffset) = 0.05f;
 
 	return 0;
 }

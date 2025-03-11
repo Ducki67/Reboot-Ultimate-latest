@@ -3436,10 +3436,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 					if (Arguments.size() >= 6)
 						Count = std::stoi(Arguments[5]);
 				}
-				else if (ActorName == "ufo")
-				{
-					Loc.Z += 1000;
-				}
 				else
 				{
 					Loc.Z += 250;
@@ -3473,7 +3469,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				Count = Max;
 			}
 
-			if (ActorName == "driftboard")
+			if (ActorName == "driftboard" || ActorName == "hoverboard")
 			{
 				ActorName = "/Game/Athena/DrivableVehicles/JackalVehicle_Athena.JackalVehicle_Athena_C";
 			}
@@ -3481,7 +3477,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				ActorName = "/Game/Athena/DrivableVehicles/SurfboardVehicle_Athena.SurfboardVehicle_Athena_C";
 			}
-			else if (ActorName == "quadcrasher")
+			else if (ActorName == "quadcrasher" || ActorName == "quad")
 			{
 				ActorName = "/Game/Athena/DrivableVehicles/AntelopeVehicle.AntelopeVehicle_C";
 			}
@@ -3644,6 +3640,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 					{
 						NewActor->ForceNetUpdate();
 						AmountSpawned++;
+						SendMessageToConsole(PlayerController, L"Spawned!");
 					}
 				}
 			}

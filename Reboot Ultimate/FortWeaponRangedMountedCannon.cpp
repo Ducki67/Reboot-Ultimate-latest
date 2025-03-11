@@ -30,32 +30,21 @@ bool AFortWeaponRangedMountedCannon::FireActorInCannon(FVector LaunchDir, bool b
     {
         auto MountedCannon = Cast<AFortMountedCannon>(Vehicle);
 
-        LOG_INFO(LogDev, "MountedCannon: {}", __int64(MountedCannon));
-
-        if (MountedCannon)
-        {
-            if (bIsServer 
-                && this->HasAuthority()
-                // theres another Pawn check with their vehicle here, not sure what it is.
-                )
-            {
-                MountedCannon->ShootPawnOut();
-            }
-        }
-
-        return false;
+        if (!MountedCannon)
+            return false;
     }
 
-    if (!Vehicle->GetPawnAtSeat(1))
-        return false;
+    auto SeatIndex = Pawn->GetVehicleSeatIndex();
+    LOG_INFO(LogDev, "SeatIndex: {}", SeatIndex);
 
-    if (bIsServer)
+    if (SeatIndex == 1)
     {
-        if (this->HasAuthority())
-            PushCannon->ShootPawnOut(LaunchDir);
+        LOG_INFO(LogDev, "Player is in cannon seat, launching pawn instead of firing weapon.");
+        PushCannon->ShootPawnOut(LaunchDir);
+        return false;
     }
 
-    return true;
+    return FireActorInCannon(LaunchDir, bIsServer);
 }
 
 void AFortWeaponRangedMountedCannon::ServerFireActorInCannonHook(AFortWeaponRangedMountedCannon* Cannon, FVector LaunchDir)
