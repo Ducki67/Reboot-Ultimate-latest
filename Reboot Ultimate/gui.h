@@ -30,6 +30,7 @@
 #include <iostream>
 #include <shlobj.h>
 #include <urlmon.h>
+#include <curl/curl.h>
 
 #include "objectviewer.h"
 #include "FortAthenaMutator_Disco.h"
@@ -147,9 +148,12 @@ static inline void ResetDevice();
 static inline LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 static inline std::string CurrentVersion = "1.0.0"; // change with each update
-static inline std::string VersionURL = "https://raw.githubusercontent.com/Ralzify/Reboot-Ultimate/main/version.txt";
 static inline std::string DllDownloadURL = "https://github.com/Ralzify/Reboot-Ultimate/releases/latest/download/Reboot.Ultimate.dll";
+static inline std::string GitHubVersionURL = "https://api.github.com/repos/Ralzify/Reboot-Ultimate/contents/version.txt";
 static inline std::string DllFilePath = "C:\\Users\\Public\\Downloads\\Reboot.Ultimate.dll";
+
+static inline std::string GitHubUsername = "Ralzify";
+static inline std::string GitHubToken = "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";
 
 inline FString* GetRequestURL(UObject* Connection)
 {
@@ -301,38 +305,35 @@ static inline T RandomizeItems(std::vector<T>& Vector)
 	return Vector[RandomIndex];
 }
 
-static std::string GetLatestVersion()
-{
-	HINTERNET hInternet = InternetOpenA("VersionCheck", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
-	if (!hInternet) return "";
-
-	HINTERNET hConnect = InternetOpenUrlA(hInternet, VersionURL.c_str(), NULL, 0, INTERNET_FLAG_RELOAD, 0);
-	if (!hConnect)
-	{
-		InternetCloseHandle(hInternet);
-		return "";
-	}
-
-	char buffer[64];
-	DWORD bytesRead;
-	std::string latestVersion;
-
-	if (InternetReadFile(hConnect, buffer, sizeof(buffer) - 1, &bytesRead) && bytesRead > 0)
-	{
-		buffer[bytesRead] = '\0';
-		latestVersion = buffer;
-	}
-
-	InternetCloseHandle(hConnect);
-	InternetCloseHandle(hInternet);
-
-	return latestVersion;
+static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* output) {
+	size_t totalSize = size * nmemb;
+	output->append((char*)contents, totalSize);
+	return totalSize;
 }
 
-static bool DownloadLatestDLL()
-{
-	HRESULT hr = URLDownloadToFileA(NULL, DllDownloadURL.c_str(), DllFilePath.c_str(), 0, NULL);
-	return SUCCEEDED(hr);
+static std::string GetLatestVersion() {
+	CURL* curl = curl_easy_init();
+	std::string readBuffer;
+	if (curl) {
+		struct curl_slist* headers = NULL;
+		headers = curl_slist_append(headers, ("Authorization: token " + GitHubToken).c_str());
+
+		curl_easy_setopt(curl, CURLOPT_URL, GitHubVersionURL.c_str());
+		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+		curl_easy_perform(curl);
+		curl_easy_cleanup(curl);
+	}
+
+	auto versionPos = readBuffer.find("\"content\":");
+	if (versionPos != std::string::npos) {
+		std::string versionData = readBuffer.substr(versionPos + 11);
+		versionData = versionData.substr(0, versionData.find("\""));
+		return versionData;
+	}
+
+	return "";
 }
 
 static std::vector Tertiaries = {
@@ -1463,21 +1464,16 @@ static inline void MainUI()
 				ImGui::NewLine();
 
 				std::string latestVersion = GetLatestVersion();
+				latestVersion.erase(std::remove_if(latestVersion.begin(), latestVersion.end(), ::isspace), latestVersion.end()); // Trim spaces
 
 				if (!latestVersion.empty() && latestVersion != CurrentVersion)
 				{
 					ImGui::TextColored(ImVec4(1, 0, 0, 1), "New Version Available: %s", latestVersion.c_str());
 
-					if (ImGui::Button("Download Update"))
+					if (ImGui::Button("Download Update")) 
 					{
-						if (DownloadLatestDLL())
-						{
-							ImGui::Text("Update downloaded successfully! Restart required.");
-						}
-						else
-						{
-							ImGui::Text("Failed to download update.");
-						}
+						std::string command = "start " + DllDownloadURL;
+						system(command.c_str());
 					}
 				}
 				else
