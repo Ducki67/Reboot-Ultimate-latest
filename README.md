@@ -27,7 +27,7 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 - [x] Toggle Victory Crown Slomo on S19
 - [x] Added more indicators (Started, Ended, Gamemode, Players)
 - [x] Many tabs now show a status message when you interact with buttons.
-- [x] V-Bucks on Kill & Win are now a toggleable option in the Pregame UI, as well as customization for Backend IP, Port, and Name.
+- [x] Version Checker: Checks if you are using the latest version of Ultimate, and will prompt you to update if you aren't.
 - [x] This DLL is currently locked behind a selected amount of IPs. Only specific people can host with it, however anyone can play.
 
 ## Commands (compared to old reboot ultimate):
