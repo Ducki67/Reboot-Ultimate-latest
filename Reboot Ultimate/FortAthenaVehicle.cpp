@@ -48,6 +48,7 @@ UFortWeaponItemDefinition* AFortAthenaVehicle::GetVehicleWeaponForSeat(int SeatI
 		static auto TurretWeaponItemDefinition = FindObject<UFortWeaponItemDefinition>(L"/Game/Athena/Items/Traps/MountedTurret/MountedTurret_Weapon.MountedTurret_Weapon");
 		static auto OstrichShotgunWeaponItemDefinition = FindObject<UFortWeaponItemDefinition>(L"/Game/Athena/Items/Weapons/Vehicles/WID_OstrichShotgunTest2.WID_OstrichShotgunTest2");
 		static auto NevadaWeaponItemDefinition = FindObject<UFortWeaponItemDefinition>(L"/Nevada/Weapons/TractorBeam/WID_Nevada_TractorBeam_Weapon.WID_Nevada_TractorBeam_Weapon");
+		static auto MeatballItemDefinition = FindObject<UFortWeaponItemDefinition>(L"/Game/Athena/Items/Weapons/Vehicles/MeatballWeapon/Meatball_Weapon.Meatball_Weapon");
 
 		auto ReceivingActorName = this->GetName();
 

@@ -3,6 +3,8 @@
 // TODO: Update ImGUI
 
 #pragma comment(lib, "d3d9.lib")
+#pragma comment(lib, "wininet.lib")
+#pragma comment(lib, "urlmon.lib")
 
 #include <Windows.h>
 #include <dxgi.h>
@@ -23,7 +25,11 @@
 #include <olectl.h>
 #include <json.hpp>
 #include <windows.h> 
+#include <wininet.h>
 #include <Shellapi.h>
+#include <iostream>
+#include <shlobj.h>
+#include <urlmon.h>
 
 #include "objectviewer.h"
 #include "FortAthenaMutator_Disco.h"
@@ -139,6 +145,11 @@ static inline bool CreateDeviceD3D(HWND hWnd);
 static inline void CleanupDeviceD3D();
 static inline void ResetDevice();
 static inline LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+static inline std::string CurrentVersion = "1.0.0"; // change with each update
+static inline std::string VersionURL = "https://raw.githubusercontent.com/Ralzify/Reboot-Ultimate/main/version.txt";
+static inline std::string DllDownloadURL = "https://github.com/Ralzify/Reboot-Ultimate/releases/latest/download/Reboot.Ultimate.dll";
+static inline std::string DllFilePath = "C:\\Users\\Public\\Downloads\\Reboot.Ultimate.dll";
 
 inline FString* GetRequestURL(UObject* Connection)
 {
@@ -288,6 +299,40 @@ static inline T RandomizeItems(std::vector<T>& Vector)
 	int RandomIndex = std::rand() % Vector.size();
 	// LOG_INFO(LogDev, "RandomIndex: {}", __int64(RandomIndex));
 	return Vector[RandomIndex];
+}
+
+static std::string GetLatestVersion()
+{
+	HINTERNET hInternet = InternetOpenA("VersionCheck", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
+	if (!hInternet) return "";
+
+	HINTERNET hConnect = InternetOpenUrlA(hInternet, VersionURL.c_str(), NULL, 0, INTERNET_FLAG_RELOAD, 0);
+	if (!hConnect)
+	{
+		InternetCloseHandle(hInternet);
+		return "";
+	}
+
+	char buffer[64];
+	DWORD bytesRead;
+	std::string latestVersion;
+
+	if (InternetReadFile(hConnect, buffer, sizeof(buffer) - 1, &bytesRead) && bytesRead > 0)
+	{
+		buffer[bytesRead] = '\0';
+		latestVersion = buffer;
+	}
+
+	InternetCloseHandle(hConnect);
+	InternetCloseHandle(hInternet);
+
+	return latestVersion;
+}
+
+static bool DownloadLatestDLL()
+{
+	HRESULT hr = URLDownloadToFileA(NULL, DllDownloadURL.c_str(), DllFilePath.c_str(), 0, NULL);
+	return SUCCEEDED(hr);
 }
 
 static std::vector Tertiaries = {
@@ -1413,6 +1458,31 @@ static inline void MainUI()
 							}
 						}
 					}
+				}
+
+				ImGui::NewLine();
+
+				std::string latestVersion = GetLatestVersion();
+
+				if (!latestVersion.empty() && latestVersion != CurrentVersion)
+				{
+					ImGui::TextColored(ImVec4(1, 0, 0, 1), "New Version Available: %s", latestVersion.c_str());
+
+					if (ImGui::Button("Download Update"))
+					{
+						if (DownloadLatestDLL())
+						{
+							ImGui::Text("Update downloaded successfully! Restart required.");
+						}
+						else
+						{
+							ImGui::Text("Failed to download update.");
+						}
+					}
+				}
+				else
+				{
+					ImGui::TextColored(ImVec4(0, 1, 0, 1), "You are running the latest version.");
 				}
 			}
 		}
