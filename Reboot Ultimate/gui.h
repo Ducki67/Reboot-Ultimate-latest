@@ -314,11 +314,12 @@ static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::stri
 static std::string GetLatestVersion() {
 	CURL* curl = curl_easy_init();
 	std::string readBuffer;
+
 	if (curl) {
 		struct curl_slist* headers = NULL;
 		headers = curl_slist_append(headers, ("Authorization: token " + GitHubToken).c_str());
 
-		curl_easy_setopt(curl, CURLOPT_URL, GitHubVersionURL.c_str());
+		curl_easy_setopt(curl, CURLOPT_URL, "https://raw.githubusercontent.com/Ralzify/Reboot-Ultimate/main/version.json");
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
@@ -326,14 +327,40 @@ static std::string GetLatestVersion() {
 		curl_easy_cleanup(curl);
 	}
 
-	auto versionPos = readBuffer.find("\"content\":");
-	if (versionPos != std::string::npos) {
-		std::string versionData = readBuffer.substr(versionPos + 11);
-		versionData = versionData.substr(0, versionData.find("\""));
-		return versionData;
+	try {
+		json jsonData = json::parse(readBuffer);
+		return jsonData["version"].get<std::string>();  // Extract version
+	}
+	catch (std::exception& e) {
+		std::cerr << "JSON Parsing Error: " << e.what() << std::endl;
+		return "";
+	}
+}
+
+static std::string GetDownloadURL() {
+	CURL* curl = curl_easy_init();
+	std::string readBuffer;
+
+	if (curl) {
+		struct curl_slist* headers = NULL;
+		headers = curl_slist_append(headers, ("Authorization: token " + GitHubToken).c_str());
+
+		curl_easy_setopt(curl, CURLOPT_URL, "https://raw.githubusercontent.com/Ralzify/Reboot-Ultimate/main/version.json");
+		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+		curl_easy_perform(curl);
+		curl_easy_cleanup(curl);
 	}
 
-	return "";
+	try {
+		json jsonData = json::parse(readBuffer);
+		return jsonData["download_url"].get<std::string>();
+	}
+	catch (std::exception& e) {
+		std::cerr << "JSON Parsing Error: " << e.what() << std::endl;
+		return "";
+	}
 }
 
 static std::vector Tertiaries = {
@@ -1464,19 +1491,19 @@ static inline void MainUI()
 				ImGui::NewLine();
 
 				std::string latestVersion = GetLatestVersion();
-				latestVersion.erase(std::remove_if(latestVersion.begin(), latestVersion.end(), ::isspace), latestVersion.end()); // Trim spaces
+				std::string downloadURL = GetDownloadURL();
 
-				if (!latestVersion.empty() && latestVersion != CurrentVersion)
+				if (!latestVersion.empty() && latestVersion != CurrentVersion) 
 				{
 					ImGui::TextColored(ImVec4(1, 0, 0, 1), "New Version Available: %s", latestVersion.c_str());
 
 					if (ImGui::Button("Download Update")) 
 					{
-						std::string command = "start " + DllDownloadURL;
+						std::string command = "start " + downloadURL;
 						system(command.c_str());
 					}
 				}
-				else
+				else 
 				{
 					ImGui::TextColored(ImVec4(0, 1, 0, 1), "You are running the latest version.");
 				}
