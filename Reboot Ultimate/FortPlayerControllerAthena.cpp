@@ -493,7 +493,7 @@ void AFortPlayerControllerAthena::ServerClientIsReadyToRespawn(AFortPlayerContro
 				return;
 			}
 
-			PlayerPawn->Owner = PlayerControllerAthena;
+			PlayerPawn->SetOwner(PlayerControllerAthena);
 			PlayerPawn->OnRep_Owner();
 
 			PlayerControllerAthena->Pawn = PlayerPawn;
@@ -505,6 +505,7 @@ void AFortPlayerControllerAthena::ServerClientIsReadyToRespawn(AFortPlayerContro
 			// PlayerPawn->SetMaxShield(100);
 			PlayerPawn->SetShield(100);
 
+			PlayerControllerAthena->RespawnPlayerAfterDeath(true);
 			PlayerControllerAthena->SetControlRotation(RespawnRotation);
 
 			RespawnData->IsClientReady() = true;

@@ -4253,6 +4253,23 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			CheatManager->Teleport();
 			CheatManager = nullptr;
 			SendMessageToConsole(PlayerController, L"Teleported!");
+
+			auto Pawn = ReceivingController->GetMyFortPawn();
+
+			if (!Pawn)
+			{
+				SendMessageToConsole(PlayerController, L"No pawn to get location from!");
+				return;
+			}
+
+			auto PawnLocation = Pawn->GetActorLocation();
+
+			if (PawnLocation.X == 0.0f && PawnLocation.Y == 0.0f && PawnLocation.Z == 0.0f)
+			{
+				FVector FailsafeLocation = FVector(0.0f, 0.0f, 10000.0f);
+				Pawn->TeleportTo(FailsafeLocation, Pawn->GetActorRotation());
+				SendMessageToConsole(PlayerController, L"Failsafe triggered: Teleported to (0, 0, 10000) due to invalid (0, 0, 0) location.");
+			}
 		}
 		else if (Command == "savewaypoint" || Command == "s")
 		{
@@ -4271,6 +4288,13 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			}
 
 			auto PawnLocation = Pawn->GetActorLocation();
+
+			if (PawnLocation.X == 0.0f && PawnLocation.Y == 0.0f && PawnLocation.Z == 0.0f)
+			{
+				SendMessageToConsole(PlayerController, L"Cannot save a waypoint at (0, 0, 0)!");
+				return;
+			}
+
 			std::string Phrase = Arguments[1];
 
 			if (Waypoints.find(Phrase) != Waypoints.end())
@@ -4344,6 +4368,12 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else
 			{
 				FVector Destination = Waypoints[Phrase].back();
+
+				if (Destination.X == 0.0f && Destination.Y == 0.0f && Destination.Z == 0.0f)
+				{
+					SendMessageToConsole(PlayerController, L"Waypoint is invalid (0, 0, 0)! Aborting teleport.");
+					return;
+				}
 
 				auto Pawn = ReceivingController->GetMyFortPawn();
 
@@ -4778,6 +4808,17 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			ExecutingPawn->TeleportTo(TargetLocation, ExecutingPawn->GetActorRotation());
 
 			SendMessageToConsole(PlayerController, L"Teleported successfully!");
+
+			auto Pawn = ReceivingController->GetMyFortPawn();
+
+			auto PawnLocation = Pawn->GetActorLocation();
+
+			if (PawnLocation.X == 0.0f && PawnLocation.Y == 0.0f && PawnLocation.Z == 0.0f)
+			{
+				FVector FailsafeLocation = FVector(0.0f, 0.0f, 10000.0f);
+				Pawn->TeleportTo(FailsafeLocation, Pawn->GetActorRotation());
+				SendMessageToConsole(PlayerController, L"Failsafe triggered: Teleported to (0, 0, 10000) due to invalid (0, 0, 0) location.");
+			}
 		}
 		else if (Command == "bugitgo" || Command == "b")
 		{
@@ -4826,6 +4867,17 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 				Pawn->ProcessEvent(LaunchCharacterFn, &ACharacter_LaunchCharacter_Params);
 			}
+
+			auto Pawn = ReceivingController->GetMyFortPawn();
+
+			auto PawnLocation = Pawn->GetActorLocation();
+
+			if (PawnLocation.X == 0.0f && PawnLocation.Y == 0.0f && PawnLocation.Z == 0.0f)
+			{
+				FVector FailsafeLocation = FVector(0.0f, 0.0f, 10000.0f);
+				Pawn->TeleportTo(FailsafeLocation, Pawn->GetActorRotation());
+				SendMessageToConsole(PlayerController, L"Failsafe triggered: Teleported to (0, 0, 10000) due to invalid (0, 0, 0) location.");
+			}
 		}
 		else if (Command == "enablebugitgo")
 		{
@@ -4839,45 +4891,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				SendMessageToConsole(PlayerController, L"cheat bugitgo has been re-enabled!");
 			}
 		}
-		/*else if (Command == "tpto")
-		{
-			if (Arguments.size() < 2)
-			{
-				SendMessageToConsole(PlayerController, L"Please specify a player's name using \\PlayerName\\.");
-				return;
-			}
-
-			FString TargetPlayerName = FString(Arguments[1]); // E0289
-
-			APlayerController* TargetController = FindPlayerControllerByName(TargetPlayerName); // E0020
-
-			if (!TargetController)
-			{
-				SendMessageToConsole(PlayerController, L"Player not found!");
-				return;
-			}
-
-			auto TargetPawn = TargetController->GetPawn(); // E0135
-
-			if (!TargetPawn)
-			{
-				SendMessageToConsole(PlayerController, L"Target player does not have a valid pawn.");
-				return;
-			}
-
-			FVector TargetLocation = TargetPawn->GetActorLocation();
-
-			auto ExecutingPawn = Cast<APawn>(ReceivingController->GetPawn());
-
-			if (!ExecutingPawn)
-			{
-				SendMessageToConsole(PlayerController, L"You do not have a valid pawn to teleport.");
-				return;
-			}
-
-			ExecutingPawn->TeleportTo(TargetLocation, ExecutingPawn->GetActorRotation());
-			SendMessageToConsole(PlayerController, L"Teleported to Player!");
-		}*/
 		else if (Command == "healthall")
 		{
 			for (int i = 0; i < ClientConnections.Num(); i++)

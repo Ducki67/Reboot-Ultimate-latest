@@ -14,7 +14,6 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 - [x] Added Swag Lines to S16+
 - [x] Customizable Lategame Loadouts (also now for one shot)
 - [x] Fixed Boat Rockets/Some Vehicle Weapons on S9+
-- [x] Fixed Respawning on 12.41+
 - [x] Fixed Attached Actor Chest Loot
 - [x] Fixed Reviving on Win
 
@@ -60,7 +59,7 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 
 - [Milxnor](https://github.com/Milxnor): Original Creator of Project Reboot 3.0
 - [Max](https://github.com/max8447): Originally made at least 80% of the original Reboot Ultimate. A lot of this code is his.
-- [Heliato](https://github.com/Heliato): Helped fix Traps on 19.10, Win Lines/Swags on 16+, and Respawning on 16+.
+- [Heliato](https://github.com/Heliato): Helped fix Traps on 19.10, and Win Lines/Swags on 16+.
 
 ## To Do List:
 

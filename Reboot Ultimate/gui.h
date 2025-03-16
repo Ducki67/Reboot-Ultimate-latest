@@ -147,10 +147,10 @@ static inline void CleanupDeviceD3D();
 static inline void ResetDevice();
 static inline LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-static inline std::string CurrentVersion = "1.0.0"; // change with each update
+static inline std::string CurrentVersion = "1.0.1"; // change with each update
 static inline std::string DllDownloadURL = "https://github.com/Ralzify/Reboot-Ultimate/releases/latest/download/Reboot.Ultimate.dll";
 static inline std::string GitHubVersionURL = "https://api.github.com/repos/Ralzify/Reboot-Ultimate/contents/version.txt";
-static inline std::string DllFilePath = "C:\\Users\\Public\\Downloads\\Reboot.Ultimate.dll";
+static inline std::string DllFilePath = "C:\\Users\\Public\\Downloads\\Reboot_Ultimate.dll";
 
 static inline std::string GitHubUsername = "Ralzify";
 static inline std::string GitHubToken = "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";
@@ -1265,7 +1265,7 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 			WorldInventory->AddItem(STWLight, nullptr, (std::rand() % 999) + 186);
 			WorldInventory->AddItem(STWShells, nullptr, (std::rand() % 999) + 186);
 			WorldInventory->AddItem(Arrows, nullptr, (std::rand() % 30) + 12);
-			WorldInventory->AddItem(ReconAmmo, nullptr, 999);
+			// WorldInventory->AddItem(ReconAmmo, nullptr, 999);
 			WorldInventory->AddItem(OSTraps, nullptr, (std::rand() % 5) + 2);
 
 			WorldInventory->Update();
@@ -1505,7 +1505,7 @@ static inline void MainUI()
 				}
 				else 
 				{
-					ImGui::TextColored(ImVec4(0, 1, 0, 1), "You are running the latest version.");
+					ImGui::TextColored(ImVec4(0, 1, 0, 1), "You are running the latest version. (%s)", latestVersion.c_str());
 				}
 			}
 		}

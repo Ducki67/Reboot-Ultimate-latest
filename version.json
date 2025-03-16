@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0",
-    "download_url": "https://github.com/Ralzify/Reboot-Ultimate/releases/latest/download/Reboot.Ultimate.dll",
-    "changelog": "Release"
+    "version": "1.0.1",
+    "download_url": "https://github.com/Ralzify/Reboot-Ultimate/releases/latest/download/Reboot_Ultimate.dll",
+    "changelog": "Added failsafe to telporting commands."
 }
