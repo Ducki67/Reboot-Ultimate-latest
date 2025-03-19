@@ -1,6 +1,6 @@
 #pragma once
 
-#include "log.h"
+#include "LogManager.h"
 #include "UnrealNames.h"
 
 struct FNameEntryId

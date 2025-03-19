@@ -18,6 +18,7 @@
 #include "FortPlaysetItemDefinition.h"
 #include "FortGameModeAthena.h"
 #include "UObjectArray.h"
+#include "LogManager.h"
 
 void Addresses::SetupVersion()
 {
@@ -403,7 +404,7 @@ void Addresses::Print()
 	LOG_INFO(LogDev, "ApplyCharacterCustomization: 0x{:x}", ApplyCharacterCustomization - Base);
 	LOG_INFO(LogDev, "EnterAircraft: 0x{:x}", EnterAircraft - Base);
 	LOG_INFO(LogDev, "SetTimer: 0x{:x}", SetTimer - Base);
-	PRINT_CRITICAL_OFFSET(PickupInitialize);
+	// PRINT_CRITICAL_OFFSET(PickupInitialize);
 	LOG_INFO(LogDev, "FreeEntry: 0x{:x}", FreeEntry - Base);
 	LOG_INFO(LogDev, "FreeArrayOfEntries: 0x{:x}", FreeArrayOfEntries - Base);
 	LOG_INFO(LogDev, "UpdateTrackedAttributesLea: 0x{:x}", UpdateTrackedAttributesLea - Base);

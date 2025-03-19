@@ -49,8 +49,8 @@
     #include <source_location>
     #include <DbgHelp.h>
     #pragma comment(lib, "Dbghelp.lib")
-#include "../Reboot Ultimate/log.h"
-#include "../Reboot Ultimate/inc.h"
+    #include "../Reboot Ultimate/LogManager.h"
+    #include "../Reboot Ultimate/inc.h"
 
 
     #define MemcuryAssert(cond)                                              \

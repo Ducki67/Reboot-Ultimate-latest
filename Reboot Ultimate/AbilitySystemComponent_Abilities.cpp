@@ -4,6 +4,7 @@
 #include "FortPawn.h"
 #include "FortPlayerController.h"
 #include "FortPlayerStateAthena.h"
+#include <functional>
 
 void LoopSpecs(UAbilitySystemComponent* AbilitySystemComponent, std::function<void(FGameplayAbilitySpec*)> func)
 {

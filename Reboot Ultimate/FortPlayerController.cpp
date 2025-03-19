@@ -357,10 +357,10 @@ void AFortPlayerController::ServerExecuteInventoryItemHook(AFortPlayerController
 		{
 			LOG_INFO(LogDev, "Unequipping current trap.");
 
-			LOG_INFO(LogDev, "Pawn->GetCurrentWeapon()->GetItemEntryGuid(): {}", Pawn->GetCurrentWeapon()->GetItemEntryGuid().ToString());
-			LOG_INFO(LogDev, "ItemGuid: {}", ItemGuid.ToString());
-			LOG_INFO(LogDev, "ItemDefinition: {}", ItemDefinition->GetFullName());
-			LOG_INFO(LogDev, "ItemInstance->GetItemEntry()->GetItemGuid(): {}", ItemInstance->GetItemEntry()->GetItemGuid().ToString());
+			// LOG_INFO(LogDev, "Pawn->GetCurrentWeapon()->GetItemEntryGuid(): {}", Pawn->GetCurrentWeapon()->GetItemEntryGuid().ToString());
+			// LOG_INFO(LogDev, "ItemGuid: {}", ItemGuid.ToString());
+			// LOG_INFO(LogDev, "ItemDefinition: {}", ItemDefinition->GetFullName());
+			// LOG_INFO(LogDev, "ItemInstance->GetItemEntry()->GetItemGuid(): {}", ItemInstance->GetItemEntry()->GetItemGuid().ToString());
 
 			Pawn->GetCurrentWeapon()->GetItemEntryGuid() = ItemGuid;
 			Pawn->EquipWeaponDefinition((UFortWeaponItemDefinition*)ItemDefinition, ItemInstance->GetItemEntry()->GetItemGuid());
@@ -374,7 +374,7 @@ void AFortPlayerController::ServerExecuteInventoryItemHook(AFortPlayerController
 				LOG_ERROR(LogDev, "Failed to equip: ItemDefinition is not a weapon!");
 			}
 
-			LOG_INFO(LogDev, "Pawn->GetCurrentWeapon()->GetItemEntryGuid(): {}", Pawn->GetCurrentWeapon()->GetItemEntryGuid().ToString());
+			// LOG_INFO(LogDev, "Pawn->GetCurrentWeapon()->GetItemEntryGuid(): {}", Pawn->GetCurrentWeapon()->GetItemEntryGuid().ToString());
 			LOG_INFO(LogDev, "Pawn->GetCurrentWeapon()->GetFullName(): {}", Pawn->GetCurrentWeapon()->GetFullName());
 		}
 	}

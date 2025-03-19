@@ -15,6 +15,7 @@
 #include <map>
 #include <string>
 #include <algorithm>
+#include "FortBackpackItemDefinition.h"
 
 std::map<std::string, std::vector<FVector>> Waypoints;
 
@@ -1388,104 +1389,61 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			auto& BackblingID = Arguments[1];
 
-			if (BackblingID == "blackknight")
+			if (BackblingID.contains("CP_Backpack_"))
 			{
-				BackblingID = "Male_Commando_BlackKnight";
-			}
-			else if (BackblingID == "cuddle")
-			{
-				BackblingID = "Female_Commando_BR039";
-			}
-			else if (BackblingID == "brite")
-			{
-				BackblingID = "CP_Backpack_Brite";
-			}
-			else if (BackblingID == "tp1")
-			{
-				BackblingID = "CP_Backpack_RetroGrey";
-			}
-			else if (BackblingID == "guitar")
-			{
-				BackblingID = "Female_Commando_Guitar";
-			}
-			else if (BackblingID == "crested")
-			{
-				BackblingID = "CP_Backpack_CuChulainn";
-			}
-			else if (BackblingID == "ventura")
-			{
-				BackblingID = "CP_Backpack_DecoFemale";
-			}
-			else if (BackblingID == "viking")
-			{
-				BackblingID = "CP_Backpack_VikingMale";
-			}
-			else if (BackblingID == "shark")
-			{
-				BackblingID = "CP_Backpack_Shark";
-			}
-			else if (BackblingID == "galaxy" || BackblingID == "gal" || BackblingID == "galdisc")
-			{
-				BackblingID = "CP_Backpack_Celestial";
-			}
-			else if (BackblingID == "cape")
-			{
-				BackblingID = "CP_Backpack_DarkViking";
-			}
-			else if (BackblingID == "ghostportal")
-			{
-				BackblingID = "CP_Backpack_GhostPortal";
-			}
-			else if (BackblingID == "vamp" || BackblingID == "vampire" || BackblingID == "coven")
-			{
-				BackblingID = "CP_Backpack_VampireMale02";
-			}
-			else if (BackblingID == "darkbag" || BackblingID == "dark")
-			{
-				BackblingID = "CP_Backpack_DarkBomber";
-			}
-			else if (BackblingID == "sunsprout")
-			{
-				BackblingID = "CP_Backpack_FarmerFemale";
-			}
-			else if (BackblingID == "clover")
-			{
-				BackblingID = "CP_Backpack_LuckyRiderMale";
-			}
-			else if (BackblingID == "butterfly")
-			{
-				BackblingID = "CP_Backpack_ShatterFly";
-			}
-			else if (BackblingID == "coin")
-			{
-				BackblingID = "CP_Backpack_AssassinSuitCoin";
-			}
-			else if (BackblingID == "star")
-			{
-				BackblingID = "CP_Backpack_Constellation";
-			}
-			else if (BackblingID == "cuddlepool" || BackblingID == "redcuddle")
-			{
-				BackblingID = "CP_Backpack_FuzzyBearDonut";
-			}
-			else if (BackblingID == "cactusjack")
-			{
-				BackblingID = "CP_Backpack_Cyclone";
-			}
+				std::string BackblingPath = "/Game/Characters/CharacterParts/Backpacks/" + BackblingID + "." + BackblingID;
 
-			std::string BackblingPath = "/Game/Characters/CharacterParts/Backpacks/" + BackblingID + "." + BackblingID;
+				auto backpackPart = LoadObject(BackblingPath, CustomCharacterPartClass);
 
-			auto backpackPart = LoadObject(BackblingPath, CustomCharacterPartClass);
+				if (!backpackPart)
+				{
+					SendMessageToConsole(PlayerController, L"Invalid CharacterPart!");
+					return;
+				}
 
-			if (!backpackPart)
-			{
-				SendMessageToConsole(PlayerController, L"Invalid backbling ID!");
-				return;
+				Pawn->ServerChoosePart(EFortCustomPartType::Backpack, backpackPart);
+
+				SendMessageToConsole(PlayerController, L"Backbling set successfully!");
 			}
+			else
+			{
+				static auto AthenaBackpackItemDefinitionClass = FindObject<UClass>(L"/Script/FortniteGame.AthenaBackpackItemDefinition");
 
-			Pawn->ServerChoosePart(EFortCustomPartType::Backpack, backpackPart);
+				std::string BackpackPath = "/Game/Athena/Items/Cosmetics/Backpacks/" + BackblingID + "." + BackblingID;
 
-			SendMessageToConsole(PlayerController, L"Backbling set successfully!");
+				UObject* Backpack = FindObject<UObject>(BackpackPath, AthenaBackpackItemDefinitionClass);
+
+				if (!Backpack)
+				{
+					SendMessageToConsole(PlayerController, L"Backbling not found!");
+					return;
+				}
+
+				static auto BackpackOffset = Backpack->GetOffset("CharacterParts");
+				auto BackpackItemDef = Backpack->Get<UFortBackpackItemDefinition*>(BackpackOffset);
+
+				if (!BackpackItemDef)
+				{
+					SendMessageToConsole(PlayerController, L"Backpack cast failed!");
+					return;
+				}
+
+				static auto CharacterPartsOffset = BackpackItemDef->GetOffset("CharacterParts");
+
+				auto& CharacterParts = BackpackItemDef->Get<TArray<UCustomCharacterPart*>>(CharacterPartsOffset);
+
+				if (CharacterParts.Num() <= 0 || !CharacterParts[0])
+				{
+					SendMessageToConsole(PlayerController, L"CharacterPart is missing from the backbling definition!");
+					return;
+				}
+
+				auto backpackPart = CharacterParts[0];
+
+				Pawn->ServerChoosePart(EFortCustomPartType::Backpack, backpackPart);
+
+				SendMessageToConsole(PlayerController, L"Backbling set successfully!");
+			}
 		}
 		else if (Command == "backblingall" || Command == "setbackblingall" || Command == "backpackall")
 		{
@@ -1508,11 +1466,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				static auto CustomCharacterPartClass = FindObject<UClass>(L"/Script/FortniteGame.CustomCharacterPart");
 
 				auto& BackblingID = Arguments[1];
-
-				if (BackblingID.starts_with("BID_"))
-				{
-					BackblingID.replace(0, 4, "CP_Backpack_");
-				}
 
 				if (BackblingID == "blackknight")
 				{

@@ -884,7 +884,7 @@ static void ApplyNullAndRetTrues()
 
 DWORD WINAPI Main(LPVOID)
 {
-    InitLogger();
+    LogManager::Init();
 
     std::cin.tie(0);
     std::cout.tie(0);

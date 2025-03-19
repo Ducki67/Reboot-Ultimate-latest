@@ -3,6 +3,8 @@
 #include "Object.h"
 #include "anticheat.h"
 
+#include <functional>
+
 enum class ENetDormancy : uint8_t
 {
 	DORM_Never = 0,
