@@ -14,8 +14,9 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 - [x] Added Swag Lines to S16+
 - [x] Customizable Lategame Loadouts (also now for one shot)
 - [x] Fixed Boat Rockets/Some Vehicle Weapons on S9+
-- [x] Fixed Attached Actor Chest Loot
-- [x] Fixed Reviving on Win
+- [x] Added Attached Actor Chest Loot
+- [x] Added Reviving on Win
+- [x] Fixed Editing (100%)
 
 ## UI:
 
@@ -28,6 +29,7 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 - [x] Many tabs now show a status message when you interact with buttons.
 - [x] Version Checker: Checks if you are using the latest version of Ultimate, and will prompt you to update if you aren't.
 - [x] This DLL is currently locked behind a selected amount of IPs. Only specific people can host with it, however anyone can play.
+- [x] Fixed Logging (can be found in logs tab OR C:\Users\...\AppData\Local\Reboot Ultimate)
 
 ## Commands (compared to old reboot ultimate):
 
@@ -54,20 +56,20 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 - [x] cheat skin - Similar to cheat give, you can now type a phrase (ex: cheat skin renegaderaider) and it will put on Renegade Raider.
 - [x] cheat pickaxe - Similar to cheat give, you can now type a phrase (ex: cheat pickaxe raidersrevenge) and it will put on the Raider's Revenge pickaxe.
 - [x] cheat backbling - Apply a backbling using a CharacterPart ID.
+- [x] cheat changename {Name} - Changes the player's in-game name.
 
 ## CREDIT:
 
 - [Milxnor](https://github.com/Milxnor): Original Creator of Project Reboot 3.0
 - [Max](https://github.com/max8447): Originally made at least 80% of the original Reboot Ultimate. A lot of this code is his.
-- [Heliato](https://github.com/Heliato): Helped fix Traps on 19.10, and Win Lines/Swags on 16+.
+- [Heliato](https://github.com/Heliato): Helped fix Traps on 19.10, Win Lines/Swags on 16+, and SetEditingPlayer.
 
 ## To Do List:
 
 - [ ] Ch2+ Map Markers
 - [ ] Ch2+ Llamas
 - [x] Auto Bus Start (buggy but i may fix later)
-- [ ] Try to fix Recon Ammo
-- [ ] Fix Grappler on S14+ (heliato please help)
+- [ ] Fix Grappler on S14+
 
 # Installation
 

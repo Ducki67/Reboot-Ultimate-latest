@@ -1,5 +1,5 @@
 {
-    "version": "1.0.2",
-    "download_url": "https://github.com/Ralzify/Reboot-Ultimate/releases/latest/download/Reboot.Ultimate.dll",
-    "changelog": "Attempting a new logging system, and start on cheat backbling AthenaBackpackItemDefinition support."
+    "version": "1.0.3",
+    "download_url": "https://github.com/Ralzify/Reboot-Ultimate/releases/latest/download/Reboot_Ultimate.dll",
+    "changelog": "Fix editing bug, new command (may be skunked?), some stuff for 18.40 and 19.01, and add back backbling tags."
 }

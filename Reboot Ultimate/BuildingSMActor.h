@@ -23,6 +23,7 @@ public:
 		this->ProcessEvent(fn, &Builds);
 		return Builds;
 	}
+
 	bool IsPlayerPlaced()
 	{
 		static auto bPlayerPlacedOffset = GetOffset("bPlayerPlaced");
@@ -55,15 +56,13 @@ public:
 		return Get<EFortResourceType>(ResourceTypeOffset);
 	}
 
-	void SetEditingPlayer(APlayerState* NewEditingPlayer) // actually AFortPlayerStateZone
+	void SetEditingPlayer(AFortPlayerStateZone* NewEditingPlayer)
 	{
-		if (// AActor::HasAuthority() &&
-			(!GetEditingPlayer() || !NewEditingPlayer)
-			)
+		if (this->HasAuthority() && (!this->GetEditingPlayer() || !NewEditingPlayer))
 		{
-			SetNetDormancy((ENetDormancy)(2 - (NewEditingPlayer != 0)));
-			// they do something here
-			GetEditingPlayer() = NewEditingPlayer;
+			this->SetNetDormancy(ENetDormancy(2 - (NewEditingPlayer != nullptr)));
+			this->ForceNetUpdate();
+			this->GetEditingPlayer() = NewEditingPlayer;
 		}
 	}
 

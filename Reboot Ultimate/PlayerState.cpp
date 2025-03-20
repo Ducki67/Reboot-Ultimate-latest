@@ -91,3 +91,9 @@ void APlayerState::OnRep_Score()
 	static auto fn = FindObject<UFunction>(L"/Script/Engine.PlayerState.OnRep_Score");
 	this->ProcessEvent(fn);
 }
+
+UClass* AFortPlayerStateZone::StaticClass()
+{
+	static auto Class = FindObject<UClass>(L"/Script/FortniteGame.FortPlayerStateZone");
+	return Class;
+}

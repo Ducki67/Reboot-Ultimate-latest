@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Actor.h"
-
 #include "UnrealString.h"
 #include "Controller.h"
 
@@ -30,4 +29,10 @@ public:
 	void SetPlayerName(const FString& S);
 	void OnRep_PlayerName();
 	void OnRep_Score();
+};
+
+class AFortPlayerStateZone : public APlayerState
+{
+public:
+	static UClass* StaticClass();
 };

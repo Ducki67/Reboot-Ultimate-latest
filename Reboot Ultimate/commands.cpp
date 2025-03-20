@@ -14,6 +14,7 @@
 #include <sstream>
 #include <map>
 #include <string>
+#include <format>
 #include <algorithm>
 #include "FortBackpackItemDefinition.h"
 
@@ -1388,6 +1389,91 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			static auto CustomCharacterPartClass = FindObject<UClass>(L"/Script/FortniteGame.CustomCharacterPart");
 
 			auto& BackblingID = Arguments[1];
+
+			if (BackblingID == "blackknight")
+			{
+				BackblingID = "Male_Commando_BlackKnight";
+			}
+			else if (BackblingID == "cuddle")
+			{
+				BackblingID = "Female_Commando_BR039";
+			}
+			else if (BackblingID == "brite")
+			{
+				BackblingID = "CP_Backpack_Brite";
+			}
+			else if (BackblingID == "tp1")
+			{
+				BackblingID = "CP_Backpack_RetroGrey";
+			}
+			else if (BackblingID == "guitar")
+			{
+				BackblingID = "Female_Commando_Guitar";
+			}
+			else if (BackblingID == "crested")
+			{
+				BackblingID = "CP_Backpack_CuChulainn";
+			}
+			else if (BackblingID == "ventura")
+			{
+				BackblingID = "CP_Backpack_DecoFemale";
+			}
+			else if (BackblingID == "viking")
+			{
+				BackblingID = "CP_Backpack_VikingMale";
+			}
+			else if (BackblingID == "shark")
+			{
+				BackblingID = "CP_Backpack_Shark";
+			}
+			else if (BackblingID == "galaxy" || BackblingID == "gal" || BackblingID == "galdisc")
+			{
+				BackblingID = "CP_Backpack_Celestial";
+			}
+			else if (BackblingID == "cape")
+			{
+				BackblingID = "CP_Backpack_DarkViking";
+			}
+			else if (BackblingID == "ghostportal")
+			{
+				BackblingID = "CP_Backpack_GhostPortal";
+			}
+			else if (BackblingID == "vamp" || BackblingID == "vampire" || BackblingID == "coven")
+			{
+				BackblingID = "CP_Backpack_VampireMale02";
+			}
+			else if (BackblingID == "darkbag" || BackblingID == "dark")
+			{
+				BackblingID = "CP_Backpack_DarkBomber";
+			}
+			else if (BackblingID == "sunsprout")
+			{
+				BackblingID = "CP_Backpack_FarmerFemale";
+			}
+			else if (BackblingID == "clover")
+			{
+				BackblingID = "CP_Backpack_LuckyRiderMale";
+			}
+			else if (BackblingID == "butterfly")
+			{
+				BackblingID = "CP_Backpack_ShatterFly";
+			}
+			else if (BackblingID == "coin")
+			{
+				BackblingID = "CP_Backpack_AssassinSuitCoin";
+			}
+			else if (BackblingID == "star")
+			{
+				BackblingID = "CP_Backpack_Constellation";
+			}
+			else if (BackblingID == "cuddlepool" || BackblingID == "redcuddle")
+			{
+				BackblingID = "CP_Backpack_FuzzyBearDonut";
+			}
+			else if (BackblingID == "cactusjack")
+			{
+				BackblingID = "CP_Backpack_Cyclone";
+			}
 
 			if (BackblingID.contains("CP_Backpack_"))
 			{
@@ -3349,6 +3435,40 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			ApplyHID(Pawn, HIDDef);
 
 			SendMessageToConsole(PlayerController, L"Applied HID!");
+		}
+		else if (Command == "changename" || Command == "setname" || Command == "name")
+		{
+			if (Arguments.size() <= 1)
+			{
+				SendMessageToConsole(PlayerController, L"Please provide a name!\n");
+				return;
+			}
+
+			std::string CombinedName;
+			for (size_t i = 1; i < Arguments.size(); ++i)
+			{
+				CombinedName += Arguments[i];
+
+				if (i != Arguments.size() - 1)
+					CombinedName += " ";
+			}
+
+			std::wstring WideName(CombinedName.begin(), CombinedName.end());
+			FString NewName = FString(WideName.c_str());
+
+			if (Fortnite_Version < 9)
+			{
+				PlayerController->ServerChangeName(NewName);
+			}
+			else
+			{
+				auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
+				GameMode->ChangeName(PlayerController, NewName, true);
+			}
+
+			PlayerState->OnRep_PlayerName();
+
+			SendMessageToConsole(PlayerController, L"Changed name!");
 		}
 		else if (Command == "suicide" || Command == "kill")
 		{
@@ -5480,6 +5600,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 - cheat ban - Permanently bans the player from the game. (IP Ban)
 - cheat bot {#} - Spawns a bot at the player (experimental).
 - cheat buildfree - Toggles Infinite Materials.
+- cheat changename {Name} - Changes the player's in-game name.
 - cheat damagetarget {#} - Damages the Actor in front of you by the specified amount.
 - cheat dbno - Puts the receiving controller in a fake down-but-not-out (knocked) state.
 - cheat demospeed - Speeds up/slows down the speed of the game.
