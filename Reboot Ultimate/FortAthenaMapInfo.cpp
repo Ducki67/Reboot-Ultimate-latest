@@ -34,20 +34,9 @@ FVector AFortAthenaMapInfo::PickSupplyDropLocation(FVector Center, float Radius)
 
 void AFortAthenaMapInfo::SpawnLlamas()
 {
-	UClass* LlamaClass = nullptr;
-
-	if (Fortnite_Version < 17)
+	if (!GetLlamaClass())
 	{
-		LlamaClass = FindObject<UClass>(L"/Game/Athena/SupplyDrops/Llama/AthenaSupplyDrop_Llama.AthenaSupplyDrop_Llama_C");
-	}
-	else
-	{
-		LlamaClass = FindObject<UClass>(L"/Labrador/Pawn/BP_AIPawn_Labrador.BP_AIPawn_Labrador_C");
-	}
-
-	if (!LlamaClass)
-	{
-		// LOG_INFO(LogDev, "No Llama Class, is this intended?");
+		LOG_INFO(LogDev, "No Llama Class, is this intended?");
 		return;
 	}
 
@@ -61,10 +50,12 @@ void AFortAthenaMapInfo::SpawnLlamas()
 		int Radius = 100000;
 		FVector Location = PickSupplyDropLocation(FVector(1, 1, 10000), Radius);
 
+		LOG_INFO(LogDev, "Initial Llama at {} {} {}", Location.X, Location.Y, Location.Z);
+
 		if (Location.CompareVectors(FVector(0, 0, 0)))
 			continue;
 
-		FRotator RandomYawRotator;
+		FRotator RandomYawRotator = FRotator();
 		RandomYawRotator.Yaw = (float)rand() * 0.010986663f;
 
 		FTransform InitialSpawnTransform;
@@ -72,8 +63,7 @@ void AFortAthenaMapInfo::SpawnLlamas()
 		InitialSpawnTransform.Rotation = RandomYawRotator.Quaternion();
 		InitialSpawnTransform.Scale3D = FVector(1, 1, 1);
 
-		auto LlamaStart = GetWorld()->SpawnActor<AFortAthenaSupplyDrop>(LlamaClass, InitialSpawnTransform,
-			CreateSpawnParameters(ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn, true));
+		auto LlamaStart = GetWorld()->SpawnActor<AFortAthenaSupplyDrop>(GetLlamaClass(), InitialSpawnTransform, CreateSpawnParameters(ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn, true));
 
 		LOG_INFO(LogDev, "LlamaStart: {}", __int64(LlamaStart));
 

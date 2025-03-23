@@ -1342,6 +1342,9 @@ DWORD WINAPI Main(LPVOID)
         }
     }
 
+    /*Hooking::MinHook::Hook(FortWeaponDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortDecoTool.ServerCreateBuildingAndSpawnDeco"),
+        AFortDecoTool::ServerCreateBuildingAndSpawnDeco, nullptr, false, true);*/
+
     Hooking::MinHook::Hook(FindObject<UKismetSystemLibrary>(L"/Script/Engine.Default__KismetSystemLibrary"), FindObject<UFunction>(L"/Script/Engine.KismetSystemLibrary.PrintString"),
         UKismetSystemLibrary::PrintStringHook, (PVOID*)&UKismetSystemLibrary::PrintStringOriginal, false, true); // todo FortShippingLog
 

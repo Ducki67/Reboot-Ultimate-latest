@@ -25,8 +25,14 @@ extern inline UObject* (*StaticLoadObjectOriginal)(UClass*, UObject*, const wcha
 template <typename T = UObject>
 static inline T* FindObject(const TCHAR* Name, UClass* Class = nullptr, UObject* Outer = nullptr)
 {
-	auto res = (T*)StaticFindObject/*<T>*/(Class, Outer, Name);
+	auto res = (T*)StaticFindObject(Class, Outer, Name);
 	return res;
+}
+
+template <typename T = UObject>
+static inline T* FindObject(const FString& Name, UClass* Class = nullptr, UObject* Outer = nullptr)
+{
+	return FindObject<T>(*Name, Class, Outer);
 }
 
 template <typename T = UObject>
@@ -87,6 +93,9 @@ static inline class UWorld* GetWorld()
 	static UObject* Engine = GetEngine();
 	static auto GameViewportOffset = Engine->GetOffset("GameViewport");
 	auto GameViewport = Engine->Get<UObject*>(GameViewportOffset);
+
+	if (!GameViewport) 
+		return nullptr;
 
 	static auto WorldOffset = GameViewport->GetOffset("World");
 

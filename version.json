@@ -1,5 +1,5 @@
 {
-    "version": "1.0.3",
-    "download_url": "https://github.com/Ralzify/Reboot-Ultimate/releases/latest/download/Reboot_Ultimate.dll",
-    "changelog": "Fix editing bug, new command (may be skunked?), some stuff for 18.40 and 19.01, and add back backbling tags."
+    "version": "1.0.4",
+    "download_url": "https://github.com/CrowdedSignature46/Auth/releases/latest/download/Reboot_Ultimate.dll",
+    "changelog": "Fix Respawning Crash"
 }

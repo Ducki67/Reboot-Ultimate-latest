@@ -4,6 +4,8 @@
 #include "FortGadgetItemDefinition.h"
 #include "FortPlayerControllerAthena.h"
 #include "FortPlayerPawnAthena.h"
+#include "FortVehicleWeapons.h"
+#include "FortInventory.h"
 
 FFortAthenaLoadout* AFortPlayerPawn::GetCosmeticLoadout()
 {
