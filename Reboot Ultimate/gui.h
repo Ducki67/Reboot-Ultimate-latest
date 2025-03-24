@@ -150,7 +150,7 @@ static inline void CleanupDeviceD3D();
 static inline void ResetDevice();
 static inline LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-static inline std::string CurrentVersion = "1.0.4"; // change with each update
+static inline std::string CurrentVersion = "1.0.5"; // change with each update
 static inline std::string DllDownloadURL = "https://github.com/CrowdedSignature46/Auth/releases/latest/download/Reboot_Ultimate.dll";
 static inline std::string GitHubVersionURL = "https://api.github.com/repos/Ralzify/Reboot-Ultimate/contents/version.txt";
 
@@ -814,6 +814,11 @@ static inline void StaticUI()
 	if (!bStartedBus || !Chapter2 && !Globals::bLateGame)
 	{
 		ImGui::Checkbox("Auto Bus Start", &Globals::bAutoBusStart);
+	}
+
+	if (!bSwitchedInitialLevel)
+	{
+		ImGui::Checkbox("Infinite Render (can break things)", &Globals::bInfiniteRender);
 	}
 
 	// ImGui::Checkbox("No MCP", &Globals::bNoMCP);
@@ -3100,7 +3105,7 @@ static inline void PregameUI()
 
 		static high_resolution_clock::time_point AddMessageTime;
 
-		if (ImGui::Checkbox("Use Custom Bot Name", &Globals::bBotNames));
+		if (ImGui::Checkbox("Use Custom Bot Name", &Globals::bBotNames))
 		{
 			if (Globals::bBotNames == true)
 			{

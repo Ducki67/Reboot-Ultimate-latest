@@ -200,7 +200,7 @@ public:
 		return Get<AFortAthenaMapInfo*>(MapInfoOffset);
 	}
 
-	int GetTeamsLeft()
+	int& GetTeamsLeft()
 	{
 		static auto TeamsLeftOffset = GetOffset("TeamsLeft");
 		return Get<int>(TeamsLeftOffset);

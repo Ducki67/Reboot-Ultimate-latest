@@ -196,7 +196,7 @@ public:
 
 	FString GetRandomName()
 	{
-		int RandomNumber = 200 + (std::rand() % 151);
+		int RandomNumber = 264 + (std::rand() % 101);
 		static int CurrentBotNum = 1;
 		std::wstring BotNumWStr;
 		FString NewName;
@@ -212,14 +212,16 @@ public:
 			if (Fortnite_Version < 9)
 			{
 				BotNumWStr = std::to_wstring(RandomNumber);
-				NewName = (std::format(L"Anonymous[{}]", BotNumWStr)).c_str();
+				std::wstring FormattedName = std::format(L"Anonymous[{}]", BotNumWStr);
+				NewName = FString(FormattedName.c_str());
 			}
 			else
 			{
 				if (Fortnite_Version < 11)
 				{
 					BotNumWStr = std::to_wstring(RandomNumber);
-					NewName = (std::format(L"Anonymous[{}]", BotNumWStr)).c_str();
+					std::wstring FormattedName = std::format(L"Anonymous[{}]", BotNumWStr);
+					NewName = FString(FormattedName.c_str());
 				}
 				else
 				{
@@ -246,7 +248,7 @@ public:
 		}
 		else
 		{
-			BotNewName = GetRandomName(); 
+			BotNewName = GetRandomName();
 		}
 
 		LOG_INFO(LogBots, "BotNewName: {}", BotNewName.ToString());

@@ -26,6 +26,7 @@ namespace Globals
 	extern inline int AmountOfHealthSiphon = 50;
 	extern inline bool bUseSiphon = false;
 	extern inline bool bShouldUseReplicationGraph = false;
+	extern inline bool bInfiniteRender = false;
 
 	extern inline bool bBotInvincible = false;
 	extern inline bool bBotPC = false;

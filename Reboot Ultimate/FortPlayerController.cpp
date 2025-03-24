@@ -958,7 +958,10 @@ void AFortPlayerController::ServerAttemptAircraftJumpHook(AFortPlayerController*
 		
 		if (Globals::bLateGame)
 		{
-			NewPawnAsFort->SetShield(100);
+			if (!PlaylistName.contains("Low"))
+			{
+				NewPawnAsFort->SetShield(100);
+			}
 
 			NewPawnAsFort->TeleportTo(AircraftToJumpFrom->GetActorLocation(), FRotator());
 		}
@@ -1945,6 +1948,8 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 				}
 
 				// LOG_INFO(LogDev, "KillerPlayerState->Place: {}", KillerPlayerState ? KillerPlayerState->GetPlace() : -1);
+
+				LOG_INFO(LogDev, "TeamsLeft: {}", GameState->GetTeamsLeft()); // Important for launcher don't remove!
 			}
 
 
