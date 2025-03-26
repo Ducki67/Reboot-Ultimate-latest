@@ -2,7 +2,7 @@
 
 #include "Array.h"
 #include "BitArray.h"
-#include "LogManager.h"
+#include "log.h"
 
 #define INDEX_NONE -1
 

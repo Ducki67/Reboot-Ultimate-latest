@@ -56,7 +56,6 @@
 #include "botnames.h"
 #include "KismetRenderingLibrary.h"
 #include "FortLootPackage.h"
-#include "LogManager.h"
 
 #define PREGAME_GAME_TAB 1
 #define PREGAME_PLAYLIST_TAB 2
@@ -78,7 +77,6 @@
 #define DEBUGLOG_TAB 14
 #define SETTINGS_TAB 15
 #define CREDITS_TAB 16
-#define LOGS_TAB 17
 
 #define MAIN_PLAYERTAB 1
 // #define INVENTORY_PLAYERTAB 2
@@ -110,7 +108,6 @@ extern inline int NumRequiredPlayersToStart = 1;
 extern inline bool bDebugPrintLooting = false;
 extern inline bool bDebugPrintFloorLoot = false;
 extern inline bool bDebugPrintSwapping = false;
-extern inline bool bAutoScroll = true;
 extern inline bool bEnableBotTick = false;
 extern inline bool bZoneReversing = false;
 extern inline bool bEnableCombinePickup = false;
@@ -150,7 +147,7 @@ static inline void CleanupDeviceD3D();
 static inline void ResetDevice();
 static inline LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-static inline std::string CurrentVersion = "1.0.5"; // change with each update
+static inline std::string CurrentVersion = "1.0.6"; // change with each update
 static inline std::string DllDownloadURL = "https://github.com/CrowdedSignature46/Auth/releases/latest/download/Reboot_Ultimate.dll";
 static inline std::string GitHubVersionURL = "https://api.github.com/repos/Ralzify/Reboot-Ultimate/contents/version.txt";
 
@@ -363,30 +360,6 @@ static std::string GetDownloadURL() {
 		std::cerr << "JSON Parsing Error: " << e.what() << std::endl;
 		return "";
 	}
-}
-
-static inline void DrawLogsTab() 
-{
-	const auto& logs = LogManager::GetLogs();
-
-	ImGui::BeginChild("Logs", ImVec2(0, 0), true);
-
-	for (const auto& log : logs) 
-	{
-		ImVec4 color = ImVec4(1, 1, 1, 1);
-
-		switch (log.level) 
-		{
-			case LogLevel::Info: color = ImVec4(0.8f, 0.8f, 0.8f, 1.0f); break;
-			case LogLevel::Warning: color = ImVec4(1.0f, 1.0f, 0.0f, 1.0f); break;
-			case LogLevel::Error: color = ImVec4(1.0f, 0.2f, 0.2f, 1.0f); break;
-			case LogLevel::Debug: color = ImVec4(0.5f, 0.5f, 1.0f, 1.0f); break;
-		}
-
-		ImGui::TextColored(color, "%s", log.message.c_str());
-	}
-
-	ImGui::EndChild();
 }
 
 static std::vector Tertiaries = {
@@ -996,14 +969,6 @@ static inline void MainTabs()
 			ImGui::EndTabItem();
 		}
 
-		if (ImGui::BeginTabItem("Logs"))
-		{
-			Tab = LOGS_TAB;
-			PlayerTab = -1;
-			bInformationTab = false;
-			ImGui::EndTabItem();
-		}
-
 		ImGui::EndTabBar();
 	}
 }
@@ -1048,7 +1013,7 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 		Sleep(1000);
 	}
 
-	float MaxTickRate = 2;
+	float MaxTickRate = 5;
 
 	auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
 	auto GameState = Cast<AFortGameStateAthena>(GameMode->GetGameState());
@@ -1488,6 +1453,8 @@ static inline void MainUI()
 							if (Globals::bLateGame.load())
 							{
 								CreateThread(0, 0, LateGameThread, 0, 0, 0);
+
+								bStartedBus = true;
 							}
 							else
 							{
@@ -1522,6 +1489,8 @@ static inline void MainUI()
 
 								GameState->Get<float>(WarmupCountdownStartTimeOffset) = TimeSeconds;
 								GameMode->Get<float>(WarmupEarlyCountdownDurationOffset) = EarlyDuration;
+
+								bStartedBus = true;
 							}
 						}
 					}
@@ -2657,54 +2626,6 @@ static inline void MainUI()
 				bShouldDestroyAllPlayerBuilds = true;
 			}
 		}
-
-		else if (Tab == LOGS_TAB)
-		{
-			ImGui::Text("Reboot Ultimate Logs");
-			ImGui::Separator();
-
-			ImGui::Checkbox("Auto-Scroll", &bAutoScroll);
-
-			ImGui::BeginChild("LogsOutput", ImVec2(0, 400), true, ImGuiWindowFlags_HorizontalScrollbar);
-
-			const auto& logs = LogManager::GetLogs();
-
-			for (const auto& log : logs)
-			{
-				ImVec4 color = ImVec4(1, 1, 1, 1);
-
-				switch (log.level) 
-				{
-					case LogLevel::Info: color = ImVec4(0.8f, 0.8f, 0.8f, 1.0f); break;
-					case LogLevel::Warning: color = ImVec4(1.0f, 1.0f, 0.0f, 1.0f); break;
-					case LogLevel::Error: color = ImVec4(1.0f, 0.2f, 0.2f, 1.0f); break;
-					case LogLevel::Debug: color = ImVec4(0.5f, 0.5f, 1.0f, 1.0f); break;
-				}
-
-				ImGui::TextColored(color, "%s", log.message.c_str());
-			}
-
-			if (bAutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY() - 50.f)
-			{
-				ImGui::SetScrollHereY(1.0f);
-			}
-
-			ImGui::EndChild();
-
-			ImGui::Spacing();
-
-			if (ImGui::Button("Open Logs Folder"))
-			{
-				ShellExecuteA(0, "open", LogManager::logDir.c_str(), NULL, NULL, SW_SHOWDEFAULT);
-			}
-
-			ImGui::SameLine();
-
-			if (ImGui::Button("Clear Log Memory"))
-			{
-				LogManager::logs.clear();
-			}
-		}
 	}
 	else if (PlayerTab != 2435892 && bLoaded)
 	{
@@ -3105,7 +3026,7 @@ static inline void PregameUI()
 
 		static high_resolution_clock::time_point AddMessageTime;
 
-		if (ImGui::Checkbox("Use Custom Bot Name", &Globals::bBotNames))
+		if (ImGui::Checkbox("Use Custom Bot Name", &Globals::bBotNames));
 		{
 			if (Globals::bBotNames == true)
 			{

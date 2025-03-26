@@ -3,7 +3,7 @@
 #include <locale>
 
 #include "Array.h"
-#include "LogManager.h"
+#include "log.h"
 
 // #define EXPERIMENTAL_FSTRING
 

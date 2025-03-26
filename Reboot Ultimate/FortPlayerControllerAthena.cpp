@@ -605,7 +605,7 @@ void AFortPlayerControllerAthena::ServerTeleportToPlaygroundLobbyIslandHook(AFor
 
 void AFortPlayerControllerAthena::ServerAcknowledgePossessionHook(APlayerController* Controller, APawn* Pawn)
 {
-	LOG_INFO(LogGame, "ServerAcknowledgePossessionHook!");
+	LOG_INFO(LogGame, "ServerAcknowledgePossessionHook!")
 
 	static auto AcknowledgedPawnOffset = Controller->GetOffset("AcknowledgedPawn");
 
@@ -709,6 +709,8 @@ void AFortPlayerControllerAthena::GetPlayerViewPointHook(AFortPlayerControllerAt
 
 	void (*GetActorEyesViewPointOriginal)(AActor * Actor, FVector * OutLocation, FRotator * OutRotation) = decltype(GetActorEyesViewPointOriginal)(PlayerController->VFTable[GetActorEyesViewPointIndex]);
 	return GetActorEyesViewPointOriginal(PlayerController, &Location, &Rotation);
+
+	// auto PCViewTarget = PlayerController->GetViewTarget();
 
 	if (auto MyFortPawn = PlayerController->GetMyFortPawn())
 	{

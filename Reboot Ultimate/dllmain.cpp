@@ -884,7 +884,7 @@ static void ApplyNullAndRetTrues()
 
 DWORD WINAPI Main(LPVOID)
 {
-    LogManager::Init();
+    InitLogger();
 
     std::cin.tie(0);
     std::cout.tie(0);
@@ -1341,9 +1341,6 @@ DWORD WINAPI Main(LPVOID)
                 AFortDecoTool::ServerSpawnDeco, nullptr, false, true);
         }
     }
-
-    /*Hooking::MinHook::Hook(FortWeaponDefault, FindObject<UFunction>(L"/Script/FortniteGame.FortDecoTool.ServerCreateBuildingAndSpawnDeco"),
-        AFortDecoTool::ServerCreateBuildingAndSpawnDeco, nullptr, false, true);*/
 
     Hooking::MinHook::Hook(FindObject<UKismetSystemLibrary>(L"/Script/Engine.Default__KismetSystemLibrary"), FindObject<UFunction>(L"/Script/Engine.KismetSystemLibrary.PrintString"),
         UKismetSystemLibrary::PrintStringHook, (PVOID*)&UKismetSystemLibrary::PrintStringOriginal, false, true); // todo FortShippingLog

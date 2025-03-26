@@ -49,7 +49,7 @@
     #include <source_location>
     #include <DbgHelp.h>
     #pragma comment(lib, "Dbghelp.lib")
-    #include "../Reboot Ultimate/LogManager.h"
+    #include "../Reboot Ultimate/log.h"
     #include "../Reboot Ultimate/inc.h"
 
 

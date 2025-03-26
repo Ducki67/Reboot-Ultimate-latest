@@ -648,8 +648,8 @@ void AFortPlayerController::ServerAttemptInteractHook(UObject* Context, FFrame* 
 					static auto OnRep_MountedWeaponInfoReppedFn = FindObject<UFunction>("/Script/FortniteGame.FortWeaponRangedForVehicle.OnRep_MountedWeaponInfoRepped");
 					VehicleWeapon->ProcessEvent(OnRep_MountedWeaponInfoReppedFn);
 
-					static auto OnHostVehicleSetupFn = FindObject<UFunction>("/Script/FortniteGame.FortWeaponRangedForVehicle.OnHostVehicleSetup");
-					VehicleWeapon->ProcessEvent(OnHostVehicleSetupFn);
+					static auto OnHostVehicleSetupdFn = FindObject<UFunction>("/Script/FortniteGame.FortWeaponRangedForVehicle.OnHostVehicleSetup");
+					VehicleWeapon->ProcessEvent(OnHostVehicleSetupdFn);
 				}
 			}
 		}

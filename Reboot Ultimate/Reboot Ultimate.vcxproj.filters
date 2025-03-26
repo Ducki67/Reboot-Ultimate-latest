@@ -352,9 +352,6 @@
     <ClCompile Include="FortDecoTool.cpp">
       <Filter>FortniteGame\Source\FortniteGame\Private\Weapons</Filter>
     </ClCompile>
-    <ClCompile Include="LogManager.cpp">
-      <Filter>Reboot\Private</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Array.h">
@@ -524,9 +521,6 @@
     </ClInclude>
     <ClInclude Include="GameplayTagContainer.h">
       <Filter>Engine\Source\Runtime\GameplayTags\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="FortBackpackItemDefinition.h">
-      <Filter>FortniteGame\Source\FortniteGame\Public\Items</Filter>
     </ClInclude>
     <ClInclude Include="FortWeaponMeleeItemDefinition.h">
       <Filter>FortniteGame\Source\FortniteGame\Public\Items</Filter>
@@ -1098,7 +1092,7 @@
     <ClInclude Include="hooking.h">
       <Filter>Reboot\Public</Filter>
     </ClInclude>
-    <ClInclude Include="LogManager.h">
+    <ClInclude Include="log.h">
       <Filter>Reboot\Public</Filter>
     </ClInclude>
     <ClInclude Include="KismetRenderingLibrary.h">

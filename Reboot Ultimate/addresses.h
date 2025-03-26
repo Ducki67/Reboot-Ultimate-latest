@@ -1,7 +1,7 @@
 #pragma once
 
 // #include "finder.h"
-#include "LogManager.h"
+#include "log.h"
 #include "inc.h"
 
 namespace Addresses

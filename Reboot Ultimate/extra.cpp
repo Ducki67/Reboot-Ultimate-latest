@@ -74,8 +74,8 @@ void SetZoneToIndexHook(AFortGameModeAthena* GameModeAthena, int OverridePhaseMa
 
 	if (!MapInfo)
 	{
-		LOG_WARN(LogZone, "Invalid MapInfo!");
-		return SetZoneToIndexOriginal(GameModeAthena, OverridePhaseMaybeIDFK);
+		LOG_WARN(LogZone, "Invalid MapInfo!")
+			return SetZoneToIndexOriginal(GameModeAthena, OverridePhaseMaybeIDFK);
 	}
 
 	static auto SafeZoneDefinitionOffset = MapInfo->GetOffset("SafeZoneDefinition");

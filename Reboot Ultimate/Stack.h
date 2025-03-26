@@ -73,12 +73,6 @@ public:
 		}
 	}
 
-	__forceinline void IncrementCode() 
-	{
-		if (Code)
-			Code++;
-	}
-
 	template</* class TProperty, */ typename TNativeType>
 	__forceinline TNativeType& StepCompiledInRef(void* const TemporaryBuffer)
 	{

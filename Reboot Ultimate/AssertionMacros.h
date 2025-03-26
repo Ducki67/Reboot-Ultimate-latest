@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LogManager.h"
+#include "log.h"
 #include "inc.h"
 
 #define UE_PUSH_MACRO(name) __pragma(push_macro(name))

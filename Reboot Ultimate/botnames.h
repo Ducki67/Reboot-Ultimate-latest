@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include "discord.h"
-#include "LogManager.h"
+#include "log.h"
 
 inline std::vector<FString> PlayerBotNames;
 

@@ -1269,8 +1269,6 @@ void AFortGameModeAthena::Athena_HandleStartingNewPlayerHook(AFortGameModeAthena
 			if (Globals::bLateGame.load())
 			{
 				CreateThread(0, 0, LateGameThread, 0, 0, 0);
-
-				bStartedBus = true;
 			}
 			else
 			{
@@ -1289,8 +1287,6 @@ void AFortGameModeAthena::Athena_HandleStartingNewPlayerHook(AFortGameModeAthena
 
 					GameState->Get<float>(WarmupCountdownStartTimeOffset) = TimeSeconds;
 					GameMode->Get<float>(WarmupEarlyCountdownDurationOffset) = EarlyBusDuration;
-
-					bStartedBus = true;
 
 					/*CreateThread(0, 0, [](LPVOID) -> DWORD
 					{

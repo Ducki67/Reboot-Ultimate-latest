@@ -14,9 +14,7 @@
 #include <sstream>
 #include <map>
 #include <string>
-#include <format>
 #include <algorithm>
-#include "FortBackpackItemDefinition.h"
 
 std::map<std::string, std::vector<FVector>> Waypoints;
 
@@ -1475,61 +1473,19 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				BackblingID = "CP_Backpack_Cyclone";
 			}
 
-			if (BackblingID.contains("CP_Backpack_"))
+			std::string BackblingPath = "/Game/Characters/CharacterParts/Backpacks/" + BackblingID + "." + BackblingID;
+
+			auto backpackPart = LoadObject(BackblingPath, CustomCharacterPartClass);
+
+			if (!backpackPart)
 			{
-				std::string BackblingPath = "/Game/Characters/CharacterParts/Backpacks/" + BackblingID + "." + BackblingID;
-
-				auto backpackPart = LoadObject(BackblingPath, CustomCharacterPartClass);
-
-				if (!backpackPart)
-				{
-					SendMessageToConsole(PlayerController, L"Invalid CharacterPart!");
-					return;
-				}
-
-				Pawn->ServerChoosePart(EFortCustomPartType::Backpack, backpackPart);
-
-				SendMessageToConsole(PlayerController, L"Backbling set successfully!");
+				SendMessageToConsole(PlayerController, L"Invalid backbling ID!");
+				return;
 			}
-			else
-			{
-				static auto AthenaBackpackItemDefinitionClass = FindObject<UClass>(L"/Script/FortniteGame.AthenaBackpackItemDefinition");
 
-				std::string BackpackPath = "/Game/Athena/Items/Cosmetics/Backpacks/" + BackblingID + "." + BackblingID;
+			Pawn->ServerChoosePart(EFortCustomPartType::Backpack, backpackPart);
 
-				UObject* Backpack = FindObject<UObject>(BackpackPath, AthenaBackpackItemDefinitionClass);
-
-				if (!Backpack)
-				{
-					SendMessageToConsole(PlayerController, L"Backbling not found!");
-					return;
-				}
-
-				static auto BackpackOffset = Backpack->GetOffset("CharacterParts");
-				auto BackpackItemDef = Backpack->Get<UFortBackpackItemDefinition*>(BackpackOffset);
-
-				if (!BackpackItemDef)
-				{
-					SendMessageToConsole(PlayerController, L"Backpack cast failed!");
-					return;
-				}
-
-				static auto CharacterPartsOffset = BackpackItemDef->GetOffset("CharacterParts");
-
-				auto& CharacterParts = BackpackItemDef->Get<TArray<UCustomCharacterPart*>>(CharacterPartsOffset);
-
-				if (CharacterParts.Num() <= 0 || !CharacterParts[0])
-				{
-					SendMessageToConsole(PlayerController, L"CharacterPart is missing from the backbling definition!");
-					return;
-				}
-
-				auto backpackPart = CharacterParts[0];
-
-				Pawn->ServerChoosePart(EFortCustomPartType::Backpack, backpackPart);
-
-				SendMessageToConsole(PlayerController, L"Backbling set successfully!");
-			}
+			SendMessageToConsole(PlayerController, L"Backbling set successfully!");
 		}
 		else if (Command == "backblingall" || Command == "setbackblingall" || Command == "backpackall")
 		{
@@ -1552,6 +1508,11 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				static auto CustomCharacterPartClass = FindObject<UClass>(L"/Script/FortniteGame.CustomCharacterPart");
 
 				auto& BackblingID = Arguments[1];
+
+				if (BackblingID.starts_with("BID_"))
+				{
+					BackblingID.replace(0, 4, "CP_Backpack_");
+				}
 
 				if (BackblingID == "blackknight")
 				{
@@ -3435,40 +3396,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			ApplyHID(Pawn, HIDDef);
 
 			SendMessageToConsole(PlayerController, L"Applied HID!");
-		}
-		else if (Command == "changename" || Command == "setname" || Command == "name")
-		{
-			if (Arguments.size() <= 1)
-			{
-				SendMessageToConsole(PlayerController, L"Please provide a name!\n");
-				return;
-			}
-
-			std::string CombinedName;
-			for (size_t i = 1; i < Arguments.size(); ++i)
-			{
-				CombinedName += Arguments[i];
-
-				if (i != Arguments.size() - 1)
-					CombinedName += " ";
-			}
-
-			std::wstring WideName(CombinedName.begin(), CombinedName.end());
-			FString NewName = FString(WideName.c_str());
-
-			if (Fortnite_Version < 9)
-			{
-				PlayerController->ServerChangeName(NewName);
-			}
-			else
-			{
-				auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
-				GameMode->ChangeName(PlayerController, NewName, true);
-			}
-
-			PlayerState->OnRep_PlayerName();
-
-			SendMessageToConsole(PlayerController, L"Changed name!");
 		}
 		else if (Command == "suicide" || Command == "kill")
 		{
@@ -5600,7 +5527,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 - cheat ban - Permanently bans the player from the game. (IP Ban)
 - cheat bot {#} - Spawns a bot at the player (experimental).
 - cheat buildfree - Toggles Infinite Materials.
-- cheat changename {Name} - Changes the player's in-game name.
 - cheat damagetarget {#} - Damages the Actor in front of you by the specified amount.
 - cheat dbno - Puts the receiving controller in a fake down-but-not-out (knocked) state.
 - cheat demospeed - Speeds up/slows down the speed of the game.
