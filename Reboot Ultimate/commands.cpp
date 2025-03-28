@@ -3397,6 +3397,40 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, L"Applied HID!");
 		}
+		else if (Command == "changename" || Command == "setname" || Command == "name")
+		{
+			if (Arguments.size() <= 1)
+			{
+				SendMessageToConsole(PlayerController, L"Please provide a name!\n");
+				return;
+			}
+
+			std::string CombinedName;
+			for (size_t i = 1; i < Arguments.size(); ++i)
+			{
+				CombinedName += Arguments[i];
+
+				if (i != Arguments.size() - 1)
+					CombinedName += " ";
+			}
+
+			std::wstring WideName(CombinedName.begin(), CombinedName.end());
+			FString NewName = FString(WideName.c_str());
+
+			if (Fortnite_Version < 9)
+			{
+				PlayerController->ServerChangeName(NewName);
+			}
+			else
+			{
+				auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
+				GameMode->ChangeName(PlayerController, NewName, true);
+			}
+
+			PlayerState->OnRep_PlayerName();
+
+			SendMessageToConsole(PlayerController, L"Changed players name!");
+		}
 		else if (Command == "suicide" || Command == "kill")
 		{
 			static auto ServerSuicideFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerController.ServerSuicide");
@@ -5527,6 +5561,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 - cheat ban - Permanently bans the player from the game. (IP Ban)
 - cheat bot {#} - Spawns a bot at the player (experimental).
 - cheat buildfree - Toggles Infinite Materials.
+- cheat changename {Name} - Changes the player's in-game name.
 - cheat damagetarget {#} - Damages the Actor in front of you by the specified amount.
 - cheat dbno - Puts the receiving controller in a fake down-but-not-out (knocked) state.
 - cheat demospeed - Speeds up/slows down the speed of the game.

@@ -2093,8 +2093,7 @@ void AFortPlayerController::ServerEditBuildingActorHook(UObject* Context, FFrame
 	static ABuildingSMActor* (*BuildingSMActorReplaceBuildingActor)(ABuildingSMActor*, __int64, UClass*, int, int, uint8_t, AFortPlayerController*) =
 		decltype(BuildingSMActorReplaceBuildingActor)(Addresses::ReplaceBuildingActor);
 
-	if (auto BuildingActor = BuildingSMActorReplaceBuildingActor(BuildingActorToEdit, 1, NewBuildingClass,
-		BuildingActorToEdit->GetCurrentBuildingLevel(), RotationIterations, bMirrored, PlayerController))
+	if (auto BuildingActor = BuildingSMActorReplaceBuildingActor(BuildingActorToEdit, 1, NewBuildingClass, BuildingActorToEdit->GetCurrentBuildingLevel(), RotationIterations, bMirrored, PlayerController))
 	{
 		BuildingActor->SetPlayerPlaced(true);
 	}
@@ -2106,37 +2105,16 @@ void AFortPlayerController::ServerEditBuildingActorHook(UObject* Context, FFrame
 
 void AFortPlayerController::ServerEndEditingBuildingActorHook(AFortPlayerController* PlayerController, ABuildingSMActor* BuildingActorToStopEditing)
 {
+	if (!BuildingActorToStopEditing)
+		return;
+
 	auto Pawn = PlayerController->GetMyFortPawn();
 
-	if (!BuildingActorToStopEditing || !Pawn
-		|| BuildingActorToStopEditing->GetEditingPlayer() != PlayerController->GetPlayerState()
-		|| BuildingActorToStopEditing->IsDestroyed())
+	if (!Pawn)
+		return;
+
+	if (BuildingActorToStopEditing->GetEditingPlayer() != PlayerController->GetPlayerState() || BuildingActorToStopEditing->IsDestroyed())
 		return;
 
 	BuildingActorToStopEditing->SetEditingPlayer(nullptr);
-
-	static auto EditToolDef = FindObject<UFortWeaponItemDefinition>(L"/Game/Items/Weapons/BuildingTools/EditTool.EditTool");
-
-	auto WorldInventory = PlayerController->GetWorldInventory();
-
-	if (!WorldInventory)
-		return;
-
-	auto EditToolInstance = WorldInventory->FindItemInstance(EditToolDef);
-
-	if (!EditToolInstance)
-		return;
-	
-	Pawn->EquipWeaponDefinition(EditToolDef, EditToolInstance->GetItemEntry()->GetItemGuid());
-
-	auto EditTool = Cast<AFortWeap_EditingTool>(Pawn->GetCurrentWeapon());
-
-	BuildingActorToStopEditing->GetEditingPlayer() = nullptr;
-	// BuildingActorToStopEditing->OnRep_EditingPlayer();
-
-	if (EditTool)
-	{
-		EditTool->GetEditActor() = nullptr;
-		EditTool->OnRep_EditActor();
-	}
 }

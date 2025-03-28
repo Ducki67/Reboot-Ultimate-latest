@@ -147,12 +147,12 @@ static inline void CleanupDeviceD3D();
 static inline void ResetDevice();
 static inline LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-static inline std::string CurrentVersion = "1.0.6"; // change with each update
+static inline std::string CurrentVersion = "1.0.7"; // change with each update
 static inline std::string DllDownloadURL = "https://github.com/CrowdedSignature46/Auth/releases/latest/download/Reboot_Ultimate.dll";
 static inline std::string GitHubVersionURL = "https://api.github.com/repos/Ralzify/Reboot-Ultimate/contents/version.txt";
 
 static inline std::string GitHubUsername = "Ralzify";
-static inline std::string GitHubToken = "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";
+static inline std::string GitHubToken = "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";
 
 inline FString* GetRequestURL(UObject* Connection)
 {
