@@ -147,12 +147,9 @@ static inline void CleanupDeviceD3D();
 static inline void ResetDevice();
 static inline LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-static inline std::string CurrentVersion = "1.0.7"; // change with each update
+static inline std::string CurrentVersion = "1.0.8"; // change with each update
 static inline std::string DllDownloadURL = "https://github.com/CrowdedSignature46/Auth/releases/latest/download/Reboot_Ultimate.dll";
-static inline std::string GitHubVersionURL = "https://api.github.com/repos/Ralzify/Reboot-Ultimate/contents/version.txt";
-
-static inline std::string GitHubUsername = "Ralzify";
-static inline std::string GitHubToken = "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";
+static inline std::string GitHubVersionURL = "https://raw.githubusercontent.com/CrowdedSignature46/Auth/main/version.json";
 
 inline FString* GetRequestURL(UObject* Connection)
 {
@@ -310,53 +307,65 @@ static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::stri
 	return totalSize;
 }
 
-static std::string GetLatestVersion() {
+static std::string GetLatestVersion() 
+{
 	CURL* curl = curl_easy_init();
 	std::string readBuffer;
 
-	if (curl) {
-		struct curl_slist* headers = NULL;
-		headers = curl_slist_append(headers, ("Authorization: token " + GitHubToken).c_str());
-
-		curl_easy_setopt(curl, CURLOPT_URL, "https://raw.githubusercontent.com/Ralzify/Reboot-Ultimate/main/version.json");
-		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+	if (curl) 
+	{
+		curl_easy_setopt(curl, CURLOPT_URL, "https://raw.githubusercontent.com/CrowdedSignature46/Auth/main/version.json");
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
-		curl_easy_perform(curl);
+		CURLcode res = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
+
+		if (res != CURLE_OK) 
+		{
+			std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
+			return "";
+		}
 	}
 
-	try {
+	try 
+	{
 		json jsonData = json::parse(readBuffer);
-		return jsonData["version"].get<std::string>();  // Extract version
+		return jsonData["version"].get<std::string>();
 	}
-	catch (std::exception& e) {
+	catch (std::exception& e) 
+	{
 		std::cerr << "JSON Parsing Error: " << e.what() << std::endl;
 		return "";
 	}
 }
 
-static std::string GetDownloadURL() {
+static std::string GetDownloadURL() 
+{
 	CURL* curl = curl_easy_init();
 	std::string readBuffer;
 
-	if (curl) {
-		struct curl_slist* headers = NULL;
-		headers = curl_slist_append(headers, ("Authorization: token " + GitHubToken).c_str());
-
-		curl_easy_setopt(curl, CURLOPT_URL, "https://raw.githubusercontent.com/Ralzify/Reboot-Ultimate/main/version.json");
-		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+	if (curl) 
+	{
+		curl_easy_setopt(curl, CURLOPT_URL, "https://raw.githubusercontent.com/CrowdedSignature46/Auth/main/version.json");
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
-		curl_easy_perform(curl);
+		CURLcode res = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
+
+		if (res != CURLE_OK) 
+		{
+			std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
+			return "";
+		}
 	}
 
-	try {
+	try 
+	{
 		json jsonData = json::parse(readBuffer);
 		return jsonData["download_url"].get<std::string>();
 	}
-	catch (std::exception& e) {
+	catch (std::exception& e) 
+	{
 		std::cerr << "JSON Parsing Error: " << e.what() << std::endl;
 		return "";
 	}
@@ -1013,7 +1022,7 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 		Sleep(1000);
 	}
 
-	float MaxTickRate = 5;
+	float MaxTickRate = 2;
 
 	auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
 	auto GameState = Cast<AFortGameStateAthena>(GameMode->GetGameState());

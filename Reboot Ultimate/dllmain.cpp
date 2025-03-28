@@ -72,7 +72,7 @@ const std::vector<std::string> WhitelistedIPs = {
     "26.198.115.19", // Heliato
     "26.69.16.29", // rit main
     "26.157.120.241", // sylo
-    "26.20.41.121", // liend
+    "26.88.5.211", // liend
     "26.61.188.132", // crazy
     "26.116.27.139", // midnight
     "26.0.11.135", // kye of norcal
@@ -1243,7 +1243,7 @@ DWORD WINAPI Main(LPVOID)
     // Hooking::MinHook::Hook(FindObject<UFortServerBotManagerAthena>(L"/Script/FortniteGame.Default__FortServerBotManagerAthena"), FindObject<UFunction>(L"/Script/FortniteGame.FortServerBotManagerAthena.SpawnBot"),
        // UFortServerBotManagerAthena::SpawnBotHook, (PVOID*)&UFortServerBotManagerAthena::SpawnBotOriginal, false);
 
-    if (Fortnite_Version < 18)
+    if (Fortnite_Version != 19 || Fortnite_Version != 18)
     {
         Hooking::MinHook::Hook(GameModeDefault, FindObject<UFunction>(L"/Script/Engine.GameModeBase.SpawnDefaultPawnFor"),
             AGameModeBase::SpawnDefaultPawnForHook, nullptr, false);
