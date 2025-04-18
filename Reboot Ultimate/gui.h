@@ -147,7 +147,7 @@ static inline void CleanupDeviceD3D();
 static inline void ResetDevice();
 static inline LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-static inline std::string CurrentVersion = "1.0.8"; // change with each update
+static inline std::string CurrentVersion = "1.1.3"; // change with each update
 static inline std::string DllDownloadURL = "https://github.com/CrowdedSignature46/Auth/releases/latest/download/Reboot_Ultimate.dll";
 static inline std::string GitHubVersionURL = "https://raw.githubusercontent.com/CrowdedSignature46/Auth/main/version.json";
 
@@ -178,7 +178,11 @@ inline std::vector<ActorSpawnStruct> ActorsToSpawn;
 static inline void SetIsLategame(bool Value) // if spawn island make this 0
 {
 	Globals::bLateGame.store(Value);
-	StartingShield = Value ? 100 : 0;
+
+	if (!PlaylistName.contains("Low"))
+	{
+		StartingShield = Value ? 100 : 0;
+	}
 }
 
 static inline bool HasAnyCalendarModification()
@@ -283,6 +287,19 @@ enum class Playlist : int
 	Custom
 };
 
+enum class Skins : int
+{
+	RenegadeRaider,
+	Aerial,
+	GhoulTrooper,
+	SkullTrooper,
+	NogOps,
+	SparkleSpecialist,
+	Galaxy,
+	Fennix,
+	Custom
+};
+
 template<typename T>
 static inline T GetRandomItem(std::vector<T>& Vector, int ConnectionIndex)
 {
@@ -307,12 +324,12 @@ static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::stri
 	return totalSize;
 }
 
-static std::string GetLatestVersion() 
+static std::string GetLatestVersion()
 {
 	CURL* curl = curl_easy_init();
 	std::string readBuffer;
 
-	if (curl) 
+	if (curl)
 	{
 		curl_easy_setopt(curl, CURLOPT_URL, "https://raw.githubusercontent.com/CrowdedSignature46/Auth/main/version.json");
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
@@ -320,31 +337,31 @@ static std::string GetLatestVersion()
 		CURLcode res = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
 
-		if (res != CURLE_OK) 
+		if (res != CURLE_OK)
 		{
 			std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
 			return "";
 		}
 	}
 
-	try 
+	try
 	{
 		json jsonData = json::parse(readBuffer);
 		return jsonData["version"].get<std::string>();
 	}
-	catch (std::exception& e) 
+	catch (std::exception& e)
 	{
 		std::cerr << "JSON Parsing Error: " << e.what() << std::endl;
 		return "";
 	}
 }
 
-static std::string GetDownloadURL() 
+static std::string GetDownloadURL()
 {
 	CURL* curl = curl_easy_init();
 	std::string readBuffer;
 
-	if (curl) 
+	if (curl)
 	{
 		curl_easy_setopt(curl, CURLOPT_URL, "https://raw.githubusercontent.com/CrowdedSignature46/Auth/main/version.json");
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
@@ -352,19 +369,19 @@ static std::string GetDownloadURL()
 		CURLcode res = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
 
-		if (res != CURLE_OK) 
+		if (res != CURLE_OK)
 		{
 			std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
 			return "";
 		}
 	}
 
-	try 
+	try
 	{
 		json jsonData = json::parse(readBuffer);
 		return jsonData["download_url"].get<std::string>();
 	}
-	catch (std::exception& e) 
+	catch (std::exception& e)
 	{
 		std::cerr << "JSON Parsing Error: " << e.what() << std::endl;
 		return "";
@@ -802,8 +819,6 @@ static inline void StaticUI()
 	{
 		ImGui::Checkbox("Infinite Render (can break things)", &Globals::bInfiniteRender);
 	}
-
-	// ImGui::Checkbox("No MCP", &Globals::bNoMCP);
 
 	/*if (Addresses::ApplyGadgetData && Addresses::RemoveGadgetData && Engine_Version < 424)
 	{
@@ -1410,6 +1425,11 @@ static inline void MainUI()
 				ImGui::Text(std::format("Ended: {}", GameState->GetGamePhase() > EAthenaGamePhase::Warmup && !GameMode->IsMatchInProgress()).c_str());
 				ImGui::Text(std::format("Gamemode: {} {}", (isLateGame ? "Lategame" : "Full Map"), PlaylistShortName).c_str());
 				ImGui::Text(std::format("Players: {}", GameState->GetPlayersLeft()).c_str());
+				
+				if (Globals::bInfiniteRender)
+				{
+					ImGui::Text(std::format("Infinite Render: {}", Globals::bInfiniteRender).c_str());
+				}
 
 				/*if (!Globals::bStartedListening) // hm
 				{
@@ -1510,17 +1530,17 @@ static inline void MainUI()
 				std::string latestVersion = GetLatestVersion();
 				std::string downloadURL = GetDownloadURL();
 
-				if (!latestVersion.empty() && latestVersion != CurrentVersion) 
+				if (!latestVersion.empty() && latestVersion != CurrentVersion)
 				{
 					ImGui::TextColored(ImVec4(1, 0, 0, 1), "New Version Available: %s", latestVersion.c_str());
 
-					if (ImGui::Button("Download Update")) 
+					if (ImGui::Button("Download Update"))
 					{
 						std::string command = "start " + downloadURL;
 						system(command.c_str());
 					}
 				}
-				else 
+				else
 				{
 					ImGui::TextColored(ImVec4(0, 1, 0, 1), "You are running the latest version. (%s)", latestVersion.c_str());
 				}
@@ -1813,10 +1833,10 @@ static inline void MainUI()
 			{
 				ImGui::Checkbox("Enable Cannon Animations", &bEnableCannonAnimations);
 
-				ImGui::NewLine();
-
 				if (!bEnableCannonAnimations)
 				{
+					ImGui::NewLine();
+
 					ImGui::Text("FMod Cannon Launch Velocity");
 					ImGui::InputFloat("X", CannonXMultiplier);
 					ImGui::InputFloat("Y", CannonYMultiplier);
@@ -1828,6 +1848,8 @@ static inline void MainUI()
 			{
 				ImGui::Checkbox("Toggle Victory Crown Slowmo", &Globals::bCrownSlowmo);
 			}
+
+			ImGui::Checkbox("DBNO Slomo On Win (this is ass rn dont use)", &Globals::KnockOnWin);
 		}
 
 		else if (Tab == ZONE_TAB)
@@ -1984,7 +2006,7 @@ static inline void MainUI()
 
 				obj << FortniteVersionStr;
 
-				for (int i = 0; i < ObjectNum; i++)
+				for (int i = 0; i < ObjectNum; ++i)
 				{
 					auto CurrentObject = GetObjectByIndex(i);
 
@@ -2013,7 +2035,7 @@ static inline void MainUI()
 
 					auto AllObjects = GetAllObjectsOfClass(CIDClass);
 
-					for (int i = 0; i < AllObjects.size(); i++)
+					for (int i = 0; i < AllObjects.size(); ++i)
 					{
 						auto CurrentCID = AllObjects.at(i);
 
@@ -2042,7 +2064,7 @@ static inline void MainUI()
 
 				auto AllFunctions = GetAllObjectsOfClass(FunctionsClass);
 
-				for (int i = 0; i < AllFunctions.size(); i++)
+				for (int i = 0; i < AllFunctions.size(); ++i)
 				{
 					auto CurrentFunction = AllFunctions.at(i);
 
@@ -2071,7 +2093,7 @@ static inline void MainUI()
 
 					auto AllObjects = GetAllObjectsOfClass(FortPlaylistClass);
 
-					for (int i = 0; i < AllObjects.size(); i++)
+					for (int i = 0; i < AllObjects.size(); ++i)
 					{
 						auto Object = AllObjects.at(i);
 
@@ -2107,7 +2129,7 @@ static inline void MainUI()
 					auto DumpItemDefinitionClass = [&WeaponsFile](UClass* Class) {
 						auto AllObjects = GetAllObjectsOfClass(Class);
 
-						for (int i = 0; i < AllObjects.size(); i++)
+						for (int i = 0; i < AllObjects.size(); ++i)
 						{
 							auto Object = AllObjects.at(i);
 
@@ -2316,7 +2338,7 @@ static inline void MainUI()
 				}
 			} */
 
-			/* 
+			/*
 			ImGui::Text(std::format("Amount of hooks {}", AllFunctionHooks.size()).c_str());
 
 			for (auto& FunctionHook : AllFunctionHooks)
@@ -2341,7 +2363,7 @@ static inline void MainUI()
 
 					FunctionHook.IsHooked = !FunctionHook.IsHooked;
 				}
-			} 
+			}
 			*/
 		}
 		else if (Tab == DEBUGLOG_TAB)
@@ -3035,7 +3057,7 @@ static inline void PregameUI()
 
 		static high_resolution_clock::time_point AddMessageTime;
 
-		if (ImGui::Checkbox("Use Custom Bot Name", &Globals::bBotNames));
+		if (ImGui::Checkbox("Use Custom Bot Name", &Globals::bBotNames))
 		{
 			if (Globals::bBotNames == true)
 			{
@@ -3062,21 +3084,7 @@ static inline void PregameUI()
 		{
 			if (ImGui::Checkbox("Use Random Skins", &Globals::bUseRandomSkins));
 			{
-				if (Globals::bUseRandomSkins == false)
-				{
-					ImGui::InputText("HID To Use", SkinInput, sizeof(SkinInput));
 
-					if (ImGui::Button("Set As Bot's Skin"))
-					{
-						Globals::BotSkin = SkinInput;
-
-						ImGui::NewLine();
-
-						SkinStatusMessage = "Set Bot's Skin to " + Globals::BotSkin + "!";
-
-						AddMessageTime = high_resolution_clock::now();
-					}
-				}
 			}
 		}
 
@@ -3104,11 +3112,83 @@ static inline void PregameUI()
 
 		ImGui::NewLine();
 
-		if (!Globals::bUseRandomSkins)
+		static int SelectedSkin = (int)Skins::Galaxy;
+
+		ImGui::RadioButton("Renegade Raider", &SelectedSkin, (int)Skins::RenegadeRaider);
+		ImGui::RadioButton("Aerial Assault Trooper", &SelectedSkin, (int)Skins::Aerial);
+		ImGui::RadioButton("Ghoul Trooper", &SelectedSkin, (int)Skins::GhoulTrooper);
+		ImGui::RadioButton("Skull Trooper", &SelectedSkin, (int)Skins::SkullTrooper);
+		ImGui::RadioButton("Nog Ops", &SelectedSkin, (int)Skins::NogOps);
+		ImGui::RadioButton("Sparkle Specialist", &SelectedSkin, (int)Skins::SparkleSpecialist);
+		ImGui::RadioButton("Galaxy Skin", &SelectedSkin, (int)Skins::Galaxy);
+		ImGui::RadioButton("Fennix", &SelectedSkin, (int)Skins::Fennix);
+		ImGui::RadioButton("Custom", &SelectedSkin, (int)Skins::Custom);
+
+		switch (SelectedSkin)
 		{
-			if (ImGui::Button("List of HID's"))
+		case (int)Skins::RenegadeRaider:
+		{
+			Globals::BotSkin = "HID_028_Athena_Commando_F";
+			break;
+		}
+		case (int)Skins::Aerial:
+		{
+			Globals::BotSkin = "HID_017_Athena_Commando_M";
+			break;
+		}
+		case (int)Skins::GhoulTrooper:
+		{
+			Globals::BotSkin = "HID_029_Athena_Commando_F_Halloween";
+			break;
+		}
+		case (int)Skins::SkullTrooper:
+		{
+			Globals::BotSkin = "HID_030_Athena_Commando_M_Halloween";
+			break;
+		}
+		case (int)Skins::NogOps:
+		{
+			Globals::BotSkin = "HID_046_Athena_Commando_F_HolidaySweater";
+			break;
+		}
+		case (int)Skins::SparkleSpecialist:
+		{
+			Globals::BotSkin = "HID_038_Athena_Commando_M_Disco";
+			break;
+		}
+		case (int)Skins::Galaxy:
+		{
+			Globals::BotSkin = "HID_175_Athena_Commando_M_Celestial";
+			break;
+		}
+		case (int)Skins::Fennix:
+		{
+			Globals::BotSkin = "HID_504_Athena_Commando_M_Lopex";
+			break;
+		}
+		case (int)Skins::Custom:
+		{
+			break;
+		}
+		default:
+		{
+			break;
+		}
+		}
+
+		if (SelectedSkin == (int)Skins::Custom)
+		{
+			ImGui::InputText("HID To Use", SkinInput, sizeof(SkinInput));
+
+			if (ImGui::Button("Set As Bot's Skin"))
 			{
-				ShellExecute(0, 0, L"https://pastebin.com/2Cbctp1S", 0, 0, SW_SHOW);
+				Globals::BotSkin = SkinInput;
+
+				ImGui::NewLine();
+
+				SkinStatusMessage = "Set Bot's Skin to " + Globals::BotSkin + "!";
+
+				AddMessageTime = high_resolution_clock::now();
 			}
 		}
 
@@ -3148,10 +3228,10 @@ static inline void PregameUI()
 		}
 	}
 
-	
+
 	else if (PregameTab == PREGAME_SETTINGS_TAB)
 	{
-		ImGui::Text("Alot of these options can be configured before the game initializes, but it's more proper to do it before.");
+		ImGui::Checkbox("No MCP", &Globals::bNoMCP);
 
 		if (ImGui::Checkbox("Use Custom Lootpool (EXPERIMENTAL)", &Globals::bCustomLootpool))
 		{
@@ -3384,17 +3464,17 @@ static inline void PregameUI()
 	}
 }
 
-static inline HICON LoadIconFromMemory(const char* bytes, int bytes_size, const wchar_t* IconName) 
+static inline HICON LoadIconFromMemory(const char* bytes, int bytes_size, const wchar_t* IconName)
 {
 	HANDLE hMemory = CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, bytes_size, IconName);
-	if (hMemory == NULL) 
+	if (hMemory == NULL)
 	{
 		return NULL;
 	}
 
 	LPVOID lpBuffer = MapViewOfFile(hMemory, FILE_MAP_READ, 0, 0, bytes_size);
 
-	if (lpBuffer == NULL) 
+	if (lpBuffer == NULL)
 	{
 		CloseHandle(hMemory);
 		return NULL;
@@ -3402,7 +3482,7 @@ static inline HICON LoadIconFromMemory(const char* bytes, int bytes_size, const 
 
 	ICONINFO icon_info;
 
-	if (!GetIconInfo((HICON)lpBuffer, &icon_info)) 
+	if (!GetIconInfo((HICON)lpBuffer, &icon_info))
 	{
 		UnmapViewOfFile(lpBuffer);
 		CloseHandle(hMemory);

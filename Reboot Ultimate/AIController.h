@@ -6,7 +6,7 @@
 #include "BlackboardComponent.h"
 #include "reboot.h"
 #include "PathFollowingTypes.h"
-#include "TSubClassOf.h"
+#include "TSubclassOf.h"
 
 using UNavigationQueryFilter = UObject;
 

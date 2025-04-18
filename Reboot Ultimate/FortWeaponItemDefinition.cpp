@@ -36,17 +36,15 @@ int UFortWeaponItemDefinition::GetClipSize()
 	return *(int*)(__int64(Row) + ClipSizeOffset);
 }
 
-float& UFortWeaponItemDefinition::GetSpread()
+int UFortWeaponItemDefinition::GetSpread()
 {
-	static float INVALID_RET = 0.f;
-
 	static auto WeaponStatHandleOffset = GetOffset("WeaponStatHandle");
 	auto& WeaponStatHandle = Get<FDataTableRowHandle>(WeaponStatHandleOffset);
 
 	auto Table = WeaponStatHandle.DataTable;
 
 	if (!Table)
-		return INVALID_RET;
+		return 0;
 
 	auto& RowMap = Table->GetRowMap();
 
@@ -64,10 +62,41 @@ float& UFortWeaponItemDefinition::GetSpread()
 	}
 
 	if (!Row)
-		return INVALID_RET;
+		return 0;
 
 	static auto SpreadOffset = FindOffsetStruct("/Script/FortniteGame.FortRangedWeaponStats", "Spread");
-	return *(float*)(__int64(Row) + SpreadOffset);
+	return *(int*)(__int64(Row) + SpreadOffset);
+}
+
+int UFortWeaponItemDefinition::ForceSpreadZero()
+{
+	static auto WeaponStatHandleOffset = GetOffset("WeaponStatHandle");
+	auto& WeaponStatHandle = Get<FDataTableRowHandle>(WeaponStatHandleOffset);
+
+	auto Table = WeaponStatHandle.DataTable;
+
+	if (!Table)
+		return 0;
+
+	auto& RowMap = Table->GetRowMap();
+
+	for (int i = 0; i < RowMap.Pairs.Elements.Data.Num(); ++i)
+	{
+		auto& Pair = RowMap.Pairs.Elements.Data.at(i).ElementData.Value;
+
+		if (Pair.Key() == WeaponStatHandle.RowName)
+		{
+			void* Row = Pair.Value();
+			if (Row)
+			{
+				static auto SpreadOffset = FindOffsetStruct("/Script/FortniteGame.FortRangedWeaponStats", "Spread");
+				*(float*)((uintptr_t)Row + SpreadOffset) = 0.0f;
+			}
+			break;
+		}
+	}
+
+	return 0;
 }
 
 int UFortWeaponItemDefinition::GetInitialClips()

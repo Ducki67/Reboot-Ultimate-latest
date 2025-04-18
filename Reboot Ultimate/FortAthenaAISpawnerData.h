@@ -1,7 +1,7 @@
 #pragma once
 
 #include "reboot.h"
-#include "TSubClassOf.h"
+#include "TSubclassOf.h"
 #include "FortAthenaAISpawnerDataComponentList.h"
 #include "Pawn.h"
 

@@ -20,7 +20,8 @@ public:
 	}
 
 	int GetClipSize();
-	float& GetSpread();
+	int GetSpread();
+	int ForceSpreadZero();
 	int GetInitialClips();
 	UFortWorldItemDefinition* GetAmmoData();
 	void RemoveGrantedWeaponAbilities(class AFortPlayerControllerAthena* PlayerController);

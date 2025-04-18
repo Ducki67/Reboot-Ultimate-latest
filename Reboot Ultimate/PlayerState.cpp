@@ -94,6 +94,6 @@ void APlayerState::OnRep_Score()
 
 UClass* AFortPlayerStateZone::StaticClass()
 {
-	static auto Class = FindObject<UClass>(L"/Script/FortniteGame.FortPlayerStateZone");
-	return Class;
+	static auto fn = FindObject<UClass>(L"/Script/FortniteGame.FortPlayerStateZone");
+	return fn;
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TSubClassOf.h"
+#include "TSubclassOf.h"
 #include "BehaviorTree.h"
 #include "FortPawn.h"
 

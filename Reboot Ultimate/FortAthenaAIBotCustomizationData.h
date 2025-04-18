@@ -2,7 +2,7 @@
 
 #include "reboot.h"
 #include "FortAthenaAIBotCharacterCustomization.h"
-#include "TSubClassOf.h"
+#include "TSubclassOf.h"
 #include "BehaviorTree.h"
 #include "FortBotNameSettings.h"
 #include "FortAthenaAIBotInventoryItems.h"

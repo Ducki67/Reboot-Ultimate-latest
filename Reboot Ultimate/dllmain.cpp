@@ -68,18 +68,20 @@
 
 const std::vector<std::string> WhitelistedIPs = {
     "26.95.73.26", // ralz
-    "26.153.21.74", // sweefy
+    "26.0.199.236", // sweefy
     "26.198.115.19", // Heliato
     "26.69.16.29", // rit main
     "26.157.120.241", // sylo
+    "26.140.35.4", // bomb
     "26.88.5.211", // liend
     "26.61.188.132", // crazy
-    "26.116.27.139", // midnight
-    "26.0.11.135", // kye of norcal
-    "26.38.76.122", // bubble
-    "26.205.99.136", // day
+    "26.20.240.122", // midnight
+    "26.28.169.92", // fraggot 2
+    "26.139.184.134", // rit shadow 87
+    "26.85.3.16", // day
+    "26.165.79.75", // exo
     "26.223.77.91", // say
-    "26.204.97.61", // rit shadow
+    "26.235.139.63", // scy
     "26.186.58.140" // jecity
 };
 
@@ -1243,7 +1245,7 @@ DWORD WINAPI Main(LPVOID)
     // Hooking::MinHook::Hook(FindObject<UFortServerBotManagerAthena>(L"/Script/FortniteGame.Default__FortServerBotManagerAthena"), FindObject<UFunction>(L"/Script/FortniteGame.FortServerBotManagerAthena.SpawnBot"),
        // UFortServerBotManagerAthena::SpawnBotHook, (PVOID*)&UFortServerBotManagerAthena::SpawnBotOriginal, false);
 
-    if (Fortnite_Version != 19 || Fortnite_Version != 18)
+    if (Fortnite_Version < 18)
     {
         Hooking::MinHook::Hook(GameModeDefault, FindObject<UFunction>(L"/Script/Engine.GameModeBase.SpawnDefaultPawnFor"),
             AGameModeBase::SpawnDefaultPawnForHook, nullptr, false);

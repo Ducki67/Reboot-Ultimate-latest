@@ -28,7 +28,7 @@ void AFortDecoTool::ServerSpawnDeco(AFortDecoTool * DecoTool, FFrame & Stack, vo
     if (!PlayerControllerAthena || !PlayerStateAthena || !BlueprintClass.Get())
         return;
 
-    ABuildingActor* (*SpawnDeco)(AFortDecoTool * DecoTool, UClass * Class, const FVector & Location, const FRotator & Rotation, ABuildingSMActor * AttachedActor, int a6, EBuildingAttachmentType InBuildingAttachmentType) = decltype(SpawnDeco)(0x69abec4 + uintptr_t(GetModuleHandle(0)));
+    ABuildingActor* (*SpawnDeco)(AFortDecoTool * DecoTool, UClass * Class, const FVector & Location, const FRotator & Rotation, ABuildingSMActor * AttachedActor, int a6, EBuildingAttachmentType InBuildingAttachmentType) = decltype(SpawnDeco)(Offsets::ServerSpawnDeco);
     ABuildingActor* BuildingTrap = SpawnDeco(DecoTool, BlueprintClass, Location, Rotation, AttachedActor, 0, InBuildingAttachmentType);
 
     if (BuildingTrap)
@@ -60,25 +60,4 @@ void AFortDecoTool::ServerCreateBuildingAndSpawnDeco(AFortDecoTool* DecoTool, FF
     Stack.Code += Stack.Code != nullptr;
 
     LOG_INFO(LogDev, "ServerCreateBuildingAndSpawnDeco called - DecoTool: {}", DecoTool->GetFullName().c_str());
-
-    UFortDecoItemDefinition* TrapItemDefinition = Cast<UFortDecoItemDefinition>(DecoTool->GetItemDefinition());
-    AFortPlayerPawn* PlayerPawn = Cast<AFortPlayerPawn>(DecoTool->GetOwner());
-
-    if (!TrapItemDefinition || !PlayerPawn)
-        return;
-
-    AFortPlayerControllerAthena* PlayerControllerAthena = Cast<AFortPlayerControllerAthena>(PlayerPawn->GetController());
-    AFortPlayerStateAthena* PlayerStateAthena = Cast<AFortPlayerStateAthena>(PlayerPawn->GetPlayerState());
-    TSubclassOf<ABuildingActor> BlueprintClass = TrapItemDefinition->GetBlueprintClass();
-
-    if (!PlayerControllerAthena || !PlayerStateAthena || !BlueprintClass.Get())
-        return;
-
-    ABuildingActor* (*SpawnDeco)(AFortDecoTool * DecoTool, UClass * Class, const FVector & Location, const FRotator & Rotation, ABuildingSMActor * AttachedActor, int a6, EBuildingAttachmentType InBuildingAttachmentType) = decltype(SpawnDeco)(0x69abec4 + uintptr_t(GetModuleHandle(0)));
-    ABuildingActor* BuildingTrap = SpawnDeco(DecoTool, BlueprintClass, Location, Rotation, AttachedActor, 0, InBuildingAttachmentType);
-
-    if (BuildingTrap)
-    {
-        BuildingTrap->SetTeam(PlayerStateAthena->GetTeamIndex());
-    }
 }

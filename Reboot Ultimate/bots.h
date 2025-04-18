@@ -155,7 +155,7 @@ public:
 					{
 						auto& StartingItem = StartingItems.at(i);
 
-						(*Inventory)->AddItem(StartingItem.GetItem(), nullptr, StartingItem.GetCount());
+						// (*Inventory)->AddItem(StartingItem.GetItem(), nullptr, StartingItem.GetCount());
 					}
 
 					if (auto FortPlayerController = Cast<AFortPlayerController>(Controller))
@@ -357,7 +357,7 @@ public:
 		auto PlayerAbilitySet = GetPlayerAbilitySet();
 		auto AbilitySystemComponent = PlayerState->GetAbilitySystemComponent();
 
-		if (PlayerAbilitySet)
+		if (PlayerAbilitySet && AbilitySystemComponent)
 		{
 			PlayerAbilitySet->GiveToAbilitySystem(AbilitySystemComponent);
 		}
@@ -368,11 +368,13 @@ public:
 
 		if (!ShouldUseAIBotController())
 		{
-			GameState->GetPlayersLeft()++;
+			++GameState->GetPlayersLeft();
 			GameState->OnRep_PlayersLeft();
 
 			if (auto FortPlayerControllerAthena = Cast<AFortPlayerControllerAthena>(Controller))
+			{
 				GameMode->GetAlivePlayers().Add(FortPlayerControllerAthena);
+			}
 		}
 	}
 

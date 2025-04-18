@@ -6,6 +6,7 @@
 #include "moderation.h"
 #include "gui.h"
 #include "BehaviorTree.h"
+#include "Object.h"
 #include "AIBlueprintHelperLibrary.h"
 #include "FortServerBotManagerAthena.h"
 #include "FortAthenaAIBotSpawnerData.h"
@@ -483,19 +484,15 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "Athena_SilverBlazer_V2";
 			}
-			else if (weaponName == "decoy" || weaponName == "decoys")
+			else if (weaponName == "trashcannon" || weaponName == "trash")
 			{
-				weaponName = "WID_Athena_DangerGrape";
-			}
-			else if (weaponName == "zaptrap")
-			{
-				weaponName = "Athena_ZippyTrout";
+				weaponName = "WID_Launcher_Scavenger_SR_Ore_T05";
 			}
 			else if (weaponName == "batman")
 			{
 				weaponName = "WID_Badger_Grape_VR";
 			}
-			else if (weaponName == "batarangs")
+			else if (weaponName == "batarangs" || weaponName == "batarang")
 			{
 				weaponName = "WID_Athena_BadgerBangsNew";
 			}
@@ -531,17 +528,13 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				weaponName = "Athena_ChillBronco";
 			}
-			else if (weaponName == "minis")
+			else if (weaponName == "minis" || weaponName == "mini")
 			{
 				weaponName = "Athena_ShieldSmall";
 			}
 			else if (weaponName == "portafort" || weaponName == "paf")
 			{
 				weaponName = "Athena_TowerGrenade";
-			}
-			else if (weaponName == "c4")
-			{
-				weaponName = "Athena_C4";
 			}
 			else if (weaponName == "firefly" || weaponName == "fireflies")
 			{
@@ -630,6 +623,10 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else if (weaponName == "light" || weaponName == "lightammo")
 			{
 				weaponName = "AthenaAmmoDataBulletsLight";
+			}
+			else if (weaponName == "grappler_n" || weaponName == "grap_n" || weaponName == "grapple_n")
+			{
+				weaponName = "WID_Hook_Gun_VR_Ore_T03";
 			}
 			else if (weaponName == "grappler" || weaponName == "grap" || weaponName == "grapple")
 			{
@@ -800,8 +797,44 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 			}
 
+			/*int loadedAmmo = -1;
+
+			try
+			{
+				if (NumArgs >= 3)
+					loadedAmmo = std::stoi(Arguments[3]);
+			}
+			catch (...)
+			{
+				loadedAmmo = -1; // fallback to default behavior
+			}*/
+
+			bool bForceZeroSpread = false;
+
+			if (NumArgs >= 3)
+			{
+				auto& arg = Arguments[3];
+
+				std::transform(arg.begin(), arg.end(), arg.begin(), ::tolower);
+
+				if (arg == "zero_spread" || arg == "bloom")
+				{
+					bForceZeroSpread = true;
+				}
+			}
+
+			if (bForceZeroSpread)
+			{
+				if (auto WeaponDef = Cast<UFortWeaponItemDefinition>(WID))
+				{
+					WeaponDef->ForceSpreadZero();
+
+					SendMessageToConsole(PlayerController, L"gay bloom :3");
+				}
+			}
+
 			bool bShouldUpdate = false;
-			WorldInventory->AddItem(WID, &bShouldUpdate, count);
+			WorldInventory->AddItem(WID, &bShouldUpdate, count/*, loadedAmmo*/);
 
 			if (bShouldUpdate)
 				WorldInventory->Update();
@@ -2482,39 +2515,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, L"You have **PERMANENTLY** turned off fall damage for this game.");
 		}
-		else if (Command == "changespread")
-		{
-			if (NumArgs < 1)
-			{
-				SendMessageToConsole(ReceivingController, L"Please provide a valid clip size!");
-				return;
-			}
-
-			auto WorldInventory = ReceivingController->GetWorldInventory();
-
-			if (!WorldInventory)
-			{
-				SendMessageToConsole(PlayerController, L"No world inventory!");
-				return;
-			}
-
-			static auto WeaponDef = FindObject<UFortWeaponItemDefinition>("/Game/Athena/Items/Weapons/WID_Sniper_BoltAction_Scope_Athena_SR_Ore_T03.WID_Sniper_BoltAction_Scope_Athena_SR_Ore_T03");
-
-			int NewSpread = WeaponDef->GetSpread();
-
-			try { NewSpread = std::stoi(Arguments[1]); }
-			catch (...) {}
-
-			WeaponDef->GetSpread() = NewSpread;
-
-			bool bShouldUpdate = false;
-			WorldInventory->AddItem(WeaponDef, &bShouldUpdate);
-
-			if (bShouldUpdate)
-				WorldInventory->Update();
-
-			SendMessageToConsole(PlayerController, L"Granted item!");
-		}
 		else if (Command == "setshield" || Command == "shield")
 		{
 			auto Pawn = ReceivingController->GetMyFortPawn();
@@ -2619,16 +2619,24 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				catch (...) {}
 			}
 
-			if (Siphon > 0)
+			if (Siphon >= 1)
 			{
 				Globals::bUseSiphon == true;
 			}
-			else if (Siphon == 0)
+			else if (Siphon <= 0)
 			{
 				Globals::bUseSiphon == false;
 			}
 
-			Globals::AmountOfHealthSiphon = Siphon;
+			if (Globals::bUseSiphon)
+			{
+				Globals::AmountOfHealthSiphon = Siphon;
+			}
+			else
+			{
+				SendMessageToConsole(PlayerController, L"bUseSiphon is dying idfk why go kys stupid coder boy");
+				return;
+			}
 
 			std::wstringstream ss;
 			ss << std::fixed << std::setprecision(0) << Siphon;
@@ -2678,13 +2686,17 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				}
 			}
 
-			Pawn->SetHealth(100.f);
-			Pawn->SetShield(100.f);
-
 			if (Health.GetMinimum() != MaxHealth)
 			{
 				Health.GetMinimum() = MaxHealth;
 				SendMessageToConsole(PlayerController, L"God ON.");
+
+				Pawn->SetHealth(100.f);
+
+				if (!PlaylistName.contains("Low"))
+				{
+					Pawn->SetShield(100.f);
+				}
 			}
 			else
 			{
@@ -2964,6 +2976,10 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			{
 				Class = "/Game/Building/ActorBlueprints/Prop/Prop_TirePile_04.Prop_TirePile_04_C";
 			}
+			else if (Class == "paf" || Class == "fortress")
+			{
+				Class = "/Game/Athena/Items/Consumables/TowerGrenade/Prop_TirePile_Tower.Prop_TirePile_Tower_C";
+			}
 			else if (Class == "llama")
 			{
 				Class = "/Game/Athena/SupplyDrops/Llama/AthenaSupplyDrop_Llama.AthenaSupplyDrop_Llama_C";
@@ -3015,6 +3031,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			CheatManager->DestroyAll(AClass);
 			CheatManager = nullptr;
+
+			SendMessageToConsole(PlayerController, L"Destroyed all objects!");
 		}
 		else if (Command == "destroyfishingholes")
 		{
@@ -4017,7 +4035,13 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			if (Fortnite_Version >= 7.40 && Fortnite_Version <= 8.51)
 			{
 				SendMessageToConsole(PlayerController, L"You cannot spawn a bot on this version!");
-				SendMessageToConsole(PlayerController, L"Try restarting the server using « cheat restart » and using another account as a bot instead!");
+				SendMessageToConsole(PlayerController, L"Try restarting the server usbluing « cheat restart » and using another account as a bot instead!");
+				return;
+			}
+
+			if (GameState->GetGamePhase() < EAthenaGamePhase::Aircraft)
+			{
+				SendMessageToConsole(PlayerController, L"Bot spawning before aircraft is not allowed!");
 				return;
 			}
 
@@ -4826,6 +4850,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				return;
 			}
 
+			auto Pawn = ReceivingController->GetMyFortPawn();
+
 			auto ReceivingPawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn());
 			auto ExecutingPawn = Cast<AFortPlayerPawn>(PlayerController->GetMyFortPawn());
 
@@ -4835,24 +4861,58 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				return;
 			}
 
-			FVector TargetLocation = ReceivingPawn->GetActorLocation();
+			std::string Phrase = Arguments[1];
 
-			TargetLocation.Z += 50.0f;
+			if (Phrase == "me" || Phrase == "m" || Phrase == "self")
+			{
+				FVector TargetLocation = ExecutingPawn->GetActorLocation();
 
-			ExecutingPawn->TeleportTo(TargetLocation, ExecutingPawn->GetActorRotation());
+				TargetLocation.Z += 50.0f;
+
+				ReceivingPawn->TeleportTo(TargetLocation, ReceivingPawn->GetActorRotation());
+
+				auto PawnLocation = ReceivingPawn->GetActorLocation();
+
+				if (PawnLocation.X == 0.0f && PawnLocation.Y == 0.0f && PawnLocation.Z == 0.0f)
+				{
+					FVector FailsafeLocation = FVector(0.0f, 0.0f, 10000.0f);
+					Pawn->TeleportTo(FailsafeLocation, Pawn->GetActorRotation());
+					SendMessageToConsole(PlayerController, L"Failsafe triggered: Teleported to (0, 0, 10000) due to invalid (0, 0, 0) location.");
+					return;
+				}
+			}
+			else
+			{
+				FVector TargetLocation = ReceivingPawn->GetActorLocation();
+
+				TargetLocation.Z += 50.0f;
+
+				ExecutingPawn->TeleportTo(TargetLocation, ExecutingPawn->GetActorRotation());
+
+				auto PawnLocation = ExecutingPawn->GetActorLocation();
+
+				if (PawnLocation.X == 0.0f && PawnLocation.Y == 0.0f && PawnLocation.Z == 0.0f)
+				{
+					FVector FailsafeLocation = FVector(0.0f, 0.0f, 10000.0f);
+					Pawn->TeleportTo(FailsafeLocation, Pawn->GetActorRotation());
+					SendMessageToConsole(PlayerController, L"Failsafe triggered: Teleported to (0, 0, 10000) due to invalid (0, 0, 0) location.");
+					return;
+				}
+			}
+
+			static auto LaunchCharacterFn = FindObject<UFunction>(L"/Script/Engine.Character.LaunchCharacter");
+
+			struct
+			{
+				FVector LaunchVelocity;
+				bool bXYOverride;
+				bool bZOverride;
+				bool bIgnoreFallDamage;
+			} ACharacter_LaunchCharacter_Params{ FVector(0.0f, 0.0f, -10000000.0f), false, false, true }; // sort of works to stop momentum
+
+			Pawn->ProcessEvent(LaunchCharacterFn, &ACharacter_LaunchCharacter_Params);
 
 			SendMessageToConsole(PlayerController, L"Teleported successfully!");
-
-			auto Pawn = ReceivingController->GetMyFortPawn();
-
-			auto PawnLocation = Pawn->GetActorLocation();
-
-			if (PawnLocation.X == 0.0f && PawnLocation.Y == 0.0f && PawnLocation.Z == 0.0f)
-			{
-				FVector FailsafeLocation = FVector(0.0f, 0.0f, 10000.0f);
-				Pawn->TeleportTo(FailsafeLocation, Pawn->GetActorRotation());
-				SendMessageToConsole(PlayerController, L"Failsafe triggered: Teleported to (0, 0, 10000) due to invalid (0, 0, 0) location.");
-			}
 		}
 		else if (Command == "bugitgo" || Command == "b")
 		{

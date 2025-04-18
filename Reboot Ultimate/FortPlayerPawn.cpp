@@ -398,7 +398,7 @@ AActor* AFortPlayerPawn::ServerOnExitVehicleHook(AFortPlayerPawn* PlayerPawn, ET
 {
 	auto VehicleWeaponDefinition = PlayerPawn->GetVehicleWeaponDefinition(PlayerPawn->GetVehicle());
 	LOG_INFO(LogDev, "VehicleWeaponDefinition: {}", VehicleWeaponDefinition ? VehicleWeaponDefinition->GetFullName() : "BadRead");
-	PlayerPawn->UnEquipVehicleWeaponDefinition(VehicleWeaponDefinition);
+	// PlayerPawn->UnEquipVehicleWeaponDefinition(VehicleWeaponDefinition);
 
 	return ServerOnExitVehicleOriginal(PlayerPawn, ExitForceBehavior);
 }

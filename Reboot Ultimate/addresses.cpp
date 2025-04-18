@@ -73,6 +73,8 @@ void Addresses::SetupVersion()
 
 		if (Fortnite_Version >= 16.00 && Fortnite_Version <= 18.40)
 			Engine_Version = 427; // 4.26.1;
+
+		// TODO: Fortnite_CL = X
 	}
 
 	else
@@ -551,6 +553,9 @@ void Offsets::FindAll()
 		Offsets::DefaultObject = 0x118;
 	else if (Engine_Version >= 501)
 		Offsets::DefaultObject = 0x110;
+
+	if (Fortnite_Version == 19.10)
+		Offsets::ServerSpawnDeco = 0x69abec4;
 }
 
 void Offsets::Print()

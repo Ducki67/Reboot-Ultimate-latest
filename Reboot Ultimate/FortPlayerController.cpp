@@ -1863,8 +1863,6 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 
 					auto AllPlayerStates = UGameplayStatics::GetAllActorsOfClass(GetWorld(), AFortPlayerStateAthena::StaticClass());
 
-					auto KillerPlayerController = Cast<AFortPlayerControllerAthena>(KillerPlayerState->GetOwner());
-
 					bool bDidSomeoneWin = AllPlayerStates.Num() == 0;
 
 					for (int i = 0; i < AllPlayerStates.Num(); ++i)
@@ -1893,6 +1891,8 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 					{
 						if (Fortnite_Version >= 19)
 						{
+							auto KillerPlayerController = Cast<AFortPlayerControllerAthena>(KillerPlayerState->GetOwner());
+
 							auto WorldInventory = KillerPlayerController->GetWorldInventory();
 
 							static auto VictoryCrown = FindObject<UFortItemDefinition>(L"/VictoryCrownsGameplay/Items/AGID_VictoryCrown.AGID_VictoryCrown");
@@ -1903,6 +1903,35 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 					}
 
 					DBNOToggleOnWin();
+
+					if (Globals::KnockOnWin)
+					{
+						auto KillerPlayerController = Cast<AFortPlayerControllerAthena>(KillerPlayerState->GetOwner());
+
+						if (!KillerPlayerController)
+							return;
+
+						auto PlayerState = Cast<AFortPlayerState>(KillerPlayerController->GetPlayerState());
+
+						if (!PlayerState)
+							return;
+
+						auto Pawn = KillerPlayerController->GetMyFortPawn();
+
+						if (!Pawn)
+							return;
+
+						if (!Pawn->IsDBNO())
+						{
+							Pawn->SetDBNO(true);
+							Pawn->SetHasPlayedDying(false);
+
+							Pawn->SetHealth(100);
+							Pawn->SetShield(0);
+
+							Pawn->OnRep_IsDBNO();
+						}
+					}
 
 					RemoveFromAlivePlayers(GameMode, PlayerController, KillerPlayerState == DeadPlayerState ? nullptr : KillerPlayerState, KillerPawn, KillerWeaponDef, DeathCause, 0);
 
