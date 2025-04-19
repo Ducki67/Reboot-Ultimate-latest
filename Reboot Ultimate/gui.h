@@ -3110,85 +3110,88 @@ static inline void PregameUI()
 			}
 		}
 
-		ImGui::NewLine();
+		if (!Globals::bUseRandomSkins)
+		{
+			ImGui::NewLine();
 
-		static int SelectedSkin = (int)Skins::Galaxy;
+			static int SelectedSkin = (int)Skins::Galaxy;
 
-		ImGui::RadioButton("Renegade Raider", &SelectedSkin, (int)Skins::RenegadeRaider);
-		ImGui::RadioButton("Aerial Assault Trooper", &SelectedSkin, (int)Skins::Aerial);
-		ImGui::RadioButton("Ghoul Trooper", &SelectedSkin, (int)Skins::GhoulTrooper);
-		ImGui::RadioButton("Skull Trooper", &SelectedSkin, (int)Skins::SkullTrooper);
-		ImGui::RadioButton("Nog Ops", &SelectedSkin, (int)Skins::NogOps);
-		ImGui::RadioButton("Sparkle Specialist", &SelectedSkin, (int)Skins::SparkleSpecialist);
-		ImGui::RadioButton("Galaxy Skin", &SelectedSkin, (int)Skins::Galaxy);
-		ImGui::RadioButton("Fennix", &SelectedSkin, (int)Skins::Fennix);
-		ImGui::RadioButton("Custom", &SelectedSkin, (int)Skins::Custom);
+			ImGui::RadioButton("Renegade Raider", &SelectedSkin, (int)Skins::RenegadeRaider);
+			ImGui::RadioButton("Aerial Assault Trooper", &SelectedSkin, (int)Skins::Aerial);
+			ImGui::RadioButton("Ghoul Trooper", &SelectedSkin, (int)Skins::GhoulTrooper);
+			ImGui::RadioButton("Skull Trooper", &SelectedSkin, (int)Skins::SkullTrooper);
+			ImGui::RadioButton("Nog Ops", &SelectedSkin, (int)Skins::NogOps);
+			ImGui::RadioButton("Sparkle Specialist", &SelectedSkin, (int)Skins::SparkleSpecialist);
+			ImGui::RadioButton("Galaxy Skin", &SelectedSkin, (int)Skins::Galaxy);
+			ImGui::RadioButton("Fennix", &SelectedSkin, (int)Skins::Fennix);
+			ImGui::RadioButton("Custom", &SelectedSkin, (int)Skins::Custom);
 
-		switch (SelectedSkin)
-		{
-		case (int)Skins::RenegadeRaider:
-		{
-			Globals::BotSkin = "HID_028_Athena_Commando_F";
-			break;
-		}
-		case (int)Skins::Aerial:
-		{
-			Globals::BotSkin = "HID_017_Athena_Commando_M";
-			break;
-		}
-		case (int)Skins::GhoulTrooper:
-		{
-			Globals::BotSkin = "HID_029_Athena_Commando_F_Halloween";
-			break;
-		}
-		case (int)Skins::SkullTrooper:
-		{
-			Globals::BotSkin = "HID_030_Athena_Commando_M_Halloween";
-			break;
-		}
-		case (int)Skins::NogOps:
-		{
-			Globals::BotSkin = "HID_046_Athena_Commando_F_HolidaySweater";
-			break;
-		}
-		case (int)Skins::SparkleSpecialist:
-		{
-			Globals::BotSkin = "HID_038_Athena_Commando_M_Disco";
-			break;
-		}
-		case (int)Skins::Galaxy:
-		{
-			Globals::BotSkin = "HID_175_Athena_Commando_M_Celestial";
-			break;
-		}
-		case (int)Skins::Fennix:
-		{
-			Globals::BotSkin = "HID_504_Athena_Commando_M_Lopex";
-			break;
-		}
-		case (int)Skins::Custom:
-		{
-			break;
-		}
-		default:
-		{
-			break;
-		}
-		}
-
-		if (SelectedSkin == (int)Skins::Custom)
-		{
-			ImGui::InputText("HID To Use", SkinInput, sizeof(SkinInput));
-
-			if (ImGui::Button("Set As Bot's Skin"))
+			switch (SelectedSkin)
 			{
-				Globals::BotSkin = SkinInput;
+			case (int)Skins::RenegadeRaider:
+			{
+				Globals::BotSkin = "HID_028_Athena_Commando_F";
+				break;
+			}
+			case (int)Skins::Aerial:
+			{
+				Globals::BotSkin = "HID_017_Athena_Commando_M";
+				break;
+			}
+			case (int)Skins::GhoulTrooper:
+			{
+				Globals::BotSkin = "HID_029_Athena_Commando_F_Halloween";
+				break;
+			}
+			case (int)Skins::SkullTrooper:
+			{
+				Globals::BotSkin = "HID_030_Athena_Commando_M_Halloween";
+				break;
+			}
+			case (int)Skins::NogOps:
+			{
+				Globals::BotSkin = "HID_046_Athena_Commando_F_HolidaySweater";
+				break;
+			}
+			case (int)Skins::SparkleSpecialist:
+			{
+				Globals::BotSkin = "HID_038_Athena_Commando_M_Disco";
+				break;
+			}
+			case (int)Skins::Galaxy:
+			{
+				Globals::BotSkin = "HID_175_Athena_Commando_M_Celestial";
+				break;
+			}
+			case (int)Skins::Fennix:
+			{
+				Globals::BotSkin = "HID_504_Athena_Commando_M_Lopex";
+				break;
+			}
+			case (int)Skins::Custom:
+			{
+				break;
+			}
+			default:
+			{
+				break;
+			}
+			}
 
-				ImGui::NewLine();
+			if (SelectedSkin == (int)Skins::Custom)
+			{
+				ImGui::InputText("HID To Use", SkinInput, sizeof(SkinInput));
 
-				SkinStatusMessage = "Set Bot's Skin to " + Globals::BotSkin + "!";
+				if (ImGui::Button("Set As Bot's Skin"))
+				{
+					Globals::BotSkin = SkinInput;
 
-				AddMessageTime = high_resolution_clock::now();
+					ImGui::NewLine();
+
+					SkinStatusMessage = "Set Bot's Skin to " + Globals::BotSkin + "!";
+
+					AddMessageTime = high_resolution_clock::now();
+				}
 			}
 		}
 
