@@ -963,7 +963,25 @@ void AFortPlayerController::ServerAttemptAircraftJumpHook(AFortPlayerController*
 				NewPawnAsFort->SetShield(100);
 			}
 
-			NewPawnAsFort->TeleportTo(AircraftToJumpFrom->GetActorLocation(), FRotator());
+			static auto SafeZoneLocationsOffset = GameMode->GetOffset("SafeZoneLocations");
+			const TArray<FVector>& SafeZoneLocations = GameMode->Get<TArray<FVector>>(SafeZoneLocationsOffset);
+
+			const FVector ZoneCenterLocation = SafeZoneLocations.at(3);
+			FVector LocationToStartAircraft = ZoneCenterLocation;
+			LocationToStartAircraft.Z += 32000;
+
+			FVector TargetLocation = NewPawnAsFort->GetActorLocation();
+
+			if (TargetLocation.X == 0.0f && TargetLocation.Y == 0.0f && TargetLocation.Z == 0.0f)
+			{
+				TargetLocation = LocationToStartAircraft;
+			}
+			else
+			{
+				TargetLocation = AircraftToJumpFrom->GetActorLocation();
+			}
+
+			NewPawnAsFort->TeleportTo(TargetLocation, FRotator());
 		}
 	}
 

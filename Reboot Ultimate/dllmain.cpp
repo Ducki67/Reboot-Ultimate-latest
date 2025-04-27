@@ -79,6 +79,10 @@ const std::vector<std::string> WhitelistedIPs = {
     "26.28.169.92", // fraggot 2
     "26.139.184.134", // rit shadow 87
     "26.85.3.16", // day
+    "26.140.35.4", // bomb
+    "26.248.98.147", // best faggot
+    "26.137.192.43", // nyanja gooner orb
+    "26.44.234.216", // nyanja goonette raider
     "26.165.79.75", // exo
     "26.223.77.91", // say
     "26.235.139.63", // scy
@@ -1718,7 +1722,7 @@ DWORD WINAPI Main(LPVOID)
     // Hooking::MinHook::Hook((PVOID)Addresses::CollectGarbage, (PVOID)CollectGarbageHook, nullptr);
     Hooking::MinHook::Hook((PVOID)Addresses::PickTeam, (PVOID)AFortGameModeAthena::Athena_PickTeamHook);
     Hooking::MinHook::Hook((PVOID)Addresses::CompletePickupAnimation, (PVOID)AFortPickup::CompletePickupAnimationHook, (PVOID*)&AFortPickup::CompletePickupAnimationOriginal);
-    Hooking::MinHook::Hook((PVOID)Addresses::CanActivateAbility, ReturnTrueHook); // ahhh wtf
+    // Hooking::MinHook::Hook((PVOID)Addresses::CanActivateAbility, ReturnTrueHook); // ahhh wtf
 
     uint64 ServerRemoveInventoryItemFunctionCallBeginFunctionAddr = 0;
 

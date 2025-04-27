@@ -2337,7 +2337,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				return;
 			}
 
-			auto PlayerState = Cast<AFortPlayerState>(PlayerController->GetPlayerState());
+			auto PlayerState = Cast<AFortPlayerState>(ReceivingController->GetPlayerState());
 
 			if (!PlayerState)
 			{
@@ -2356,10 +2356,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 				Pawn->OnRep_IsDBNO();
 
-				PlayerController->ClientOnPawnRevived(PlayerController);
-				PlayerController->RespawnPlayerAfterDeath(false);
-
-				// PlayerController->IsMarkedAlive() == true;
+				ReceivingController->ClientOnPawnRevived(PlayerController);
+				ReceivingController->RespawnPlayerAfterDeath(false);
 			}
 		}
 		else if (Command == "logprocessevent")
@@ -2429,7 +2427,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, std::wstring(PlayerNames.begin(), PlayerNames.end()).c_str());
 		}
-		else if (Command == "launch")
+		else if (Command == "launch" || Command == "l")
 		{
 			float X = 0.0f, Y = 0.0f, Z = 0.0f;
 
@@ -4183,7 +4181,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			std::wstring Message = L"Time of day set to " + ss.str() + L"!\n";
 			SendMessageToConsole(PlayerController, Message.c_str());
 		}
-		else if (Command == "pausetimeofday" || Command == "pausetime" || Command == "pausehour" || Command == "timepause")
+		else if (Command == "pausetimeofday" || Command == "pausetime" || Command == "pausehour" || Command == "timepause" || Command == "pt")
 		{
 			static auto SetTimeOfDaySpeedFn = FindObject<UFunction>(L"/Script/FortniteGame.FortKismetLibrary.SetTimeOfDaySpeed");
 
@@ -4456,6 +4454,28 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				{
 					SendMessageToConsole(PlayerController, L"No pawn to teleport!");
 				}
+			}
+		}
+		else if (Command == "deletewaypoint" || Command == "wipewaypoint")
+		{
+			if (NumArgs < 1)
+			{
+				SendMessageToConsole(PlayerController, L"Please provide a waypoint phrase to delete.");
+				return;
+			}
+
+			std::string Phrase = Arguments[1];
+
+			auto it = Waypoints.find(Phrase);
+
+			if (it != Waypoints.end())
+			{
+				Waypoints.erase(it);
+				SendMessageToConsole(PlayerController, L"Waypoint deleted successfully!");
+			}
+			else
+			{
+				SendMessageToConsole(PlayerController, L"No waypoint found with that phrase!");
 			}
 		}
 		else if (Command == "gravity" || Command == "setgravity")
@@ -5622,6 +5642,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 - cheat bot {#} - Spawns a bot at the player (experimental).
 - cheat buildfree - Toggles Infinite Materials.
 - cheat changename {Name} - Changes the player's in-game name.
+- cheat deletewaypoint {phrase/number} - Deletes an already existing waypoint.
 - cheat damagetarget {#} - Damages the Actor in front of you by the specified amount.
 - cheat dbno - Puts the receiving controller in a fake down-but-not-out (knocked) state.
 - cheat demospeed - Speeds up/slows down the speed of the game.
