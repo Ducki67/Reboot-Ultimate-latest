@@ -25,7 +25,7 @@ namespace Calendar
 
 	static inline float GetFullSnowMapValue()
 	{
-		if (Fortnite_Version == 7.10 || Fortnite_Version == 7.30)
+		if (Fortnite_Version > 7 && Fortnite_Version < 7.40)
 		{
 			std::vector<std::pair<float, float>> TimeAndValues = { { 0, 1.2f}, { 0.68104035f, 4.6893263f }, { 0.9632137f, 10.13335f }, { 1.0f, 15.0f } };
 			// 1.2

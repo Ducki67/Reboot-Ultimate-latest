@@ -723,6 +723,9 @@
     <ClInclude Include="FortOctopusVehicle.h">
       <Filter>FortniteGame\Source\FortniteGame\Public\Athena\Vehicle</Filter>
     </ClInclude>
+    <ClInclude Include="FortCharacterVehicleOstrich.h">
+      <Filter>FortniteGame\Source\FortniteGame\Public\Athena\Vehicle</Filter>
+    </ClInclude>
     <ClInclude Include="IntroSort.h">
       <Filter>Engine\Source\Runtime\Core\Public\Algo</Filter>
     </ClInclude>
@@ -1109,6 +1112,9 @@
     </ClInclude>
     <ClInclude Include="FortDecoTool.h">
       <Filter>FortniteGame\Source\FortniteGame\Public\Weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="FortCharacterVehicleOstrich.cpp">
+      <Filter>FortniteGame\Source\FortniteGame\Private\Vehicle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

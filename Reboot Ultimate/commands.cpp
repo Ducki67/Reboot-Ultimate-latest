@@ -2427,7 +2427,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, std::wstring(PlayerNames.begin(), PlayerNames.end()).c_str());
 		}
-		else if (Command == "launch" || Command == "l")
+		else if (Command == "launch" || Command == "l" || Command == "send" || Command == "fling")
 		{
 			float X = 0.0f, Y = 0.0f, Z = 0.0f;
 
@@ -2437,11 +2437,60 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			try
 			{
-				if (argCount == 1)
+				if (argCount == 3 && Arguments[1].size() > 0 && !isdigit(Arguments[1][0]))
 				{
-					Z = 0.0f;
+					std::string Dir = Arguments[1];
+					float Mag = std::stof(Arguments[2]);
+
+					std::transform(Dir.begin(), Dir.end(), Dir.begin(), ::toupper);
+
+					if (Dir == "N") 
+					{ 
+						X = Mag; Z = Mag; 
+					}
+					else if (Dir == "S") 
+					{ 
+						X = -Mag; Z = Mag; 
+					}
+					else if (Dir == "E") 
+					{ 
+						Y = Mag; Z = Mag; 
+					}
+					else if (Dir == "W") 
+					{ 
+						Y = -Mag; Z = Mag; 
+					}
+					else if (Dir == "NE") 
+					{ 
+						X = Mag; Y = Mag; Z = Mag; 
+					}
+					else if (Dir == "NW") 
+					{ 
+						X = Mag; Y = -Mag; Z = Mag; 
+					}
+					else if (Dir == "SE") 
+					{ 
+						X = -Mag; Y = Mag; Z = Mag; 
+					}
+					else if (Dir == "SW") 
+					{ 
+						X = -Mag; Y = -Mag; Z = Mag; 
+					}
+					else if (Dir == "U") 
+					{ 
+						Z = Mag; 
+					}
+					else if (Dir == "D") 
+					{ 
+						Z = -Mag; 
+					}
+					else
+					{
+						SendMessageToConsole(PlayerController, L"Invalid direction. Use N, S, E, W, NE, NW, SE, SW, U, or D.");
+						return;
+					}
 				}
-				if (argCount == 2)
+				else if (argCount == 2)
 				{
 					Z = std::stof(Arguments[1]);
 				}
@@ -2600,12 +2649,12 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, L"Regenerated health and shield!\n");
 		}
-		else if (Command == "siphonanim" || Command == "siphoneffect")
+		else if (Command == "startevent" || Command == "event")
 		{
-			if (auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn()))
-				PlayerState->ApplySiphonEffect();
-
-			SendMessageToConsole(PlayerController, L"Applied Siphon Effect!");
+			if (Fortnite_Version == 11.31)
+			{
+				Calendar::StartNYE();
+			}
 		}
 		else if (Command == "siphon" || Command == "amountofhealthshield" || Command == "setsiphon")
 		{
@@ -3475,6 +3524,16 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			FVector Loc = Pawn->GetActorLocation();
 			int Count = 1;
 
+			FRotator SpawnRotation = Pawn->GetActorRotation();
+			bool HasLocation = false;
+
+			Loc.Z += 250;
+
+			std::map<std::wstring, float> DirectionToYaw = {
+				{L"N", 0.0f}, {L"E", 90.0f}, {L"S", 180.0f}, {L"W", 270.0f},
+				{L"NE", 45.0f}, {L"SE", 135.0f}, {L"SW", 225.0f}, {L"NW", 315.0f}
+			};
+
 			try
 			{
 				if (Arguments.size() >= 5)
@@ -3482,18 +3541,29 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 					Loc.X = std::stof(Arguments[2]);
 					Loc.Y = std::stof(Arguments[3]);
 					Loc.Z = std::stof(Arguments[4]) - 75;
-
-					if (Arguments.size() >= 6)
-						Count = std::stoi(Arguments[5]);
-				}
-				else
-				{
-					Loc.Z += 250;
+					HasLocation = true;
 				}
 
-				if (Arguments.size() == 3)
+				for (size_t i = (HasLocation ? 5 : 2); i < Arguments.size(); ++i)
 				{
-					Count = std::stoi(Arguments[2]);
+					const std::string& ArgStr = Arguments[i];
+
+					try
+					{
+						int PossibleCount = std::stoi(ArgStr);
+						Count = PossibleCount;
+						continue;
+					}
+					catch (...) {}
+
+					std::wstring WideArg(ArgStr.begin(), ArgStr.end());
+					std::transform(WideArg.begin(), WideArg.end(), WideArg.begin(), ::towupper);
+					auto it = DirectionToYaw.find(WideArg);
+					if (it != DirectionToYaw.end())
+					{
+						SpawnRotation.Yaw = it->second;
+						continue;
+					}
 				}
 			}
 			catch (const std::invalid_argument&)
@@ -3506,8 +3576,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				SendMessageToConsole(PlayerController, L"Input value out of range!");
 				return;
 			}
-
-			FRotator SpawnRotation = Pawn->GetActorRotation();
 
 			bool SpawnBots = ActorName == "bot" || ActorName == "bots";
 
@@ -4156,6 +4224,24 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			ss << std::fixed << std::setprecision(0) << SpeedMultiplier;
 
 			std::wstring Message = L"Demospeed set to " + ss.str() + L"!\n";
+			SendMessageToConsole(PlayerController, Message.c_str());
+		}
+		else if (Command == "gettimeofday" || Command == "gtod" || Command == "gtodm")
+		{
+			static auto GetTimeOfDayFn = FindObject<UFunction>(L"/Script/FortniteGame.FortKismetLibrary.GetTimeOfDay");
+
+			struct
+			{
+				UObject* WorldContextObject;
+				float ReturnValue;
+			} params{ GetWorld() };
+
+			UFortKismetLibrary::StaticClass()->ProcessEvent(GetTimeOfDayFn, &params);
+
+			std::wstringstream ss;
+			ss << std::fixed << std::setprecision(2) << params.ReturnValue;
+
+			std::wstring Message = L"Current Time of Day: " + ss.str() + L"\n";
 			SendMessageToConsole(PlayerController, Message.c_str());
 		}
 		else if (Command == "settimeofday" || Command == "time" || Command == "hour")

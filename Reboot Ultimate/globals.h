@@ -27,7 +27,9 @@ namespace Globals
 	extern inline bool bUseSiphon = false;
 	extern inline bool bShouldUseReplicationGraph = false;
 	extern inline bool bInfiniteRender = false;
+	extern inline int InfiniteRenderMode = 0;
 	extern inline bool KnockOnWin = false;
+	extern inline bool bUsePickaxeStutter = false;
 
 	extern inline bool bBotInvincible = false;
 	extern inline bool bBotPC = false;

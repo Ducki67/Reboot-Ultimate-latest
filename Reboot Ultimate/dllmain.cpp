@@ -77,7 +77,7 @@ const std::vector<std::string> WhitelistedIPs = {
     "26.61.188.132", // crazy
     "26.20.240.122", // midnight
     "26.28.169.92", // fraggot 2
-    "26.139.184.134", // rit shadow 87
+    "26.140.79.167", // marcus
     "26.85.3.16", // day
     "26.140.35.4", // bomb
     "26.248.98.147", // best faggot
@@ -86,6 +86,9 @@ const std::vector<std::string> WhitelistedIPs = {
     "26.165.79.75", // exo
     "26.223.77.91", // say
     "26.235.139.63", // scy
+    "26.198.29.234", // grant
+    "26.71.231.41", // genesis
+    "26.182.103.8", // kuba
     "26.186.58.140" // jecity
 };
 
@@ -1710,10 +1713,7 @@ DWORD WINAPI Main(LPVOID)
             AFortAthenaAIBotController::OnAlertLevelChangedHook, (PVOID*)&AFortAthenaAIBotController::OnAlertLevelChangedOriginal, false);
     }
 
-    if (!Globals::bInfiniteRender)
-    {
-        Hooking::MinHook::Hook((PVOID)Addresses::GetPlayerViewpoint, (PVOID)AFortPlayerControllerAthena::GetPlayerViewPointHook, (PVOID*)&AFortPlayerControllerAthena::GetPlayerViewPointOriginal);
-    }
+    Hooking::MinHook::Hook((PVOID)Addresses::GetPlayerViewpoint, (PVOID)AFortPlayerControllerAthena::GetPlayerViewPointHook, (PVOID*)&AFortPlayerControllerAthena::GetPlayerViewPointOriginal);
 
     Hooking::MinHook::Hook((PVOID)Addresses::TickFlush, (PVOID)UNetDriver::TickFlushHook, (PVOID*)&UNetDriver::TickFlushOriginal);
     Hooking::MinHook::Hook((PVOID)Addresses::OnDamageServer, (PVOID)ABuildingActor::OnDamageServerHook, (PVOID*)&ABuildingActor::OnDamageServerOriginal);
@@ -1722,7 +1722,11 @@ DWORD WINAPI Main(LPVOID)
     // Hooking::MinHook::Hook((PVOID)Addresses::CollectGarbage, (PVOID)CollectGarbageHook, nullptr);
     Hooking::MinHook::Hook((PVOID)Addresses::PickTeam, (PVOID)AFortGameModeAthena::Athena_PickTeamHook);
     Hooking::MinHook::Hook((PVOID)Addresses::CompletePickupAnimation, (PVOID)AFortPickup::CompletePickupAnimationHook, (PVOID*)&AFortPickup::CompletePickupAnimationOriginal);
-    // Hooking::MinHook::Hook((PVOID)Addresses::CanActivateAbility, ReturnTrueHook); // ahhh wtf
+
+    if (!Globals::bUsePickaxeStutter)
+    {
+        Hooking::MinHook::Hook((PVOID)Addresses::CanActivateAbility, ReturnTrueHook); // ahhh wtf
+    }
 
     uint64 ServerRemoveInventoryItemFunctionCallBeginFunctionAddr = 0;
 

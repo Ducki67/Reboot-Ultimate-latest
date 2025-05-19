@@ -147,7 +147,7 @@ static inline void CleanupDeviceD3D();
 static inline void ResetDevice();
 static inline LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-static inline std::string CurrentVersion = "1.1.4"; // change with each update
+static inline std::string CurrentVersion = "1.1.6"; // change with each update
 static inline std::string DllDownloadURL = "https://github.com/CrowdedSignature46/Auth/releases/latest/download/Reboot_Ultimate.dll";
 static inline std::string GitHubVersionURL = "https://raw.githubusercontent.com/CrowdedSignature46/Auth/main/version.json";
 
@@ -280,6 +280,7 @@ enum class Playlist : int
 	OneShotSolos,
 	OneShotDuos,
 	OneShotSquads,
+	SiphonSolos,
 	SiphonDuos,
 	SiphonSquads,
 	SlideSolos,
@@ -820,10 +821,31 @@ static inline void StaticUI()
 		ImGui::Checkbox("Infinite Render (can break things)", &Globals::bInfiniteRender);
 	}
 
+	bool StutterVersions = Fortnite_Version < 13 && Engine_Version >= 423;
+
+	if (!bSwitchedInitialLevel && StutterVersions)
+	{
+		ImGui::Checkbox("Pickaxe Stutter", &Globals::bUsePickaxeStutter);
+	}
+
 	/*if (Addresses::ApplyGadgetData && Addresses::RemoveGadgetData && Engine_Version < 424)
 	{
 		ImGui::Checkbox("Enable Gadgets", &Globals::bEnableAGIDs);
 	}*/
+
+	if (Globals::bInfiniteRender && !bSwitchedInitialLevel)
+	{
+		ImGui::NewLine();
+
+		if (Globals::InfiniteRenderMode == 0)
+			Globals::InfiniteRenderMode = 1;
+
+		ImGui::Text("Infinite Render Mode:");
+		ImGui::RadioButton("Method 1 (VFTable)", &Globals::InfiniteRenderMode, 1);
+		ImGui::RadioButton("Method 2 (ClientConnections/Sweefy)", &Globals::InfiniteRenderMode, 2);
+
+		ImGui::NewLine();
+	}
 }
 
 static inline void PregameTabs()
@@ -1428,7 +1450,14 @@ static inline void MainUI()
 				
 				if (Globals::bInfiniteRender)
 				{
-					ImGui::Text(std::format("Infinite Render: {}", Globals::bInfiniteRender).c_str());
+					std::string renderMethod = "Unknown";
+
+					if (Globals::InfiniteRenderMode == 1)
+						renderMethod = "VFTable";
+					else if (Globals::InfiniteRenderMode == 2)
+						renderMethod = "ClientConnections/Sweefy";
+
+					ImGui::Text(std::format("Infinite Render Method: {}", renderMethod).c_str());
 				}
 
 				/*if (!Globals::bStartedListening) // hm
@@ -2936,6 +2965,7 @@ static inline void PregameUI()
 		ImGui::RadioButton("One Shot Solos", &SelectedPlaylist, (int)Playlist::OneShotSolos);
 		ImGui::RadioButton("One Shot Duos", &SelectedPlaylist, (int)Playlist::OneShotDuos);
 		ImGui::RadioButton("One Shot Squads", &SelectedPlaylist, (int)Playlist::OneShotSquads);
+		ImGui::RadioButton("Siphon Solos", &SelectedPlaylist, (int)Playlist::SiphonSolos);
 		ImGui::RadioButton("Siphon Duos", &SelectedPlaylist, (int)Playlist::SiphonDuos);
 		ImGui::RadioButton("Siphon Squads", &SelectedPlaylist, (int)Playlist::SiphonSquads);
 		ImGui::RadioButton("Slide Solos", &SelectedPlaylist, (int)Playlist::SlideSolos);
@@ -2978,6 +3008,11 @@ static inline void PregameUI()
 		case (int)Playlist::OneShotSquads:
 		{
 			PlaylistName = "/Game/Athena/Playlists/Low/Playlist_Low_Squad.Playlist_Low_Squad";
+			break;
+		}
+		case (int)Playlist::SiphonSolos:
+		{
+			PlaylistName = "/Game/Athena/Playlists/Vamp/Playlist_Vamp_Solo.Playlist_Vamp_Solo";
 			break;
 		}
 		case (int)Playlist::SiphonDuos:
@@ -3057,7 +3092,7 @@ static inline void PregameUI()
 
 		static high_resolution_clock::time_point AddMessageTime;
 
-		if (ImGui::Checkbox("Use Custom Bot Name", &Globals::bBotNames))
+		if (ImGui::Checkbox("Use Custom Bot Name", &Globals::bBotNames));
 		{
 			if (Globals::bBotNames == true)
 			{

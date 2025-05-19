@@ -703,12 +703,44 @@ void AFortPlayerControllerAthena::ServerPlaySquadQuickChatMessageHook(AFortPlaye
 
 void AFortPlayerControllerAthena::GetPlayerViewPointHook(AFortPlayerControllerAthena* PlayerController, FVector& Location, FRotator& Rotation)
 {
-	// I don't know why but GetActorEyesViewPoint only works on some versions.
-	static auto GetActorEyesViewPointFn = FindObject<UFunction>(L"/Script/Engine.Actor.GetActorEyesViewPoint");
-	static auto GetActorEyesViewPointIndex = GetFunctionIdxOrPtr(GetActorEyesViewPointFn) / 8;
+	if (Globals::bInfiniteRender)
+	{
+		if (Globals::InfiniteRenderMode == 1)
+		{
+			static auto GetActorEyesViewPointFn = FindObject<UFunction>(L"/Script/Engine.Actor.GetActorEyesViewPoint");
+			static auto GetActorEyesViewPointIndex = GetFunctionIdxOrPtr(GetActorEyesViewPointFn) / 8;
 
-	void (*GetActorEyesViewPointOriginal)(AActor * Actor, FVector * OutLocation, FRotator * OutRotation) = decltype(GetActorEyesViewPointOriginal)(PlayerController->VFTable[GetActorEyesViewPointIndex]);
-	return GetActorEyesViewPointOriginal(PlayerController, &Location, &Rotation);
+			void (*GetActorEyesViewPointOriginal)(AActor * Actor, FVector * OutLocation, FRotator * OutRotation) = decltype(GetActorEyesViewPointOriginal)(PlayerController->VFTable[GetActorEyesViewPointIndex]);
+			GetActorEyesViewPointOriginal(PlayerController, &Location, &Rotation);
+			return;
+		}
+		else if (Globals::InfiniteRenderMode == 2)
+		{
+			auto& ClientConnections = GetWorld()->GetNetDriver()->GetClientConnections();
+
+			if (ClientConnections.Num() > 0)
+			{
+				auto ConnectionToView = ClientConnections[ClientConnections.Num() - 1];
+
+				if (ConnectionToView) // imposisbel butnheh
+				{
+					auto CurrentController = ConnectionToView->GetPlayerController();
+
+					if (CurrentController)
+					{
+						auto CurrentPawn = CurrentController->GetPawn();
+
+						if (CurrentPawn)
+						{
+							Location = CurrentPawn->GetActorLocation();
+							Rotation = PlayerController->GetControlRotation();
+							return;
+						}
+					}
+				}
+			}
+		}
+	}
 
 	if (auto MyFortPawn = PlayerController->GetMyFortPawn())
 	{
@@ -717,6 +749,7 @@ void AFortPlayerControllerAthena::GetPlayerViewPointHook(AFortPlayerControllerAt
 		return;
 	}
 
+	// Final fallback to original function
 	return AFortPlayerControllerAthena::GetPlayerViewPointOriginal(PlayerController, Location, Rotation);
 }
 
