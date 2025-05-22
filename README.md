@@ -16,7 +16,7 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 - [x] Fixed Boat Rockets/Some Vehicle Weapons on S9+
 - [x] Added Attached Actor Chest Loot
 - [x] Added Reviving on Win
-- [x] Fixed Editing (100%)
+- [x] Fixed Editing (?)
 
 ## UI:
 
@@ -24,39 +24,11 @@ Reboot Ultimate is a rewrite of the original [Project Reboot 3.0](https://github
 - [x] Recolored UI to be dark mode.
 - [x] You can now choose playlists in the Pre-Game tabs, instead of pasting the ID.
 - [x] Added Players Tab
-- [x] Toggle Victory Crown Slomo on S19
 - [x] Added more indicators (Started, Ended, Gamemode, Players)
 - [x] Many tabs now show a status message when you interact with buttons.
-- [x] Version Checker: Checks if you are using the latest version of Ultimate, and will prompt you to update if you aren't.
-- [x] This DLL is currently locked behind a selected amount of IPs. Only specific people can host with it, however anyone can play.
-- [x] Fixed Logging (can be found in logs tab OR C:\Users\...\AppData\Local\Reboot Ultimate)
-
-## Commands (compared to old reboot ultimate):
-
-- [x] cheat savewaypoint {phrase} - Will get the players current location, and save the coordinates based on the phrase.
-- [x] cheat waypoint {phrase} - (based on the last command) Will teleport the player to a waypoint using the specified phrase.
-- [x] cheat tpto \PlayerName\ - Teleports the executing player to the recieving player.
-- [x] cheat ban {IP/HWID} - Added support for HWID banning a user.
-- [x] cheat unban - Unbans a player. (why did this not exist before tf)
-- [x] cheat rift - Rifts the player.
-- [x] cheat revive - Revives the receiving controller if they are knocked.
-- [x] cheat infammo - Toggles Infinite Ammo.
-- [x] cheat buildfree - Toggles Infinite Materials.
-- [x] cheat launch - (reworked) ; If you want to get flung directly up, you now only need to type "cheat launch 8000" instead of "cheat launch 0 0 8000".
-- [x] cheat ghost - Toggles flight and no-clip, allowing you to phase through everything.
-- [x] cheat demospeed {#} - Changes the overral speed of the game.
-- [x] cheat siphon {#} - Changes the amount of health/shield the player gets per elimination.
-- [x] cheat regen - Regenerates all of the players health.
-- [x] cheat tptomax - Teleports the player to max height.
-- [x] cheat tpalltomax - Teleports all players to max height.
-- [x] cheat pausetime - Pauses the current time of day cycle.
-- [x] cheat getscript - Fixed so that non-host players cannot run this command.
-- [x] cheat tutorial - Fixed so that non-host players cannot run this command.
-- [x] cheat spawn - Allows for spawning at a location (ex: cheat spawn quad -120397.375000, 4183.438477, 7969.918457)
-- [x] cheat skin - Similar to cheat give, you can now type a phrase (ex: cheat skin renegaderaider) and it will put on Renegade Raider.
-- [x] cheat pickaxe - Similar to cheat give, you can now type a phrase (ex: cheat pickaxe raidersrevenge) and it will put on the Raider's Revenge pickaxe.
-- [x] cheat backbling - Apply a backbling using a CharacterPart ID.
-- [x] cheat changename {Name} - Changes the player's in-game name.
+- [x] Version Checker: Checks if you are using the latest version of Ultimate, and will prompt you to update if you aren't on the latest version.
+- [x] Infinite Render Checkbox: Toggle between 2 different types of rendering methods.
+- [x] Added toggleable Pickaxe Stutter for versions 8-12.
 
 ## CREDIT:
 

@@ -147,7 +147,7 @@ static inline void CleanupDeviceD3D();
 static inline void ResetDevice();
 static inline LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-static inline std::string CurrentVersion = "1.1.6"; // change with each update
+static inline std::string CurrentVersion = "1.1.7"; // change with each update
 static inline std::string DllDownloadURL = "https://github.com/CrowdedSignature46/Auth/releases/latest/download/Reboot_Ultimate.dll";
 static inline std::string GitHubVersionURL = "https://raw.githubusercontent.com/CrowdedSignature46/Auth/main/version.json";
 
@@ -178,7 +178,7 @@ inline std::vector<ActorSpawnStruct> ActorsToSpawn;
 static inline void SetIsLategame(bool Value) // if spawn island make this 0
 {
 	Globals::bLateGame.store(Value);
-
+	
 	if (!PlaylistName.contains("Low"))
 	{
 		StartingShield = Value ? 100 : 0;
@@ -1192,6 +1192,7 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 	{
 		auto ClientConnection = ClientConnections.at(z);
 		auto FortPC = Cast<AFortPlayerController>(ClientConnection->GetPlayerController());
+		auto Pawn = FortPC->GetMyFortPawn();
 
 		if (!FortPC)
 			continue;
@@ -1392,6 +1393,12 @@ static inline DWORD WINAPI LateGameThread(LPVOID)
 			WorldInventory->AddItem(Trap, nullptr, (std::rand() % 5) + 2);
 
 			WorldInventory->Update();
+		}
+
+		if (PlaylistName.find("/Game/Athena/Playlists/Low") != std::string::npos)
+		{
+			Pawn->SetShield(0);
+			Pawn->SetMaxShield(0);
 		}
 	}
 
@@ -1877,8 +1884,6 @@ static inline void MainUI()
 			{
 				ImGui::Checkbox("Toggle Victory Crown Slowmo", &Globals::bCrownSlowmo);
 			}
-
-			ImGui::Checkbox("DBNO Slomo On Win (this is ass rn dont use)", &Globals::KnockOnWin);
 		}
 
 		else if (Tab == ZONE_TAB)

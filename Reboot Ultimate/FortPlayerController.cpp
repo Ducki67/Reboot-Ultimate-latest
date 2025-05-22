@@ -1922,35 +1922,6 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 
 					DBNOToggleOnWin();
 
-					if (Globals::KnockOnWin)
-					{
-						auto KillerPlayerController = Cast<AFortPlayerControllerAthena>(KillerPlayerState->GetOwner());
-
-						if (!KillerPlayerController)
-							return;
-
-						auto PlayerState = Cast<AFortPlayerState>(KillerPlayerController->GetPlayerState());
-
-						if (!PlayerState)
-							return;
-
-						auto Pawn = KillerPlayerController->GetMyFortPawn();
-
-						if (!Pawn)
-							return;
-
-						if (!Pawn->IsDBNO())
-						{
-							Pawn->SetDBNO(true);
-							Pawn->SetHasPlayedDying(false);
-
-							Pawn->SetHealth(100);
-							Pawn->SetShield(0);
-
-							Pawn->OnRep_IsDBNO();
-						}
-					}
-
 					RemoveFromAlivePlayers(GameMode, PlayerController, KillerPlayerState == DeadPlayerState ? nullptr : KillerPlayerState, KillerPawn, KillerWeaponDef, DeathCause, 0);
 
 					/*
@@ -2021,6 +1992,11 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 					}
 				}
 			}
+		}
+
+		if (Fortnite_Version >= 15) // dk if this is correct
+		{
+			PlayerController->GetStateName() = UKismetStringLibrary::Conv_StringToName(L"Spectating");
 		}
 
 		if (IsRestartingSupported() && Globals::bAutoRestart && !bIsInAutoRestart)

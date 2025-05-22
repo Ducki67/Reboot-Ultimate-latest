@@ -5476,43 +5476,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 			SendMessageToConsole(PlayerController, L"Randomized all player loadouts!\n");
 		}
-		else if (Command == "godall")
-		{
-			for (int i = 0; i < ClientConnections.Num(); i++)
-			{
-				auto Pawn = ReceivingController->GetMyFortPawn();
-
-				if (!Pawn)
-				{
-					SendMessageToConsole(PlayerController, L"No pawn!");
-					return;
-				}
-
-				float MaxHealth = Pawn->GetMaxHealth();
-
-				auto HealthSet = Pawn->GetHealthSet();
-
-				if (!HealthSet)
-				{
-					SendMessageToConsole(PlayerController, L"No HealthSet!");
-					return;
-				}
-
-				static auto HealthOffset = HealthSet->GetOffset("Health");
-				auto& Health = HealthSet->Get<FFortGameplayAttributeData>(HealthOffset);
-
-				if (Health.GetMinimum() != MaxHealth)
-				{
-					Health.GetMinimum() = MaxHealth;
-					SendMessageToConsole(PlayerController, L"God of all players ON.");
-				}
-				else
-				{
-					Health.GetMinimum() = 0;
-					SendMessageToConsole(PlayerController, L"God of all players OFF.");
-				}
-			}
-		}
 		else if (Command == "tpalltomax" || Command == "allmax")
 		{
 			for (int i = 0; i < ClientConnections.Num(); i++)
@@ -5737,12 +5700,12 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 - cheat destroybuilds - Destroys all Player Builds.
 - cheat falldamage - Permanently turn off fall damage.
 - cheat fly - Toggles flight.
+- cheat gettimeofday - Gets the current time of day.
 - cheat ghost - Toggles flight and disables collision.
 - cheat give {NAMEOFITEM_RARITY || Use cheat givenames} - Gives a weapon using a shortcut name, without ID.
 - cheat giveall - Gives all players Ammo, Materials, and Traps maxed out.
 - cheat giveitem {ID} - Gives a weapon to the executing player, if inventory is full drops a pickup on the player.
 - cheat givenames - Sends a message to the console of all of the names that work with the "cheat give" command.
-- cheat godall - Gods all players.
 - cheat gravity {#} - Applies a gravity *multiplier* to the player. (0.5 for low gravity, 2 for high gravity, etc.)
 - cheat hat {CharacterPart ID} - Sets a characters hat.
 - cheat health {#} - Sets executing player's health.
@@ -5777,6 +5740,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 - cheat spawnpickup {WID} {#} - Spawns a pickup at specified player.
 - cheat speed - Changes player's movement speed (buggy running but works with cheat fly).
 - cheat startaircraft - Starts the bus.
+- cheat startevent - If eligable, starts the ingame event (like NYE).
 - cheat summon {full path of object} {optional: X, Y, Z} - Summons the specified blueprint class at the executing player's location. Note: There is a limit on the count.
 - cheat suicide - Insta-kills player.
 - cheat togglesnowmap - Toggles the map to have snow or not. (7.10, 7.30, 11.31, 15.10, 19.01, & 19.10 ONLY).
