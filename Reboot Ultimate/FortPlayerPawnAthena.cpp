@@ -65,9 +65,12 @@ void AFortPlayerPawnAthena::OnCapsuleBeginOverlapHook(UObject* Context, FFrame* 
 		bIsQuest = true;
 	}
 
-	if (OtherActor && OtherActor->GetName().contains("Rift") && Fortnite_Version >= 17)
+	if (OtherActor && OtherActor->GetName().contains("Rift") && Fortnite_Version >= 16)
 	{
-		Pawn->TeleportTo(Pawn->GetActorLocation() + FVector(0, 0, 20000), Pawn->GetActorRotation());
+		FVector CurrentLocation = Pawn->GetActorLocation();
+		FVector NewLocation(CurrentLocation.X, CurrentLocation.Y, 20000);
+
+		Pawn->TeleportTo(NewLocation, Pawn->GetActorRotation());
 
 		UAbilitySystemComponent* AbilitySystemComponent = ((AFortPlayerStateAthena*)Pawn->GetPlayerState())->GetAbilitySystemComponent();
 		if (!AbilitySystemComponent) return;

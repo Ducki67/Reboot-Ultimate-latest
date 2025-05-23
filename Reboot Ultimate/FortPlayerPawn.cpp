@@ -347,21 +347,13 @@ void AFortPlayerPawn::UnEquipVehicleWeaponDefinition(UFortWeaponItemDefinition* 
 	if (bShouldUpdate)
 		WorldInventory->Update();
 
-	LOG_INFO(LogVehicles, "Removed VehicleWeaponDefinition: {}", VehicleWeaponDefinition->GetFullName());
+	auto LastItemInstance = WorldInventory->GetPickaxeInstance(); // Bad, we should get the last item.
 
-	auto SwappingDefinition = Cast<AFortPlayerControllerAthena>(PlayerController)->GetSwappingItemDefinition();
-	auto SwappingInstance = WorldInventory->FindItemInstance(SwappingDefinition);
-
-	if (!SwappingInstance)
-		SwappingInstance = WorldInventory->GetPickaxeInstance();
-
-	if (!SwappingInstance)
+	if (!LastItemInstance)
 		return;
 
-	LOG_INFO(LogVehicles, "Equipping SwappingDefinition: {}", SwappingDefinition->GetFullName());
-
-	PlayerController->ServerExecuteInventoryItemHook(PlayerController, SwappingInstance->GetItemEntry()->GetItemGuid());
-	PlayerController->ClientEquipItem(SwappingInstance->GetItemEntry()->GetItemGuid(), true);
+	PlayerController->ServerExecuteInventoryItemHook(PlayerController, LastItemInstance->GetItemEntry()->GetItemGuid());
+	PlayerController->ClientEquipItem(LastItemInstance->GetItemEntry()->GetItemGuid(), true);
 }
 
 void AFortPlayerPawn::StartGhostModeExitHook(UObject* Context, FFrame* Stack, void* Ret)
@@ -396,9 +388,10 @@ void AFortPlayerPawn::StartGhostModeExitHook(UObject* Context, FFrame* Stack, vo
 
 AActor* AFortPlayerPawn::ServerOnExitVehicleHook(AFortPlayerPawn* PlayerPawn, ETryExitVehicleBehavior ExitForceBehavior)
 {
-	auto VehicleWeaponDefinition = PlayerPawn->GetVehicleWeaponDefinition(PlayerPawn->GetVehicle());
-	LOG_INFO(LogDev, "VehicleWeaponDefinition: {}", VehicleWeaponDefinition ? VehicleWeaponDefinition->GetFullName() : "BadRead");
-	// PlayerPawn->UnEquipVehicleWeaponDefinition(VehicleWeaponDefinition);
+	auto Vehicle = PlayerPawn->GetVehicle();
+	auto VehicleWeaponDefinition = PlayerPawn->GetVehicleWeaponDefinition(Vehicle);
+	LOG_INFO(LogDev, "[Leave] {} VehicleWeaponDefinition: {}", __int64(Vehicle), VehicleWeaponDefinition ? VehicleWeaponDefinition->GetFullName() : "BadRead");
+	PlayerPawn->UnEquipVehicleWeaponDefinition(VehicleWeaponDefinition);
 
 	return ServerOnExitVehicleOriginal(PlayerPawn, ExitForceBehavior);
 }
