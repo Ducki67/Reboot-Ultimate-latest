@@ -28,7 +28,7 @@ void AFortDecoTool::ServerSpawnDeco(AFortDecoTool * DecoTool, FFrame & Stack, vo
     if (!PlayerControllerAthena || !PlayerStateAthena || !BlueprintClass.Get())
         return;
 
-    ABuildingActor* (*SpawnDeco)(AFortDecoTool * DecoTool, UClass * Class, const FVector & Location, const FRotator & Rotation, ABuildingSMActor * AttachedActor, int a6, EBuildingAttachmentType InBuildingAttachmentType) = decltype(SpawnDeco)(Offsets::ServerSpawnDeco);
+    ABuildingActor* (*SpawnDeco)(AFortDecoTool * DecoTool, UClass * Class, const FVector & Location, const FRotator & Rotation, ABuildingSMActor * AttachedActor, int a6, EBuildingAttachmentType InBuildingAttachmentType) = decltype(SpawnDeco)(0x69abec4 + uintptr_t(GetModuleHandle(0)));
     ABuildingActor* BuildingTrap = SpawnDeco(DecoTool, BlueprintClass, Location, Rotation, AttachedActor, 0, InBuildingAttachmentType);
 
     if (BuildingTrap)
@@ -37,27 +37,45 @@ void AFortDecoTool::ServerSpawnDeco(AFortDecoTool * DecoTool, FFrame & Stack, vo
     }
 }
 
-void AFortDecoTool::ServerCreateBuildingAndSpawnDeco(AFortDecoTool* DecoTool, FFrame& Stack, void* Ret)
+void AFortDecoTool::ServerCreateBuildingAndSpawnDeco(FVector BuildingLocation, FRotator BuildingRotation, FVector Location, FRotator Rotation, EBuildingAttachmentType InBuildingAttachmentType)
 {
-    FVector BuildingLocation;
-    FRotator BuildingRotation;
-    FVector Location;
-    FRotator Rotation;
-    ABuildingSMActor* AttachedActor;
-    EBuildingAttachmentType InBuildingAttachmentType;
-    bool bSpawnDecoOnExtraPiece;
-    FVector BuildingExtraPieceLocation;
+    /*static auto WoodFloorClass = LoadObject<UClass>(L"/Game/Building/ActorBlueprints/Player/Wood/L1/PBWA_W1_Floor.PBWA_W1_Floor_C");
+    static auto BrickFloorClass = LoadObject<UClass>(L"/Game/Building/ActorBlueprints/Player/Stone/L1/PBWA_S1_Floor.PBWA_S1_Floor_C");
+    static auto MetalFloorClass = LoadObject<UClass>(L"/Game/Building/ActorBlueprints/Player/Metal/L1/PBWA_M1_Floor.PBWA_M1_Floor_C");
 
-    Stack.StepCompiledIn(&BuildingLocation);
-    Stack.StepCompiledIn(&BuildingRotation);
-    Stack.StepCompiledIn(&Location);
-    Stack.StepCompiledIn(&Rotation);
-    Stack.StepCompiledIn(&AttachedActor);
-    Stack.StepCompiledIn(&InBuildingAttachmentType);
-    Stack.StepCompiledIn(&bSpawnDecoOnExtraPiece);
-    Stack.StepCompiledIn(&BuildingExtraPieceLocation);
+    if (auto Pawn = Cast<AFortPlayerPawn>(GetOwner()))
+    {
+        if (auto Controller = Cast<AFortPlayerController>(Pawn->GetController()))
+        {
+            static auto BroadcastRemoteClientInfoOffset = Controller->GetOffset("BroadcastRemoteClientInfo");
+            UObject* BroadcastRemoteClientInfo = Controller->Get(BroadcastRemoteClientInfoOffset);
 
-    Stack.Code += Stack.Code != nullptr;
+            auto RemoteBuildingMaterial = BroadcastRemoteClientInfo->RemoteBuildingMaterial;
 
-    LOG_INFO(LogDev, "ServerCreateBuildingAndSpawnDeco called - DecoTool: {}", DecoTool->GetFullName().c_str());
+            UClass* BuildingClass = nullptr;
+
+            switch (RemoteBuildingMaterial)
+            {
+            case EFortResourceType::Wood:
+                BuildingClass = WoodFloorClass;
+                break;
+
+            case EFortResourceType::Stone:
+                BuildingClass = BrickFloorClass;
+                break;
+
+            case EFortResourceType::Metal:
+                BuildingClass = MetalFloorClass;
+                break;
+            }
+
+            if (!BuildingClass)
+                return;
+
+            if (auto BuildingActor = Controller->CreateBuildingActor(BuildingLocation, BuildingRotation, false, BuildingClass))
+            {
+                CallServerSpawnDeco(Location, Rotation, BuildingActor, InBuildingAttachmentType);
+            }
+        }
+    }*/
 }

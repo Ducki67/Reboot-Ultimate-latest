@@ -2043,6 +2043,8 @@ void AFortPlayerController::ClientOnPawnDiedHook(AFortPlayerController* PlayerCo
 
 void AFortPlayerController::ServerBeginEditingBuildingActorHook(AFortPlayerController* PlayerController, ABuildingSMActor* BuildingActorToEdit)
 {
+	// LOG_INFO(LogDev, "ServerBeginEditingBuildingActorHook!");
+
 	if (!BuildingActorToEdit || !BuildingActorToEdit->IsPlayerPlaced()) // We need more checks.
 		return;
 
@@ -2055,8 +2057,6 @@ void AFortPlayerController::ServerBeginEditingBuildingActorHook(AFortPlayerContr
 
 	if (!PlayerState)
 		return;
-
-	BuildingActorToEdit->SetEditingPlayer(Cast<AFortPlayerStateZone>(PlayerState));
 
 	auto WorldInventory = PlayerController->GetWorldInventory();
 
@@ -2073,16 +2073,23 @@ void AFortPlayerController::ServerBeginEditingBuildingActorHook(AFortPlayerContr
 	Pawn->EquipWeaponDefinition(EditToolDef, EditToolInstance->GetItemEntry()->GetItemGuid());
 
 	auto EditTool = Cast<AFortWeap_EditingTool>(Pawn->GetCurrentWeapon());
+	// LOG_INFO(LogDev, "[Begin {}] EditTool: {}!", BuildingActorToEdit->GetFullName(), __int64(EditTool));
 
 	if (!EditTool)
 		return;
 
 	EditTool->GetEditActor() = BuildingActorToEdit;
 	EditTool->OnRep_EditActor();
+
+	BuildingActorToEdit->SetEditingPlayer(PlayerState);
+
+	// LOG_INFO(LogDev, "[Begin] Updating Editing player to: {}!", __int64(PlayerState));
 }
 
 void AFortPlayerController::ServerEditBuildingActorHook(UObject* Context, FFrame& Stack, void* Ret)
 {
+	// LOG_INFO(LogDev, "ServerEditBuildingActorHook!");
+
 	auto PlayerController = (AFortPlayerController*)Context;
 
 	auto PlayerState = (AFortPlayerState*)PlayerController->GetPlayerState();
@@ -2111,33 +2118,82 @@ void AFortPlayerController::ServerEditBuildingActorHook(UObject* Context, FFrame
 	// if (!PlayerState || PlayerState->GetTeamIndex() != BuildingActorToEdit->GetTeamIndex()) 
 		//return ServerEditBuildingActorOriginal(Context, Frame, Ret);
 
-	BuildingActorToEdit->SetEditingPlayer(nullptr);
+	// BuildingActorToEdit->SetEditingPlayer(nullptr);
 
 	static ABuildingSMActor* (*BuildingSMActorReplaceBuildingActor)(ABuildingSMActor*, __int64, UClass*, int, int, uint8_t, AFortPlayerController*) =
 		decltype(BuildingSMActorReplaceBuildingActor)(Addresses::ReplaceBuildingActor);
 
-	if (auto BuildingActor = BuildingSMActorReplaceBuildingActor(BuildingActorToEdit, 1, NewBuildingClass, BuildingActorToEdit->GetCurrentBuildingLevel(), RotationIterations, bMirrored, PlayerController))
+	if (auto BuildingActor = BuildingSMActorReplaceBuildingActor(BuildingActorToEdit, 1, NewBuildingClass,
+		BuildingActorToEdit->GetCurrentBuildingLevel(), RotationIterations, bMirrored, PlayerController))
 	{
 		BuildingActor->SetPlayerPlaced(true);
 	}
 
-	// we should do more things here
+	// we need to set editactor and stuff  because on newer builds ServerEndEditingBuildingActor doesnt get calleredAdd commentMore actions
+	BuildingActorToEdit->SetEditingPlayer(nullptr);
+	auto Pawn = PlayerController->GetMyFortPawn();
+
+	if (!Pawn)
+		return ServerEditBuildingActorOriginal(Context, Stack, Ret);
+
+	static auto EditToolDef = FindObject<UFortWeaponItemDefinition>(L"/Game/Items/Weapons/BuildingTools/EditTool.EditTool");
+
+	auto WorldInventory = PlayerController->GetWorldInventory();
+
+	if (!WorldInventory)
+		return ServerEditBuildingActorOriginal(Context, Stack, Ret);
+
+	auto EditToolInstance = WorldInventory->FindItemInstance(EditToolDef);
+
+	if (!EditToolInstance)
+		return ServerEditBuildingActorOriginal(Context, Stack, Ret);
+
+	Pawn->EquipWeaponDefinition(EditToolDef, EditToolInstance->GetItemEntry()->GetItemGuid());
+
+	auto EditTool = Cast<AFortWeap_EditingTool>(Pawn->GetCurrentWeapon());
+	// LOG_INFO(LogDev, "EditTool: {}", __int64(EditTool));
+
+	if (EditTool)
+	{
+		EditTool->GetEditActor() = nullptr;
+	}
 
 	return ServerEditBuildingActorOriginal(Context, Stack, Ret);
 }
 
 void AFortPlayerController::ServerEndEditingBuildingActorHook(AFortPlayerController* PlayerController, ABuildingSMActor* BuildingActorToStopEditing)
 {
-	if (!BuildingActorToStopEditing)
-		return;
+
+	// LOG_INFO(LogDev, "[{}] ServerEndEditingBuildingActorHook EditiNgplAyer: {}!", BuildingActorToStopEditing ? BuildingActorToStopEditing->GetFullName() : "NULL", BuildingActorToStopEditing ? __int64(BuildingActorToStopEditing->GetEditingPlayer()) : -1);
 
 	auto Pawn = PlayerController->GetMyFortPawn();
 
-	if (!Pawn)
-		return;
-
-	if (BuildingActorToStopEditing->GetEditingPlayer() != PlayerController->GetPlayerState() || BuildingActorToStopEditing->IsDestroyed())
+	if (!BuildingActorToStopEditing || !Pawn
+		|| BuildingActorToStopEditing->GetEditingPlayer() != PlayerController->GetPlayerState()
+		|| BuildingActorToStopEditing->IsDestroyed())
 		return;
 
 	BuildingActorToStopEditing->SetEditingPlayer(nullptr);
+
+	static auto EditToolDef = FindObject<UFortWeaponItemDefinition>(L"/Game/Items/Weapons/BuildingTools/EditTool.EditTool");
+
+	auto WorldInventory = PlayerController->GetWorldInventory();
+
+	if (!WorldInventory)
+		return;
+
+	auto EditToolInstance = WorldInventory->FindItemInstance(EditToolDef);
+
+	if (!EditToolInstance)
+		return;
+
+	// LOG_INFO(LogDev, "EditTool BEFORE: {}", __int64(Cast<AFortWeap_EditingTool>(Pawn->GetCurrentWeapon())));
+	Pawn->EquipWeaponDefinition(EditToolDef, EditToolInstance->GetItemEntry()->GetItemGuid());
+
+	auto EditTool = Cast<AFortWeap_EditingTool>(Pawn->GetCurrentWeapon());
+
+	if (EditTool)
+	{
+		EditTool->GetEditActor() = nullptr;
+	}
 }

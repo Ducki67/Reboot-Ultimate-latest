@@ -87,6 +87,7 @@ const std::vector<std::string> WhitelistedIPs = {
     "26.223.77.91", // say
     "26.235.139.63", // scy
     "26.198.29.234", // grant
+    "26.209.201.143", // sears
     "26.71.231.41", // genesis
     "26.182.103.8", // kuba
     "26.186.58.140" // jecity

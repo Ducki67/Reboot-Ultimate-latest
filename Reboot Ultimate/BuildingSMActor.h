@@ -55,13 +55,17 @@ public:
 		return Get<EFortResourceType>(ResourceTypeOffset);
 	}
 
-	void SetEditingPlayer(AFortPlayerStateZone* NewEditingPlayer)
+	void SetEditingPlayer(APlayerState* NewEditingPlayer) // actually AFortPlayerStateZone
 	{
-		if (this->HasAuthority() && (!this->GetEditingPlayer() || !NewEditingPlayer))
+		/*
+		if (// AActor::HasAuthority() &&
+			(!GetEditingPlayer() || !NewEditingPlayer)
+			)
+			*/
 		{
-			this->SetNetDormancy(ENetDormancy(2 - (NewEditingPlayer != nullptr)));
-			this->ForceNetUpdate();
-			this->GetEditingPlayer() = NewEditingPlayer;
+			SetNetDormancy((ENetDormancy)(2 - (NewEditingPlayer != 0)));
+			ForceNetUpdate();
+			GetEditingPlayer() = NewEditingPlayer;
 		}
 	}
 

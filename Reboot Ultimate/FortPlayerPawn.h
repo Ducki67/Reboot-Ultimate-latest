@@ -52,6 +52,7 @@ public:
 
 	AFortAthenaVehicle* GetVehicle();
 	UFortWeaponItemDefinition* GetVehicleWeaponDefinition(AFortAthenaVehicle* Vehicle);
+	bool IsInVehicle();
 	uint8 GetVehicleSeatIndex();
 	void UnEquipVehicleWeaponDefinition(UFortWeaponItemDefinition* VehicleWeaponDefinition);
 	void SiphonMats();

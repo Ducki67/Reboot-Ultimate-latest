@@ -243,6 +243,17 @@ UFortWeaponItemDefinition* AFortPlayerPawn::GetVehicleWeaponDefinition(AFortAthe
 	return Vehicle->GetVehicleWeaponForSeat(Vehicle->FindSeatIndex(this));
 }
 
+bool AFortPlayerPawn::IsInVehicle()
+{
+	bool ReturnValue;
+
+	static auto IsInVehicleFn = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerPawn.IsInVehicle");
+
+	this->ProcessEvent(IsInVehicleFn, &ReturnValue);
+
+	return ReturnValue;
+}
+
 void AFortPlayerPawn::SiphonMats()
 {
 	if (Globals::AmountOfHealthSiphon != 0)

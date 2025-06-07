@@ -215,19 +215,15 @@ public:
 			}
 			else
 			{
-				if (Fortnite_Version < 11)
+				if (Fortnite_Version < 11 || PlayerBotNames.empty())
 				{
 					BotNumWStr = std::to_wstring(RandomNumber);
 					NewName = (std::format(L"Anonymous[{}]", BotNumWStr)).c_str();
 				}
 				else
 				{
-					if (!PlayerBotNames.empty())
-					{
-						int RandomIndex = std::rand() % (PlayerBotNames.size() - 1);
-						NewName = PlayerBotNames[RandomIndex];
-						PlayerBotNames.erase(PlayerBotNames.begin() + RandomIndex);
-					}
+					NewName = PlayerBotNames.back();
+					PlayerBotNames.pop_back();
 				}
 			}
 		}

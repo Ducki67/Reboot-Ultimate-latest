@@ -68,6 +68,7 @@ static inline void InitBotNames()
     PlayerBotNames.push_back(L"AllyJax");
     PlayerBotNames.push_back(L"secret_pommes");
     PlayerBotNames.push_back(L"Twin1");
+    PlayerBotNames.push_back(L"67");
     PlayerBotNames.push_back(L"1Forest120");
     PlayerBotNames.push_back(L"1eyedInvent0r");
     PlayerBotNames.push_back(L"2Xtrouble13");
@@ -846,4 +847,6 @@ static inline void InitBotNames()
     PlayerBotNames.push_back(L"wektor77");
     PlayerBotNames.push_back(L"xX360NoScopeXx28");
     PlayerBotNames.push_back(L"xXAnonymousXx30");
+
+    std::shuffle(PlayerBotNames.begin(), PlayerBotNames.end(), std::default_random_engine((unsigned int)time(0)));
 }

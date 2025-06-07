@@ -1116,6 +1116,12 @@
     <ClInclude Include="FortCharacterVehicleOstrich.cpp">
       <Filter>FortniteGame\Source\FortniteGame\Private\Vehicle</Filter>
     </ClInclude>
+    <ClInclude Include="TaskGraphInterfaces.h">
+      <Filter>Engine\Source\Runtime\Core\Public\UObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Runnable.h">
+      <Filter>Reboot\Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">

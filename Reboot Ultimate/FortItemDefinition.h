@@ -207,6 +207,16 @@ public:
 	}
 };
 
+class UAthenaGliderItemDefinition : public UObject
+{
+public:
+	static UClass* StaticClass()
+	{
+		static auto Class = FindObject<UClass>(L"/Script/FortniteGame.AthenaGliderItemDefinition");
+		return Class;
+	}
+};
+
 struct FItemAndCount
 {
 private:

@@ -553,9 +553,6 @@ void Offsets::FindAll()
 		Offsets::DefaultObject = 0x118;
 	else if (Engine_Version >= 501)
 		Offsets::DefaultObject = 0x110;
-
-	if (Fortnite_Version == 19.10)
-		Offsets::ServerSpawnDeco = 0x69abec4;
 }
 
 void Offsets::Print()

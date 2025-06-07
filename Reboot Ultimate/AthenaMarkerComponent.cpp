@@ -57,19 +57,26 @@ void UAthenaMarkerComponent::ServerAddMapMarkerHook(UAthenaMarkerComponent* Mark
 			FVector GroundLocationToTeleport = Params.ReturnValue;
 			GroundLocationToTeleport.Z += 1000;
 
-			Pawn->TeleportTo(GroundLocationToTeleport, Pawn->GetActorRotation() /* Should use Pawn->ControlRotation but it's fine */);
-
-			static auto LaunchCharacterFn = FindObject<UFunction>(L"/Script/Engine.Character.LaunchCharacter");
-
-			struct
+			if (GroundLocationToTeleport.X == 0.0f && GroundLocationToTeleport.Y == 0.0f && GroundLocationToTeleport.Z == 0.0f)
 			{
-				FVector LaunchVelocity;
-				bool bXYOverride;
-				bool bZOverride;
-				bool bIgnoreFallDamage;
-			} ACharacter_LaunchCharacter_Params{ FVector(0.0f, 0.0f, -10000000.0f), false, false, true }; // sort of works to stop momentum
+				return;
+			}
+			else
+			{
+				Pawn->TeleportTo(GroundLocationToTeleport, Pawn->GetActorRotation() /* Should use Pawn->ControlRotation but it's fine */);
 
-			Pawn->ProcessEvent(LaunchCharacterFn, &ACharacter_LaunchCharacter_Params);
+				static auto LaunchCharacterFn = FindObject<UFunction>(L"/Script/Engine.Character.LaunchCharacter");
+
+				struct
+				{
+					FVector LaunchVelocity;
+					bool bXYOverride;
+					bool bZOverride;
+					bool bIgnoreFallDamage;
+				} ACharacter_LaunchCharacter_Params{ FVector(0.0f, 0.0f, -10000000.0f), false, false, true }; // sort of works to stop momentum
+
+				Pawn->ProcessEvent(LaunchCharacterFn, &ACharacter_LaunchCharacter_Params);
+			}
 		}
 	}
 

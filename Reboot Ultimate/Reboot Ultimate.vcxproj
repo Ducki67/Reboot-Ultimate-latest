@@ -508,6 +508,7 @@
     <ClInclude Include="RemoveReference.h" />
     <ClInclude Include="ReversePredicate.h" />
     <ClInclude Include="Rotator.h" />
+    <ClInclude Include="Runnable.h" />
     <ClInclude Include="ScriptDelegates.h" />
     <ClInclude Include="ScriptDisassembler.h" />
     <ClInclude Include="ScriptInterface.h" />
@@ -522,6 +523,7 @@
     <ClInclude Include="SparseArray.h" />
     <ClInclude Include="Stack.h" />
     <ClInclude Include="StringAssetReference.h" />
+    <ClInclude Include="TaskGraphInterfaces.h" />
     <ClInclude Include="Text.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="TimerManager.h" />

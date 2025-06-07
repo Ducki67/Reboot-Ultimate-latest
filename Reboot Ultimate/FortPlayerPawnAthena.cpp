@@ -65,7 +65,7 @@ void AFortPlayerPawnAthena::OnCapsuleBeginOverlapHook(UObject* Context, FFrame* 
 		bIsQuest = true;
 	}
 
-	if (OtherActor && OtherActor->GetName().contains("Rift") && Fortnite_Version >= 16)
+	if (OtherActor && OtherActor->GetName().contains("Rift") && Fortnite_Version >= 17)
 	{
 		FVector CurrentLocation = Pawn->GetActorLocation();
 		FVector NewLocation(CurrentLocation.X, CurrentLocation.Y, 20000);

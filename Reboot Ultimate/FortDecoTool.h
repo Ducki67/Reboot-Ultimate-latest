@@ -29,5 +29,5 @@ public:
     }
 
     static void ServerSpawnDeco(AFortDecoTool* DecoTool, FFrame& Stack, void* Ret);
-    static void ServerCreateBuildingAndSpawnDeco(AFortDecoTool* DecoTool, FFrame& Stack, void* Ret);
+    static void ServerCreateBuildingAndSpawnDeco(FVector BuildingLocation, FRotator BuildingRotation, FVector Location, FRotator Rotation, EBuildingAttachmentType InBuildingAttachmentType);
 };

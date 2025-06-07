@@ -10,6 +10,8 @@
 #include <set>
 
 #include "NetSerialization.h"
+#include "TaskGraphInterfaces.h"
+#include "Runnable.h"
 
 /* enum class REBOOT_ERROR : uint8
 {
@@ -395,6 +397,52 @@ static T* Alloc(size_t Size = sizeof(T), bool bUseFMemoryRealloc = false)
 	auto mem = bUseFMemoryRealloc ? (T*)FMemory::Realloc(0, Size, 0) : (T*)VirtualAlloc(0, Size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 	// RtlSecureZeroMemory(mem, Size);
 	return mem;
+}
+
+template<typename CallableType>
+class TAsyncRunnable
+	: public FRunnable
+{
+public:
+
+	TAsyncRunnable(CallableType InFunction)
+		: Function(InFunction)
+	{ }
+
+public:
+
+	virtual uint32 Run() override
+	{
+		Function();
+
+		return 1;
+	}
+
+private:
+
+	CallableType Function;
+};
+
+inline void InternalQueueTask(ENamedThreads::Type Thread, float Seconds, FRunnable* Callable)
+{
+	std::thread([Seconds, Callable]()
+	{
+		std::this_thread::sleep_for(std::chrono::duration<float>(Seconds));
+
+		if (Callable)
+		{
+			Callable->Run();
+			delete Callable;
+		}
+	}).detach();
+}
+
+template<typename CallableType>
+void QueueTask(ENamedThreads::Type Thread, float Seconds, CallableType&& Callable)
+{
+	auto Runnable = new TAsyncRunnable(Callable);
+
+	InternalQueueTask(Thread, Seconds, Runnable);
 }
 
 namespace MemberOffsets

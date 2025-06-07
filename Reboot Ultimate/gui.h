@@ -147,7 +147,7 @@ static inline void CleanupDeviceD3D();
 static inline void ResetDevice();
 static inline LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-static inline std::string CurrentVersion = "1.1.7"; // change with each update
+static inline std::string CurrentVersion = "1.1.9"; // change with each update
 static inline std::string DllDownloadURL = "https://github.com/CrowdedSignature46/Auth/releases/latest/download/Reboot_Ultimate.dll";
 static inline std::string GitHubVersionURL = "https://raw.githubusercontent.com/CrowdedSignature46/Auth/main/version.json";
 
@@ -545,7 +545,6 @@ static std::vector Traps = {
 	"TID_Floor_Player_Launch_Pad_Athena",
 	"TID_Context_Reinforced_Athena",
 	"TID_Context_Reinforced_Athena",
-	"TID_Floor_Player_Campfire_Athena",
 	"TID_ContextTrap_Athena"
 };
 
@@ -647,8 +646,8 @@ static inline void InitStyle()
 	style.Colors[ImGuiCol_SliderGrab] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 	style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 	style.Colors[ImGuiCol_Button] = ImVec4(0.18f, 0.18f, 0.18f, 1.00f);
-	style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
-	style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
+	style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
+	style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
 	style.Colors[ImGuiCol_Header] = ImVec4(0.18f, 0.18f, 0.18f, 0.55f);
 	style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.25f, 0.25f, 0.25f, 0.80f);
 	style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);

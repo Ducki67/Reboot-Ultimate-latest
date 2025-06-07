@@ -33,8 +33,9 @@ enum class EMovementMode : uint8_t
 
 void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 {
-	if (!Msg.Data.Data || Msg.Data.Num() <= 0)
-		return;
+	bool isMsgEmpty = !Msg.Data.Data || Msg.Data.Num() <= 0;
+	// if (isMsgEmpty)
+		// return;
 
 	auto PlayerState = Cast<AFortPlayerStateAthena>(PlayerController->GetPlayerState());
 
@@ -44,7 +45,9 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		return;
 
 	std::vector<std::string> Arguments;
-	auto OldMsg = Msg.ToString();
+	std::string OldMsg = "";
+	if (!isMsgEmpty)
+		OldMsg = Msg.ToString();
 
 	auto ReceivingController = PlayerController; // for now
 	auto ReceivingPlayerState = PlayerState; // for now
@@ -102,6 +105,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 		return;
 	}
 
+	if (!isMsgEmpty)
 	{
 		auto Message = Msg.ToString();
 
@@ -147,16 +151,16 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 
 	// return;
 
-	bool bSendHelpMessage = false;
+	auto& Command = Arguments[0];
+	std::transform(Command.begin(), Command.end(), Command.begin(), ::tolower);
+
+	bool bSendHelpMessage = isMsgEmpty || Arguments.size() >= 1 && Command == "help" || Arguments.size() >= 1 && Command == "t";
 
 	auto GameState = Cast<AFortGameStateAthena>(GetWorld()->GetGameState());
 	auto GameMode = Cast<AFortGameModeAthena>(GetWorld()->GetGameMode());
 
 	if (Arguments.size() >= 1)
 	{
-		auto& Command = Arguments[0];
-		std::transform(Command.begin(), Command.end(), Command.begin(), ::tolower);
-
 		if (Command == "printsimulatelootdrops")
 		{
 			if (NumArgs < 1)
@@ -1647,11 +1651,45 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 				SendMessageToConsole(PlayerController, L"Backbling set successfully!");
 			}
 		}
+		else if (Command == "glider" || Command == "setglider")
+		{
+			if (NumArgs < 1)
+			{
+				SendMessageToConsole(PlayerController, L"Please provide a glider ID!");
+				return;
+			}
+
+			auto Pawn = Cast<AFortPlayerPawn>(ReceivingController->GetMyFortPawn());
+			if (!Pawn)
+			{
+				SendMessageToConsole(PlayerController, L"No pawn!");
+				return;
+			}
+
+			auto& GliderID = Arguments[1];
+
+			std::string GliderPath = "/Game/Athena/Items/Cosmetics/Gliders/" + GliderID + "." + GliderID;
+
+			static auto GliderDefClass = FindObject<UClass>(L"/Script/FortniteGame.AthenaGliderItemDefinition");
+
+			auto GliderDef = Cast<UAthenaGliderItemDefinition>(LoadObject(GliderPath, GliderDefClass));
+
+			if (!GliderDef)
+			{
+				SendMessageToConsole(PlayerController, L"Invalid glider ID!");
+				return;
+			}
+
+			static auto Func = FindObject<UFunction>(L"/Script/FortniteGame.FortPlayerPawn.ForceOpenParachuteAndOverrideGlider");
+			Pawn->ProcessEvent(Func, &GliderDef);
+
+			SendMessageToConsole(PlayerController, L"Successfully set glider!");
+		}
 		else if (Command == "hat" || Command == "sethat")
 		{
 			if (NumArgs < 1)
 			{
-				SendMessageToConsole(PlayerController, L"Please provide a backbling ID!");
+				SendMessageToConsole(PlayerController, L"Please provide a hat ID!");
 				return;
 			}
 
@@ -2008,10 +2046,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			else if (weaponName == "pumpkin_uc")
 			{
 				weaponName = "WID_Launcher_Pumpkin_Athena_UC_Ore_T03";
-			}
-			else if (weaponName == "pumpkin_r")
-			{
-				weaponName = "WID_Launcher_Pumpkin_Athena_R_Ore_T03";
 			}
 			else if (weaponName == "pumpkin_vr")
 			{
@@ -2833,41 +2867,6 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			RunTimeData.GetPredefinedCosmeticSetTag() = FGameplayTag();
 
 			auto SpawnedPawn = UFortServerBotManagerAthena::SpawnBotHook(BotManager, Pawn->GetActorLocation(), Pawn->GetActorRotation(), InBotData, RunTimeData);
-
-			if (SpawnedPawn)
-			{
-				SendMessageToConsole(PlayerController, L"Summoned!");
-			}
-			else
-			{
-				SendMessageToConsole(PlayerController, L"Failed to summon!");
-			}
-		}
-		else if (Command == "spawnshark")
-		{
-			auto Pawn = ReceivingController->GetPawn();
-
-			if (!Pawn)
-			{
-				SendMessageToConsole(PlayerController, L"No pawn!");
-				return;
-			}
-
-			if (NumArgs < 1)
-			{
-				SendMessageToConsole(PlayerController, L"Please provide a component list!");
-				return;
-			}
-
-			UFortAthenaAISpawnerDataComponentList* InComponentList = FindObject<UFortAthenaAISpawnerDataComponentList>("/SpicySake/Content/AISpawnerData/Parent/AISpawnerData_SpicySake_Parent_BP.AISpawnerData_SpicySake_Parent_BP_C");
-
-			if (!InComponentList)
-			{
-				SendMessageToConsole(PlayerController, L"Invalid component list!");
-				return;
-			}
-
-			auto SpawnedPawn = BotManager->SpawnAI(Pawn->GetActorLocation(), Pawn->GetActorRotation(), InComponentList);
 
 			if (SpawnedPawn)
 			{
@@ -4101,7 +4100,7 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 			if (Fortnite_Version >= 7.40 && Fortnite_Version <= 8.51)
 			{
 				SendMessageToConsole(PlayerController, L"You cannot spawn a bot on this version!");
-				SendMessageToConsole(PlayerController, L"Try restarting the server usbluing « cheat restart » and using another account as a bot instead!");
+				SendMessageToConsole(PlayerController, L"Try restarting the server using « cheat restart » and using another account as a bot instead!");
 				return;
 			}
 
@@ -5685,8 +5684,8 @@ void ServerCheatHook(AFortPlayerControllerAthena* PlayerController, FString Msg)
 	if (bSendHelpMessage)
 	{
 		FString HelpMessage = LR"(
-- cheat backbling - {CharacterPart/BID} - Sets a player's backbling.
-- cheat backblingall - {CharacterPart/BID} - Sets everyones backbling.
+- cheat backbling - {CharacterPart} - Sets a player's backbling.
+- cheat backblingall - {CharacterPart} - Sets everyones backbling.
 - cheat ban - Permanently bans the player from the game. (IP Ban)
 - cheat bot {#} - Spawns a bot at the player (experimental).
 - cheat buildfree - Toggles Infinite Materials.
