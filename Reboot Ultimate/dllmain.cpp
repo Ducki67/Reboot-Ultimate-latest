@@ -78,7 +78,7 @@ const std::vector<std::string> WhitelistedIPs = {
     "26.20.240.122", // midnight
     "26.28.169.92", // fraggot 2
     "26.140.79.167", // marcus
-    "26.85.3.16", // day
+    "26.58.5.203", // day
     "26.140.35.4", // bomb
     "26.248.98.147", // best faggot
     "26.137.192.43", // nyanja gooner orb

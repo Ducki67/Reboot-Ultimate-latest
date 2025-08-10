@@ -28,7 +28,7 @@ public:
     public:
         FORCEINLINE explicit FRelativeBitReference(int32 BitIndex)
             : DWORDIndex(BitIndex >> NumBitsPerDWORDLogTwo)
-            , Mask(1 << (BitIndex & (NumBitsPerDWORD -1)))
+            , Mask(1 << (BitIndex & (NumBitsPerDWORD - 1)))
         {
         }
 
@@ -44,7 +44,7 @@ public:
             , Mask(InMask)
         {
         }
-        FORCEINLINE const FBitReference(const uint32& InData, const uint32 InMask)
+        FORCEINLINE FBitReference(const uint32& InData, const uint32 InMask)
             : Data(const_cast<uint32&>(InData))
             , Mask(InMask)
         {
