@@ -1,3 +1,7 @@
+# THIS REPOSITORY IS OLD AND WILL NOT RECEIVE UPDATES, DO NOT ASK ABOUT IT
+## if you want a better OS unversial ogfn gameserver use https://github.com/plooshi/Erbium
+
+
 ![Banner](https://fortnite.gg/img/items/1154/icon.png?2)
 
 # What is Reboot Ultimate?
